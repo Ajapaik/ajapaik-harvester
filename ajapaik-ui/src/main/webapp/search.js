@@ -4,7 +4,9 @@ var ImageSearch = function(o) {
 
 	var defaults = {
 		'destination' : '#search-results',
-		'action' : '#action1',
+		'csv' : '#csv',
+		'harvest' : '#harvest',
+		'index' : '#index',
 		'searchForm' : '#search-form',
 		'url' : 'req url goes here',
 		'resultSize' : 60
@@ -43,10 +45,43 @@ ImageSearch.prototype.init = function() {
 ImageSearch.prototype.bindHandlers = function() {
 	var self = this;
 
-	$(this.opts.action).on('click', function(e) {
+	$(this.opts.csv).on('click', function(e) {
 		e.preventDefault();
 		alert(self.selected);
 	});
+	
+	$(this.opts.harvest).on('click', function(e) {
+		e.preventDefault();
+		
+		var date = new Date();
+
+		var is = {
+			"name" : "MuIS",
+			"schedule" : {
+				"monday" : date.getDay() == 1,
+				"tuesday" : date.getDay() == 2,
+				"wednesday" : date.getDay() == 3,
+				"thursday" : date.getDay() == 4,
+				"friday" : date.getDay() == 5,
+				"saturday" : date.getDay() == 6,
+				"sunday" : date.getDay() == 0,
+				"updateTime" : date.getHours() + ":" + (date.getMinutes() + 1),
+				"active" : true
+			}
+		}
+		
+		self.request("updateInfoSystem", [ is ], function(result) {
+			// no result
+		});
+	});
+	
+	$(this.opts.index).on('click', function(e) {
+		e.preventDefault();
+		
+		self.request("index", [], function(result) {
+			// no result
+		});
+	});	
 
 	this.$dest.on('click', 'li.item', function(e) {
 		if ($(this).hasClass('selected')) {
@@ -215,25 +250,3 @@ $(document).ready(function() {
 	});
 
 });
-
-//var is = {
-//	"name" : "MuIS",
-//	"address" : "http://www.muis.ee/OAIService/OAIService",
-//	"useSet" : null,
-//	"mapper" : "ee.ajapaik.harvester.MuisHarvestTask",
-//	"lastHarvestTime" : null,
-//	"running" : null,
-//	"schedule" : {
-//		"monday" : true,
-//		"tuesday" : false,
-//		"wednesday" : false,
-//		"thursday" : false,
-//		"friday" : false,
-//		"saturday" : false,
-//		"sunday" : false,
-//		"updateTime" : "18:53",
-//		"active" : true
-//	},
-//	"email" : "muis@muis.ee",
-//	"homepageUrl" : "http://www.muis.ee"
-//}
