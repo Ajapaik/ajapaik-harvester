@@ -60,12 +60,12 @@ public class AjapaikServiceImpl implements AjapaikService {
 		if(!StringUtils.hasText(search.getSearchPhrase()))
 			return result;
 			
-		fillResult(search, InstitutionType.MUSEUM, result);
-		fillResult(search, InstitutionType.LIBRARY, result);
-		fillResult(search, InstitutionType.ARCHIVE, result);
+//		fillResult(search, InstitutionType.MUSEUM, result);
+//		fillResult(search, InstitutionType.LIBRARY, result);
+//		fillResult(search, InstitutionType.ARCHIVE, result);
 		fillResult(search, null, result);
 
-		result.setSearchTime(((double)(System.nanoTime() - start))/1000000.0);
+		result.setSearchTime(((double)(System.nanoTime() - start)) / 1000000.0);
 		return result;
 	}
 	
@@ -118,7 +118,7 @@ public class AjapaikServiceImpl implements AjapaikService {
 		if(search.isDigital())
 			query.append(" +DIGITAL:true");
 		
-		Result r = indexer.search(query.toString(), search.getSortBy(), search.getIdCount());
+		Result r = indexer.search(query.toString(), search.getSortBy(), Integer.MAX_VALUE);
 		
 		List<Document> documents = r.getResult();
 		if(type != null) {

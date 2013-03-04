@@ -8,7 +8,6 @@ public class Search implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private int pageSize;
-	private int idCount;
 	
 	private SearchField fullSearch;
 	private SearchField what; // title
@@ -30,14 +29,6 @@ public class Search implements Serializable {
 
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
-	}
-
-	public int getIdCount() {
-		return idCount;
-	}
-
-	public void setIdCount(int idCount) {
-		this.idCount = idCount;
 	}
 
 	public SearchField getWhat() {

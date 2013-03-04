@@ -51,6 +51,6 @@
 	
 	<servlet-mapping>
         <servlet-name>cachedImageServlet</servlet-name>
-        <url-pattern>/images/</url-pattern>
+        <url-pattern>/images/*</url-pattern>
     </servlet-mapping>	
 </web-app>
