@@ -19,6 +19,7 @@
 		</layout>
 	</appender>
 	
+	<!-- 
 	<logger name="org.springframework.security">
 		<level value="DEBUG" />
 	</logger>
@@ -26,7 +27,8 @@
 	<logger name="org.apache.http">
 		<level value="DEBUG" />
 	</logger>
-
+ 	-->
+ 	
 	<logger name="ee.ajapaik">
 		<level value="DEBUG" />
 	</logger>
