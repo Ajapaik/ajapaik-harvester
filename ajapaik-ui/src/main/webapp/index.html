@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<title>Search Images</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" type="text/css" href="search.css">
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="search.js"></script>
+	<style>
+	    html, body
+	    {
+		margin: 0;
+		padding: 0;		
+	    }
+	   
+	</style>
+    </head>
+    <body>
+	<div id="image-search">
+	    <form id="search-form" action="" method="POST">
+		<input type="text" id="search" name="s" value="" placeholder="Type something..." />
+		<input type="submit" name="search" value="Search" /> 
+	    </form>
+	    <div id="actions">
+		<a href="#" class="btn" id="action1"><span>Action 1</span></a>
+		<a href="#" class="btn" id="action2"><span>Action 2</span></a>
+		<a href="#" class="btn" id="action3"><span>Action 3</span></a>
+	    </div>
+	    <div id="search-results">
+		<ul class="items">
+
+		</ul>
+		<div class="clear">&nbsp;</div>
+	    </div>
+	    
+	</div>
+    </body>
+</html>

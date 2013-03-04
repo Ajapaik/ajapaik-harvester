@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	">
+	
+	<context:property-override location="classpath:server-config.properties" ignore-resource-not-found="true" ignore-unresolvable="true" />
+	
+	<bean id="repository" class="ee.ajapaik.db.Repository">
+		<!-- 2 databases per configuredInfoSystems -->
+		<!-- total size must be half of the -Xmx value -->
+		<property name="cacheSize" value="104857600" />
+		<property name="directory" value="repository" />
+		
+		<property name="serializer" >
+			<bean class="ee.ajapaik.serialize.JavaSerializer" />
+		</property>
+	</bean>
+	
+	<bean id="indexer" class="ee.ajapaik.index.Indexer">
+		<property name="repository" ref="repository" />
+		<property name="persister" ref="persister" />
+		<property name="indexDirectory" value="index" />
+	</bean>
+	
+	<bean id="scheduler" class="ee.ajapaik.schedule.Scheduler">
+		<property name="configuredInfoSystems">
+			<map>
+				<entry key="MuIS">
+					<props>
+						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
+						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
+						<prop key="email">muis@muis.ee</prop>
+						<prop key="homepageUrl">http://www.muis.ee</prop>
+					</props>
+				</entry>
+				<!-- 
+				<entry key="NLIB">
+					<props>
+						<prop key="address">http://repox.nlib.ee:8080/repox/OAIHandler</prop>
+						<prop key="mapper">ee.urania.harvester.DigarHarvestTask</prop>
+						<prop key="useSet">DIGAR</prop>
+						<prop key="email">nlib@nlib.ee</prop>
+						<prop key="homepageUrl">http://www.nlib.ee</prop>
+					</props>
+				</entry>
+				<entry key="MKA">
+					<props>
+						<prop key="address">http://register.muinas.ee/oaiphm.php</prop>
+						<prop key="mapper">ee.urania.harvester.MKAHarvestTask</prop>
+						<prop key="email">info@muinas.ee</prop>
+						<prop key="useSet">monument:stolen</prop>
+						<prop key="homepageUrl">http://register.muinas.ee</prop>
+					</props>
+				</entry>
+				-->
+			</map>
+		</property>
+		
+		<property name="indexerCronExpression" value="0 0 23 ? * *" />
+		
+		<property name="schedulerFactory">
+			<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" />		
+		</property>
+		<property name="persister" ref="persister" />
+	</bean>
+	
+	<bean id="persister" class="ee.ajapaik.persist.SerializingPersister">
+		<property name="location" value="database" />
+		<property name="fileName" value="data.ser" />
+	</bean>
+	
+	<bean id="platformFactory" class="ee.ajapaik.platform.PlatformFactory" factory-method="getInstance" lazy-init="false" />
+	
+	<bean name="harvesterJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="repository" value-ref="repository" />
+				<entry key="encodeUrlParameters" value="true" />
+				<entry key="supportedMetadataPrefixes" value="ese,oai_dc" />
+				<entry key="allowInvalidCharacters" value="true" />
+				<entry key="invalidCharacterReplacement" value="¡" />
+				<entry key="fileCache" value-ref="fileCache" />				
+			</map>
+		</property>
+	</bean>
+	
+	<bean name="indexerJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="indexer" value-ref="indexer" />
+			</map>
+		</property>
+		
+		<property name="jobClass" value="ee.ajapaik.index.IndexerTask" />
+		<property name="name" value="indexer" />
+	</bean>	
+	
+	<bean id="fileCache" class="ee.ajapaik.image.FileCache" lazy-init="false">
+		<property name="fileStore" value="cache" />
+	</bean>
+	
+	<!-- Clients -->
+	<bean id="baseClient" class="ee.ajapaik.platform.BaseClient" abstract="true">
+		<property name="timeout" value="30000" />
+		<property name="port" value="80" />
+		<property name="host" value="localhost" />
+	</bean>
+	
+	<bean id="baseHttpClient" class="ee.ajapaik.platform.BaseHttpClient" parent="baseClient" scope="prototype">
+		<property name="retryCount" value="3" />
+		<property name="maxConcurrentConnections" value="10" />
+		<property name="protocol" value="http" />
+		<property name="userAgent" value="ee.ajapaik/1.0" />
+		<property name="useBasicAuth" value="false" />
+		<property name="username" value="" />
+		<property name="password" value="" />
+	</bean>
+	
+	<!-- Services -->
+	<bean id="ajapaikService" class="ee.ajapaik.service.AjapaikServiceImpl">
+		<property name="scheduler" ref="scheduler" />
+		<property name="indexer" ref="indexer" />
+		<property name="repository" ref="repository" />
+	</bean>
+</beans>
