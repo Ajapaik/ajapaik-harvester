@@ -8,6 +8,8 @@ var ImageSearch = function(o) {
 		'harvest' : '#harvest',
 		'index' : '#index',
 		'selectAll' : "#selectAll",
+		'totalResultCount' : "#totalResultCount",
+		'selectionCount' : '#selectionCount',
 		'searchForm' : '#search-form',
 		'url' : 'req url goes here',
 		'resultSize' : 60
@@ -136,10 +138,15 @@ ImageSearch.prototype.bindHandlers = function() {
 				self.result = result;
 				
 				if(result.ids.length > 0) {
+					$(self.opts.totalResultCount).html('Total results: ' + result.ids.length); 
+					
 					self.loadData();
 					
 					self.$dest.fadeIn();
 				} else {
+					$(self.opts.totalResultCount).html('');
+					$(self.opts.selectionCount).html(''); 
+					
 					self.$dest.hide();
 					
 					alert('No results');
@@ -162,6 +169,8 @@ ImageSearch.prototype.bindHandlers = function() {
 ImageSearch.prototype.selectItem = function(item) {
 	var id = $(item).attr('data-id');
 	this.selected.push(id);
+	
+	this.showSelectionCount();
 }
 
 ImageSearch.prototype.unselectItem = function(item) {
@@ -170,10 +179,17 @@ ImageSearch.prototype.unselectItem = function(item) {
 	while (len--) {
 		if (this.selected[len] === id) {
 			this.selected.splice(len, 1);
+			
+			this.showSelectionCount();
+			
 			return true;
 		}
 	}
 	return false;
+}
+
+ImageSearch.prototype.showSelectionCount = function() {
+	$(this.opts.selectionCount).html('Selected: ' + this.selected.length); 
 }
 
 ImageSearch.prototype.parseResult = function(data) {
