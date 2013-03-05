@@ -17,14 +17,17 @@
     </head>
     <body>
 	<div id="image-search">
-	    <form id="search-form" action="" method="POST">
-		<input type="text" id="search" name="s" value="" placeholder="Type something..." />
-		<input type="submit" name="search" value="Search" /> 
-	    </form>
-	    <div id="actions">
-		<a href="#" class="btn" id="csv"><span>CSV</span></a>
-		<a href="#" class="btn" id="harvest"><span>Harvest</span></a>
-		<a href="#" class="btn" id="index"><span>Index</span></a>
+		<div id="search-header">
+			<form id="search-form" action="" method="POST">
+			    <input type="text" id="search" name="s" value="" placeholder="Type something..." />
+			    <input type="submit" name="search" value="Search" /> 
+			</form>
+		    <div id="actions">
+				<a href="#" class="btn" id="csv"><span>CSV</span></a>
+				<a href="#" class="btn" id="harvest"><span>Harvest</span></a>
+				<a href="#" class="btn" id="index"><span>Index</span></a>
+				<a href="#" class="btn" id="selectAll"><span>Select all</span></a>
+		    </div>
 	    </div>
 	    <div id="search-results">
 		<ul class="items">

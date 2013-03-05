@@ -7,6 +7,7 @@ var ImageSearch = function(o) {
 		'csv' : '#csv',
 		'harvest' : '#harvest',
 		'index' : '#index',
+		'selectAll' : "#selectAll",
 		'searchForm' : '#search-form',
 		'url' : 'req url goes here',
 		'resultSize' : 60
@@ -38,7 +39,11 @@ ImageSearch.prototype.init = function() {
 			self.selectItem(this);
 		}
 	});
-
+    
+    // set results top margin since header is fixed position.
+    var headerH = $(this.opts.header).height();    
+    this.$dest.css('margin-top',headerH+"px");
+    
 	this.bindHandlers();
 }
 
@@ -81,6 +86,19 @@ ImageSearch.prototype.bindHandlers = function() {
 		self.request("index", [], function(result) {
 			// no result
 		});
+	});
+	
+
+	$(this.opts.selectAll).on('click', function(e) {
+		e.preventDefault();
+		
+		self.$dest.find('li.item').each(function() {
+			if (!$(this).hasClass('selected')) {
+				self.selectItem(this);
+				$(this).addClass('selected');
+			}
+		});
+		alert(self.selected);
 	});	
 
 	this.$dest.on('click', 'li.item', function(e) {
@@ -92,6 +110,7 @@ ImageSearch.prototype.bindHandlers = function() {
 			$(this).addClass('selected');
 		}
 	});
+	
 	/**
 	 * search action
 	 */
@@ -116,7 +135,15 @@ ImageSearch.prototype.bindHandlers = function() {
 			self.request("search", [ search ], function(result) {
 				self.result = result;
 				
-				self.loadData();
+				if(result.ids.length > 0) {
+					self.loadData();
+					
+					self.$dest.fadeIn();
+				} else {
+					self.$dest.hide();
+					
+					alert('No results');
+				}
 			});
 		}
 	});
