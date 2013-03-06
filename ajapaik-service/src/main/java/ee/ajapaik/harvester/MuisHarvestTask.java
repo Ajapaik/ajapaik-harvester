@@ -1,7 +1,5 @@
 package ee.ajapaik.harvester;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -92,15 +90,7 @@ public class MuisHarvestTask extends HarvestTask {
 			if(thumbnailUrl != null) {
 				rec.setImageUrl(getImageUrl(thumbnailUrl));
 				
-				try {
-					URL url = new URL(thumbnailUrl);
-					String cachedThumbnailUrl = fileCache.cacheImage(url);
-					if(cachedThumbnailUrl != null) {
-						rec.setCachedThumbnailUrl(cachedThumbnailUrl);
-					}
-				} catch (MalformedURLException e) {
-					logger.error("Error parsing url: " + thumbnailUrl, e);
-				}
+				saveThumbnail(rec, thumbnailUrl);
 			}
 			rec.setInstitutionType(InstitutionType.MUSEUM);
 		} else {

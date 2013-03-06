@@ -1,7 +1,5 @@
 package ee.ajapaik.harvester;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,16 +65,7 @@ public class MKAHarvestTask extends HarvestTask {
 			if(imageUrl != null) {
 				rec.setImageUrl(imageUrl);
 
-				String thumbnailUrl = getThumbnailUrl(imageUrl);
-				try {
-					URL url = new URL(thumbnailUrl);
-					String cachedThumbnailUrl = fileCache.cacheImage(url);
-					if(cachedThumbnailUrl != null) {
-						rec.setCachedThumbnailUrl(cachedThumbnailUrl);
-					}
-				} catch (MalformedURLException e) {
-					logger.error("Error parsing url: " + thumbnailUrl, e);
-				}
+				saveThumbnail(rec, getThumbnailUrl(imageUrl));
 			}
 			
 			rec.setInstitutionType(InstitutionType.ARCHIVE);

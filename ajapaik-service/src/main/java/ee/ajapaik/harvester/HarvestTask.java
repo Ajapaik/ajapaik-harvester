@@ -1,8 +1,10 @@
 package ee.ajapaik.harvester;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -19,6 +21,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Unmarshaller.Listener;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -40,7 +43,6 @@ import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import ee.ajapaik.db.Repository;
-import ee.ajapaik.image.FileCache;
 import ee.ajapaik.model.InfoSystem;
 import ee.ajapaik.model.search.Record;
 import ee.ajapaik.platform.BaseHttpClient;
@@ -59,7 +61,6 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	protected Repository repository;
-	protected FileCache fileCache;
 	protected String taskCode;
 	protected InfoSystem infoSystem;
 	protected boolean encodeUrlParameters;
@@ -69,10 +70,6 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	protected Map<String, String> sets;
 	protected String format;
 
-	public void setFileCache(FileCache fileCache) {
-		this.fileCache = fileCache;
-	}
-	
 	public void setInfoSystem(InfoSystem infoSystem) {
 		this.infoSystem = infoSystem;
 		this.taskCode = Digester.digestToString(infoSystem.getName());
@@ -316,18 +313,12 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 
 		URL url = new URL(operation);
 		
-		BaseHttpClient bc = PlatformFactory.getInstance().getClient(url);
-		
-		HttpGet get = new HttpGet(url.getFile());
-		get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
-		
-		HttpResponse result = bc.getHttpClient().execute(get);
-		HttpEntity entity = result.getEntity();
+		InputStream is = openStream(url);
 
-		if (entity != null) {
+		if (is != null) {
 			MonitorableBufferedInputStream bis = null;
 			try {
-				bis = new MonitorableBufferedInputStream(entity.getContent(), 8192 + 1024);
+				bis = new MonitorableBufferedInputStream(is, 8192 + 1024);
 				JAXBContext jc = JAXBContext
 						.newInstance("org.openarchives.oai._2:"
 								+ "org.openarchives.oai._2_0.oai_dc:"
@@ -414,5 +405,51 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			}
 		}
 		return builder.toString();
+	}
+	
+	public InputStream openStream(URL url) {
+		try {
+			if(url != null) {
+				logger.debug("About to make query for url: " + url);
+				
+				BaseHttpClient bc = PlatformFactory.getInstance().getClient(url);
+				
+				HttpGet get = new HttpGet(url.getFile());
+				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
+				
+				HttpResponse result = bc.getHttpClient().execute(get);
+				HttpEntity entity = result.getEntity();
+				
+				if(entity != null) {
+					if (result.getStatusLine().getStatusCode() != 404) {
+						return entity.getContent();
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Error opening stream data", e);
+		}
+		return null;
+	}
+	
+	protected void saveThumbnail(Record rec, String thumbnailUrl) {
+		try {
+			URL url = new URL(thumbnailUrl);
+			
+			InputStream is = openStream(url);
+			
+			if(is != null) {
+				byte[] data = IOUtils.toByteArray(is);
+				String key = Digester.digestToString(data);
+				
+				repository.saveImage(key, data, taskCode);
+				
+				rec.setCachedThumbnailUrl(key);
+			}
+		} catch (MalformedURLException e) {
+			logger.error("Error parsing url: " + thumbnailUrl, e);
+		} catch (IOException e) {
+			logger.error("Error reading stream", e);
+		}
 	}
 }

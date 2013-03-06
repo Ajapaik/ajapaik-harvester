@@ -1,11 +1,7 @@
 package ee.ajapaik.servlet;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import ee.ajapaik.image.FileCache;
+import ee.ajapaik.db.Repository;
 
 /**
  * 
@@ -36,40 +32,15 @@ public class CachedImageServlet extends HttpServlet {
 		String requestFile = requestPath[requestPath.length - 1];
 
 		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-		FileCache fc = ctx.getBean(FileCache.class);
+		Repository repository = ctx.getBean("repository", Repository.class);
 		
-		InputStream is = fc.getImage(requestFile);
-		if (is != null) {
+		byte[] data = repository.queryImage(requestFile);
+		if (data != null) {
 			try {
-				// Read the original image from the Server Location
-				BufferedImage bufferedImage = ImageIO.read(is);
-
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				String imageOutput = getParam(request, "type", "jpg");
-				
-				// Write the image
-				ImageIO.write(bufferedImage, imageOutput, baos);
-				
-				// Set content type
-				response.setContentType("image/" + imageOutput);
-				
-				// Empty buffer
-				baos.writeTo(response.getOutputStream());
-				
-				return;
-			} catch (Exception e) {
+				response.getOutputStream().write(data);
+			} catch (IOException e) {
 				logger.error("Failed to send image data:", e);
 			}
-		}
-	}
-	
-	// Check the param if it's not present return the default
-	private String getParam(HttpServletRequest request, String param, String def) {
-		String parameter = request.getParameter(param);
-		if (parameter == null || "".equals(parameter)) {
-			return def;
-		} else {
-			return parameter;
 		}
 	}
 }

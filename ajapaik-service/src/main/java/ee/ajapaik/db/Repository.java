@@ -32,6 +32,7 @@ public class Repository implements InitializingBean {
 	private static final Logger logger = Logger.getLogger(Repository.class);
 	private static final String RECORD = "record";
 	private static final String SET = "set";
+	private static final String IMAGE = "image";
 	
 	private Map<String, Environment> environmentMap;
 	
@@ -80,10 +81,6 @@ public class Repository implements InitializingBean {
 		}
 	}
 
-	private Database openDatabase(Environment environment) {
-		return openDatabase(environment, RECORD);
-	}
-	
 	private Database openDatabase(Environment environment, String table) {
 		try {
 			DatabaseConfig databaseConfig = new DatabaseConfig();
@@ -127,41 +124,10 @@ public class Repository implements InitializingBean {
 		return new File(directory + "/" + code);
 	}
 	
-	private void query(Environment environment, String table, ResultCallback callback) {
+	private void query(String id, Environment environment, String table, ResultCallback callback) {
 		Database db;
 		synchronized (environment) {
 			db = openDatabase(environment, table);
-		}
-		
-		DatabaseEntry entry = new DatabaseEntry();
-		Cursor cursor = null;
-		try {
-			DatabaseEntry id = new DatabaseEntry();
-			cursor = db.openCursor(null, null);
-				
-			while (cursor.getNext(id, entry, LockMode.DEFAULT) == OperationStatus.SUCCESS)
-				if( !callback.postResult(id, entry) )
-					break;
-		} catch (DatabaseException e) {
-			logger.error("Error opening cursor", e);
-		} catch (Exception e) {
-			logger.error("Error deserializing data", e);
-		} finally {
-			try {
-				if(cursor != null)
-					cursor.close();
-				
-				db.close();
-			} catch (DatabaseException e) {
-				logger.error("Error closing database", e);
-			}
-		}
-	}
-	
-	private void query(String id, Environment environment, ResultCallback callback) {
-		Database db;
-		synchronized (environment) {
-			db = openDatabase(environment);
 		}
 		
 		DatabaseEntry record = new DatabaseEntry();
@@ -202,7 +168,7 @@ public class Repository implements InitializingBean {
 			for(final String code : environmentMap.keySet()) {
 				Environment environment = getEnvironment(code);
 				synchronized (environment) {
-					query(null, environment, new ResultCallback() {
+					query(null, environment, RECORD, new ResultCallback() {
 						
 						@Override
 						public boolean postResult(DatabaseEntry key, DatabaseEntry value) {
@@ -226,7 +192,7 @@ public class Repository implements InitializingBean {
 			for(final String code : environmentMap.keySet()) {
 				Environment environment = getEnvironment(code);
 				synchronized (environment) {
-					query(environment, SET, new ResultCallback() {
+					query(null, environment, SET, new ResultCallback() {
 						@Override
 						public boolean postResult(DatabaseEntry key, DatabaseEntry value) {
 							try {
@@ -243,13 +209,62 @@ public class Repository implements InitializingBean {
 		}
 		return result;
 	}
+
+	public byte[] queryImage(String hash) {
+		final Object[] holder = new Object[] { null };
+		
+		synchronized (environmentMap) {
+			for(final String code : environmentMap.keySet()) {
+				Environment environment = getEnvironment(code);
+				synchronized (environment) {
+					query(hash, environment, IMAGE, new ResultCallback() {
+						@Override
+						public boolean postResult(DatabaseEntry key, DatabaseEntry value) {
+							try {
+								holder[0] = value.getData(); 
+								return true;
+							} catch (Exception e) {
+								logger.error("Error while saving record", e);
+								throw new RuntimeException(e);
+							}
+						}
+					});
+				}
+			}
+		}
+		return holder[0] != null ? (byte[]) holder[0] : null;
+	}
+	
+	public void saveImage(String key, byte[] data, String code) {
+		long start = System.nanoTime();
+
+		Environment environment = getEnvironment(code);
+		synchronized (environment) {
+			Database db = openDatabase(environment, IMAGE);
+
+			try {
+				db.put(null, serializer.serializeKey(key), new DatabaseEntry(data));
+			} catch (Exception e) {
+				logger.error("Error while saving record", e);
+				throw new RuntimeException(e);
+			} finally {
+				try {
+					db.close();
+				} catch (DatabaseException e) {
+					logger.error("Error closing database", e);
+				}
+			}
+		}
+		if(logger.isDebugEnabled())
+			logger.debug("Record saved in " + (System.nanoTime() - start) / 1000000D + " ms");
+	}
 	
 	public void saveSingleRecord(String key, Record data, String code) {
 		long start = System.nanoTime();
 
 		Environment environment = getEnvironment(code);
 		synchronized (environment) {
-			Database db = openDatabase(environment);
+			Database db = openDatabase(environment, RECORD);
 
 			try {
 				db.put(null, serializer.serializeKey(key), serializer.serializeRecord(data));
@@ -318,7 +333,7 @@ public class Repository implements InitializingBean {
 
 		Environment environment = getEnvironment(code);
 		synchronized (environment) {
-			Database db = openDatabase(environment);
+			Database db = openDatabase(environment, RECORD);
 			try {
 				db.delete(null, serializer.serializeKey(key));
 			} catch (Exception e) {

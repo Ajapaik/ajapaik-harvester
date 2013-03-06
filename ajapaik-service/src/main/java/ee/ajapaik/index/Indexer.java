@@ -313,13 +313,12 @@ public class Indexer implements InitializingBean {
 		long start = System.currentTimeMillis();
 		logger.info("Initializing database indexing @ " + new Date());
 
-		final List<String> blackList = persister.load("blackList");
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
 			int count = 0;
 			
 			@Override
 			public void handleRecord(Record rec, String code) {
-				if(blackList == null || !blackList.contains(rec.getId()) ) {
+				if(rec != null) {
 					count++;
 					if(count % 1000 == 0) {
 						logger.debug("Commiting index @ record: " + count);
