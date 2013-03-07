@@ -89,5 +89,4 @@ public class JavaSerializer implements Serializer {
 		}
 		return null;
 	}
-
 }

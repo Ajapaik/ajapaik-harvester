@@ -119,17 +119,25 @@ ImageSearch.prototype.bindHandlers = function() {
 	this.$form.find('input[type="submit"]').on('click', function(e) {
 		e.preventDefault();
 		
-		self.term = self.$form.find('input[name="s"]').val();
+		var description = self.$form.find('input[name="d"]').val();
+		var institution = self.$form.find('input[name="i"]').val();
+		var autor = self.$form.find('input[name="a"]').val();
 
-		if (self.term.length > 0) {
+		if (description.length > 0 || institution.length > 0 || autor.length > 0) {
 			
 			self.$dest.find('ul.items').html('');
 			self.offset = 0;
 			
 			var search = {
-				"fullSearch" : {
-					"value" : self.term
+				"description" : {
+					"value" : description
 				},
+				"who" : {
+					"value" : autor
+				},
+				"from" : {
+					"value" : institution
+				},				
 				"pageSize" : self.opts.resultSize,
 				"digital" : true
 			}
