@@ -122,6 +122,7 @@ ImageSearch.prototype.bindHandlers = function() {
 		var description = self.$form.find('input[name="d"]').val();
 		var institution = self.$form.find('input[name="i"]').val();
 		var autor = self.$form.find('input[name="a"]').val();
+		var number = self.$form.find('input[name="n"]').val();
 
 		if (description.length > 0 || institution.length > 0 || autor.length > 0) {
 			
@@ -137,7 +138,10 @@ ImageSearch.prototype.bindHandlers = function() {
 				},
 				"from" : {
 					"value" : institution
-				},				
+				},
+				"number" : {
+					"value" : number
+				},					
 				"pageSize" : self.opts.resultSize,
 				"digital" : true
 			}
