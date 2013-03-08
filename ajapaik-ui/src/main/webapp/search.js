@@ -210,11 +210,21 @@ ImageSearch.prototype.parseResult = function(data) {
 	if ($.isArray(data)) {
 		if (data.length > 0) {
 			for ( var i = 0; i < data.length; i++) {
-				html += '<li class="item" data-id="' + data[i].id
-						+ '"><img src="' + this.serviceUrl + "images/" + data[i].cachedThumbnailUrl + '" title="' + data[i].description + '" /></li>';
+				html += '<li class="item"'+
+						'data-id="' + data[i].id + '"'+
+						'data-img="'+ data[i].imageUrl +'"'+
+						'data-desc="'+ data[i].description +'"'
+					    '>' +
+					    '<img src="' + this.serviceUrl + "images/" + data[i].cachedThumbnailUrl + '" title="' + data[i].description + '" />'+
+					'</li>';
 			}
 			this.offset = this.offset + i;
-			this.$dest.find('ul.items').append(html);
+			
+			var object = $('<div><div/>').html(html).contents(); // make jQuery object
+	    
+			object.tooltip({'container': this.$dest}); // apply tooltip
+			
+			this.$dest.find('ul.items').append(object); // write items to DOM
 		} else {
 			this.loaded = true;
 		}
