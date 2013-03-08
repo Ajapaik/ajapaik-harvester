@@ -172,7 +172,7 @@ ImageSearch.prototype.bindHandlers = function() {
 	 */
 	$(document).scroll(function(e) {
 		var scrollPos = ($(document).scrollTop() + $(window).height()) / $(document).height()
-		if (scrollPos > 0.8 && self.term.length > 0 && !self.loaded) {
+		if (scrollPos > 0.8 && !self.loaded) {
 			self.loadData();
 		}
 	});
