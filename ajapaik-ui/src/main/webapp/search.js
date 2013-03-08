@@ -281,7 +281,7 @@ ImageSearch.prototype.request = function(method, params, callback) {
 				console.log("Error: " + msg.error.message);
 			}
 			
-		},
+		}
 		
 		/**
 		 * 1. no connection to serviceUrl 2. incorrect data structure in request
