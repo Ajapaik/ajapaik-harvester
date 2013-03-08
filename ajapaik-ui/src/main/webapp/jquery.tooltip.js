@@ -27,7 +27,8 @@
 	    yOffset	    : 10,		// offset y from mouse cursor
 	    zindex	    : 9999,
 	    speed	    : 100,		// fade in animation speed
-	    timeout	    : 500		// timeout before show tooltip
+	    timeout	    : 500,		// timeout before show tooltip
+	    data	    : null
 	}
 	
 	this.opts = $.extend(this.defaults, opts);
@@ -75,8 +76,14 @@
 	
 	
 	this.$el.on('mouseenter',function(e){
-		var content = '<div class="tooltip-img"><img src="'+$(this).attr('data-img')+'" /></div>'+
-					    '<div class="tooltip-desc">'+$(this).attr('data-desc')+'</div>';
+		
+		var data = self.opts.data[$(this).attr('data-id')];
+		
+		
+		var content = '<div class="tooltip-img"><img src="'+data.img+'" /></div>'+
+					    '<div class="tooltip-desc">'+data.desc+'</div>';
+	   
+		
 	   
 		self.$tooltip.html(content);
 		self.calcSize();
