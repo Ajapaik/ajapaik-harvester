@@ -44,6 +44,12 @@
         <load-on-startup>0</load-on-startup>
     </servlet>
 
+	<servlet>
+        <servlet-name>csvServlet</servlet-name>
+        <servlet-class>ee.ajapaik.servlet.CSVServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+
 	<servlet-mapping>
 		<servlet-name>dispatcher</servlet-name>
 		<url-pattern>/</url-pattern>
@@ -52,5 +58,10 @@
 	<servlet-mapping>
         <servlet-name>cachedImageServlet</servlet-name>
         <url-pattern>/images/*</url-pattern>
-    </servlet-mapping>	
+    </servlet-mapping>
+    
+	<servlet-mapping>
+        <servlet-name>csvServlet</servlet-name>
+        <url-pattern>/csv/</url-pattern>
+    </servlet-mapping>    
 </web-app>

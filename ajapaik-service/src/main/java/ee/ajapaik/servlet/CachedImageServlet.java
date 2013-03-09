@@ -2,7 +2,6 @@ package ee.ajapaik.servlet;
 
 import java.io.IOException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,10 +21,6 @@ public class CachedImageServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(CachedImageServlet.class);
-
-	public void init(ServletConfig servletConfig) throws ServletException {
-		super.init(servletConfig);
-	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String[] requestPath = request.getRequestURI().split("/");

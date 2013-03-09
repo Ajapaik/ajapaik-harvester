@@ -124,7 +124,7 @@ ImageSearch.prototype.bindHandlers = function() {
 		var autor = self.$form.find('input[name="a"]').val();
 		var number = self.$form.find('input[name="n"]').val();
 
-		if (description.length > 0 || institution.length > 0 || autor.length > 0) {
+		if (description.length > 0 || institution.length > 0 || autor.length > 0 || number.length > 0) {
 			
 			self.$dest.find('ul.items').html('');
 			self.offset = 0;
@@ -211,7 +211,7 @@ ImageSearch.prototype.parseResult = function(data) {
 		if (data.length > 0) {
 			var tooltipData = {};
 			for ( var i = 0; i < data.length; i++) {
-				html += '<li class="item" data-id="'+ data[i].id +'"><img src="'+ this.serviceUrl +"images/"+ data[i].cachedThumbnailUrl +'" title="'+ data[i].description +'" /></li>';
+				html += '<li class="item" data-id="'+ data[i].id +'"><img src="'+ this.serviceUrl +'images/'+ data[i].cachedThumbnailUrl + '" /></li>';
 				tooltipData[data[i].id] = {"img":data[i].imageUrl,"desc":data[i].description};
 			}
 			this.offset = this.offset + i;
