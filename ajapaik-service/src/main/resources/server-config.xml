@@ -13,7 +13,7 @@
 		<!-- 2 databases per configuredInfoSystems -->
 		<!-- total size must be half of the -Xmx value -->
 		<property name="cacheSize" value="104857600" />
-		<property name="directory" value="_repository" />
+		<property name="directory" value="repository" />
 		
 		<property name="serializer" >
 			<bean class="ee.ajapaik.serialize.JavaSerializer" />
