@@ -54,7 +54,11 @@ ImageSearch.prototype.bindHandlers = function() {
 
 	$(this.opts.csv).on('click', function(e) {
 		e.preventDefault();
-		alert(self.selected);
+		
+		if(self.selected.length > 0) {
+			var win = window.open(self.serviceUrl + 'csv/?ids=' + self.selected, '_blank');
+			win.focus();
+		}
 	});
 	
 	$(this.opts.harvest).on('click', function(e) {

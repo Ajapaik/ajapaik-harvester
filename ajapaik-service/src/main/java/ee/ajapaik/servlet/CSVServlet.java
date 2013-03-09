@@ -21,6 +21,8 @@ import ee.ajapaik.service.AjapaikService;
  */
 public class CSVServlet extends HttpServlet {
 
+	private static final String SEPARATOR = ";";
+	
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(CSVServlet.class);
 
@@ -48,13 +50,23 @@ public class CSVServlet extends HttpServlet {
 			
 			RecordView[] rw = service.getRecords(ids.split(","));
 			for (RecordView recordView : rw) {
-				result.append(recordView.getInstitution()).append(",");
-				result.append(recordView.getIdentifyingNumber()).append(",");
-				result.append(recordView.getCreators()).append(",");
-				result.append(recordView.getDescription()).append(",");
-				result.append("").append(",");
-				result.append("").append(",");
-				result.append(recordView.getUrlToRecord()).append("\n");
+				
+				String institution = recordView.getInstitution();
+				if(institution.contains(",")) {
+					addField(result, institution.split(",")[0]);
+				} else {
+					addField(result, institution);
+				}
+				
+				addField(result, recordView.getIdentifyingNumber());
+				addField(result, recordView.getCreators());
+				addField(result, recordView.getDescription());
+				addField(result, "date");
+				addField(result, "place");
+				addField(result, recordView.getUrlToRecord());
+				addField(result, recordView.getImageUrl());
+				
+				result.append("\n");
 			}
 			
 			response.addHeader("Content-Disposition", "attachment;filename=" + System.currentTimeMillis() + ".csv");
@@ -63,5 +75,9 @@ public class CSVServlet extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			response.getWriter().write(result.toString());
 		}
+	}
+
+	private void addField(StringBuilder result, String data) {
+		result.append(data.replaceAll(SEPARATOR, ":").replaceAll("\n", "")).append(SEPARATOR);
 	}
 }

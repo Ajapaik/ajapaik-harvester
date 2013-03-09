@@ -73,7 +73,6 @@ public class Indexer implements InitializingBean {
 	
 	private String indexDirectory;
 	private Repository repository;
-	private SerializingPersister persister;
 
 	private IndexWriter writer;
 	
@@ -91,10 +90,6 @@ public class Indexer implements InitializingBean {
 		
 		this.analyzer = new StandardAnalyzer(Version.LUCENE_CURRENT, stopwords);
 
-	}
-
-	public void setPersister(SerializingPersister persister) {
-		this.persister = persister;
 	}
 
 	public void setRepository(Repository repository) {
