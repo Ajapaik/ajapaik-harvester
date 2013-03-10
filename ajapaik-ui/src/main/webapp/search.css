@@ -232,10 +232,15 @@ a.btn:active
 .loader
 {
     height: 32px;
-    text-align: center;
     list-style: none;
-    float: left;
     padding: 10px 0;
+}
+
+.loader img
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 

@@ -21,8 +21,7 @@ var ImageSearch = function(o) {
 	this.selected = []; // array of currently selected id-s
 	this.term = ""; // search term
 	this.offset = 0; // results offset
-	this.loaded = false; // if all results are diplayed and there is no more
-							// coming from server.
+	this.loaded = true;
 	this.loading = 0; // request status.
 
 	this.id = 1;
@@ -128,9 +127,15 @@ ImageSearch.prototype.bindHandlers = function() {
 		var autor = self.$form.find('input[name="a"]').val();
 		var number = self.$form.find('input[name="n"]').val();
 
-		if (description.length > 0 || institution.length > 0 || autor.length > 0 || number.length > 0) {
+		if ((description.length > 0 || institution.length > 0 || autor.length > 0 || number.length > 0)
+				&& self.loaded) {
 			
 			self.$dest.find('ul.items').html('');
+
+			self.loaded = false;
+			self.$dest.fadeIn();
+			self.showLoader();
+			
 			self.offset = 0;
 			
 			var search = {
@@ -151,14 +156,13 @@ ImageSearch.prototype.bindHandlers = function() {
 			}
 
 			self.request("search", [ search ], function(result) {
-				self.result = result;
-				
 				if(result.ids.length > 0) {
+					self.result = result;
+					
 					$(self.opts.totalResultCount).html('Total results: ' + result.ids.length); 
 					
-					self.loadData();
+					self.parseResult(result.firstRecordViews);
 					
-					self.$dest.fadeIn();
 				} else {
 					$(self.opts.totalResultCount).html('');
 					$(self.opts.selectionCount).html(''); 
@@ -167,17 +171,27 @@ ImageSearch.prototype.bindHandlers = function() {
 					
 					alert('No results');
 				}
+				
+				self.loaded = true;
+				self.hideLoader();
 			});
 		}
 	});
 
-	/**
-	 * Load more data on page scroll
-	 */
 	$(document).scroll(function(e) {
-		var scrollPos = ($(document).scrollTop() + $(window).height()) / $(document).height()
-		if (scrollPos > 0.8 && !self.loaded) {
-			self.loadData();
+		var pos = $(document).height() - ($(document).scrollTop() + $(window).height());
+		
+		// Load @ last visible row (200 px from bottom)
+		// Prevent multible requests  (wait until loaded)
+		if (pos <= 200 && self.loaded) {
+			var ids = self.result.ids.slice(self.offset, self.offset + self.opts.resultSize);
+			if(ids.length > 0) {
+				self.loaded = false;
+				self.request("getRecords", [ ids ], function(result) {
+					self.parseResult(result);
+					self.loaded = true;
+				});
+			}
 		}
 	});
 }
@@ -225,41 +239,22 @@ ImageSearch.prototype.parseResult = function(data) {
 			object.tooltip({'container': this.$dest, 'data':tooltipData}); // apply tooltip
 			
 			this.$dest.find('ul.items').append(object); // write items to DOM
-		} else {
-			this.loaded = true;
 		}
 	}
-	this.hideLoader();
 }
 
 ImageSearch.prototype.showLoader = function() {
 	var w = this.$dest.find('ul.items').width();
-	var html = '<li class="loader" style="display: none; width: ' + w
-			+ 'px;"><img src="ajax-loader.gif" /></li>';
+	var html = '<li class="loader"><img src="ajax-loader.gif" /></li>';
 	var $loader = $(html);
 	this.$dest.find('ul.items').append($loader);
 
 	this.loading = 1;
-	$loader.show();
+	//$loader.show();
 }
 ImageSearch.prototype.hideLoader = function() {
 	this.loading = 0;
 	this.$dest.find('li.loader').hide();
-}
-
-ImageSearch.prototype.loadData = function() {
-	var self = this;
-
-	self.showLoader();
-
-	var data;
-	if(self.offset == 0) {
-		self.parseResult(self.result.firstRecordViews);
-	} else {
-		self.request("getRecords", [ self.result.ids.slice(self.offset, self.offset + self.opts.resultSize) ], function(result) {
-			self.parseResult(result);
-		});
-	}
 }
 
 ImageSearch.prototype.request = function(method, params, callback) {
