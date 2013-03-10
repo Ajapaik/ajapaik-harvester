@@ -25,7 +25,7 @@ var ImageSearch = function(o) {
 	this.loading = 0; // request status.
 
 	this.id = 1;
-	this.serviceUrl = 'http://localhost:8080/ajapaik-service/';
+	this.serviceUrl = '${service.location}';
 
 	this.result = null;
 	

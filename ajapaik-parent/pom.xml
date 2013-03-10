@@ -89,7 +89,7 @@
 				<configuration>
 					<contextHandlers>
 						<contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
-							<war>../ajapaik-ui/src/main/webapp/</war>
+							<war>../ajapaik-ui/target/ajapaik-ui.war</war>
 							<contextPath>/ajapaik-ui</contextPath>
 						</contextHandler>
 						<contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
