@@ -82,10 +82,19 @@
 	return this.size.img;
     }
     /**
+     * cross browser
+     */
+    Tooltip.prototype.scroll = function( doc ){
+	doc = doc || document;
+
+	//doc.body.scrollTop is IE quirkmode only
+	return Math.max(doc.documentElement.scrollTop, doc.body.scrollTop);
+    }
+    /**
      * sets max and minimum coordinates
      */
     Tooltip.prototype.setRange = function(e){
-	    var scroll = $('body')[0].scrollTop;
+	    var scroll = this.scroll();
 	    var $c = $(this.opts.container);	    
 	    var curY = scroll + $(win).height();
 	    
@@ -94,6 +103,7 @@
 	    
 	    this.size.min.x = $c.offset().left;
 	    this.size.min.y = ($c.height() > scroll) ? scroll : $c.height();
+	    
     }
     Tooltip.prototype.bindHandlers = function(){
 	var self = this;
@@ -263,6 +273,8 @@
      *  calculates tooltip x and y coordianates
      */
     Tooltip.prototype.calcPosition = function(e){
+	
+	//console.log(this.size);
 	
 	var pos = this.getMousePosition(e);
 	
