@@ -8,6 +8,7 @@ var ImageSearch = function(o) {
 		'harvest' : '#harvest',
 		'index' : '#index',
 		'selectAll' : "#selectAll",
+		'selectNone' : "#selectNone",
 		'totalResultCount' : "#totalResultCount",
 		'selectionCount' : '#selectionCount',
 		'searchForm' : '#search-form',
@@ -103,8 +104,18 @@ ImageSearch.prototype.bindHandlers = function() {
 				$(this).addClass('selected');
 			}
 		});
-		alert(self.selected);
-	});	
+	});
+	
+	$(this.opts.selectNone).on('click', function(e) {
+		e.preventDefault();
+		
+		self.$dest.find('li.item').each(function() {
+			if ($(this).hasClass('selected')) {
+				self.unselectItem(this);
+				$(this).removeClass('selected');
+			}
+		});
+	});
 
 	this.$dest.on('click', 'li.item', function(e) {
 		if ($(this).hasClass('selected')) {
@@ -122,12 +133,15 @@ ImageSearch.prototype.bindHandlers = function() {
 	this.$form.find('input[type="submit"]').on('click', function(e) {
 		e.preventDefault();
 		
+		var full = self.$form.find('input[name="f"]').val();
+		var id = self.$form.find('input[name="id"]').val();
+		var title = self.$form.find('input[name="t"]').val();
 		var description = self.$form.find('input[name="d"]').val();
 		var institution = self.$form.find('input[name="i"]').val();
 		var autor = self.$form.find('input[name="a"]').val();
 		var number = self.$form.find('input[name="n"]').val();
 
-		if ((description.length > 0 || institution.length > 0 || autor.length > 0 || number.length > 0)
+		if ((description.length > 0 || institution.length > 0 || autor.length > 0 || number.length > 0 || title.length > 0 || id.length > 0 || full.length > 0)
 				&& self.loaded) {
 			
 			self.$dest.find('ul.items').html('');
@@ -139,6 +153,16 @@ ImageSearch.prototype.bindHandlers = function() {
 			self.offset = 0;
 			
 			var search = {
+				"fullSearch" : {
+					"value" : full,
+				},						
+				"id" : {
+					"value" : id,
+					"type" : "OR"
+				},						
+				"what" : {
+					"value" : title
+				},					
 				"description" : {
 					"value" : description
 				},
@@ -230,7 +254,7 @@ ImageSearch.prototype.parseResult = function(data) {
 			var tooltipData = {};
 			for ( var i = 0; i < data.length; i++) {
 				html += '<li class="item" data-id="'+ data[i].id +'"><img src="'+ this.serviceUrl +'images/'+ data[i].cachedThumbnailUrl + '" /></li>';
-				tooltipData[data[i].id] = {"img":data[i].imageUrl,"desc":data[i].description};
+				tooltipData[data[i].id] = {"img":data[i].imageUrl,"desc":data[i].description,"title":data[i].title, "number":data[i].identifyingNumber};
 			}
 			this.offset = this.offset + i;
 			

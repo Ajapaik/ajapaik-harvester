@@ -24,6 +24,7 @@ public class RecordView implements Serializable {
 	private String imageUrl;
 	private InstitutionType institutionType;
 	private String id;
+	private String date;
 	
 	private boolean inBasket;
 	private String cachedThumbnailUrl;
@@ -180,6 +181,9 @@ public class RecordView implements Serializable {
 		
 		if(fields.length > 15)
 			this.imageUrl = fields[15];
+		
+		if(fields.length > 16 && fields[16] != null && !"null".equals(fields[16]))
+			this.date = fields[16];
 	}
 
 	public String getFullSearchData(){
@@ -206,7 +210,8 @@ public class RecordView implements Serializable {
 		sb.append(institutionType).append(seprator);
 		sb.append(id).append(seprator);
 		sb.append(providerName).append(seprator);
-		sb.append(imageUrl);
+		sb.append(imageUrl).append(seprator);
+		sb.append(date);
 
 		return sb.toString();
 	}
@@ -234,5 +239,13 @@ public class RecordView implements Serializable {
 
 	public String getCachedThumbnailUrl() {
 		return cachedThumbnailUrl;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 }

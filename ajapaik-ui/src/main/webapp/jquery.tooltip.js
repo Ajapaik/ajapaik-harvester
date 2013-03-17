@@ -151,7 +151,9 @@
 				    '<div class="tooltip-img loading">'+
 					'<div class="spinner" style="width: '+self.size.w+'px; height:100px;" ><img src="ajax-loader.gif"/></div>'+
 					'<img class="image" src="' + data.img + '" style="display: none;"/>'+
-				    '</div>'+
+				    '</div>' +
+				    '<div class="tooltip-title">' + data.title + '</div>' +
+				    '<div class="tooltip-number">' + data.number + '</div>' +
 				    '<div class="tooltip-desc">' + data.desc + '</div>'+
 				'</div>';
 	   

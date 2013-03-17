@@ -266,6 +266,21 @@ a.btn:active
     line-height: 18px;
 }
 
+#tooltip .tooltip-title
+{
+    padding-left: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+}
+
+#tooltip .tooltip-number
+{
+    padding-left: 10px;
+    font-size: 12px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+}
+
 #tooltip .tooltip-img
 {
     position: relative;

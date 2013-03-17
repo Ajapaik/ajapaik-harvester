@@ -8,6 +8,7 @@ public enum IndexedFields {
 	DESCRIPTION,
 	WHAT,
 	ID,
+	ID_NUMBER,
 	NUMBER,
 	WHERE,
 	YEAR,

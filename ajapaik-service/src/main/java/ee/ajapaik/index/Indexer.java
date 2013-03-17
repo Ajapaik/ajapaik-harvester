@@ -8,6 +8,7 @@ import static ee.ajapaik.index.IndexedFields.DIGITAL;
 import static ee.ajapaik.index.IndexedFields.FROM;
 import static ee.ajapaik.index.IndexedFields.FULL_SEARCH;
 import static ee.ajapaik.index.IndexedFields.ID;
+import static ee.ajapaik.index.IndexedFields.ID_NUMBER;
 import static ee.ajapaik.index.IndexedFields.INSTITUTION_TYPE;
 import static ee.ajapaik.index.IndexedFields.NUMBER;
 import static ee.ajapaik.index.IndexedFields.RECORD_VIEW;
@@ -56,8 +57,8 @@ import org.springframework.beans.factory.InitializingBean;
 import ee.ajapaik.db.RecordHandler;
 import ee.ajapaik.db.Repository;
 import ee.ajapaik.model.search.Record;
+import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.SortableField;
-import ee.ajapaik.persist.SerializingPersister;
 import ee.ajapaik.util.Tracer;
 
 /**
@@ -157,7 +158,11 @@ public class Indexer implements InitializingBean {
 
 	private Document getDocument(Record rec, String repositoryCode) {
 		Document doc = new Document();
+		
+		String[] idSplit = rec.getId().split("\\:");
+		
 		addField(doc, ID, rec.getId(), Field.Index.NOT_ANALYZED);
+		addField(doc, ID_NUMBER, idSplit[idSplit.length - 1]);
 		addField(doc, CODE, repositoryCode, Field.Index.NOT_ANALYZED);
 		addField(doc, WHAT, rec.getTitle());
 		addField(doc, DESCRIPTION, rec.getDescription());
@@ -167,7 +172,13 @@ public class Indexer implements InitializingBean {
 		addField(doc, WHO, rec.getCreators());
 		addField(doc, INSTITUTION_TYPE, rec.getInstitutionType());
 		addField(doc, COLLECTION, rec.getCollections());
-		addField(doc, FULL_SEARCH, rec.getRecordView().getFullSearchData());
+		
+		RecordView recordView = rec.getRecordView();
+		if(rec.getDates() != null) {
+			recordView.setDate(rec.getDates().toString());
+		}
+		
+		addField(doc, FULL_SEARCH, recordView.getFullSearchData());
 		addField(doc, SET_SPEC, rec.getSetSpec().get(0), Index.NOT_ANALYZED, Store.YES);
 		addField(doc, DATE_CREATED, DATE_CREATED_FORMAT.format(rec.getDateCreated()), Index.NOT_ANALYZED, Store.YES);
 		
@@ -196,7 +207,7 @@ public class Indexer implements InitializingBean {
 			addField(doc, SortableField.INSTITUTION_SORT, institutions.get(0), Field.Index.NOT_ANALYZED);
 		}
 		
-		doc.add(new Field(RECORD_VIEW.name(), rec.getRecordView().serialize(), Store.YES, Index.NO));
+		doc.add(new Field(RECORD_VIEW.name(), recordView.serialize(), Store.YES, Index.NO));
 		
 		return doc;
 	}

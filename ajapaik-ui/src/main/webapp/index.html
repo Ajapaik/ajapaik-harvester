@@ -20,6 +20,9 @@
 	<div id="image-search">
 		<div id="search-header">
 			<form id="search-form" action="" method="POST">
+				<input type="text" id="search" name="f" value="" placeholder="Full search" />
+				<input type="text" id="search" name="id" value="" placeholder="ID" />
+				<input type="text" id="search" name="t" value="" placeholder="Title" />
 			    <input type="text" id="search" name="d" value="" placeholder="Description" />
 			    <input type="text" id="search" name="a" value="" placeholder="Autor" />
 			    <input type="text" id="search" name="n" value="" placeholder="Number" />
@@ -29,9 +32,8 @@
 			</form>
 		    <div id="actions">
 				<a href="#" class="btn" id="csv"><span>CSV</span></a>
-				<a href="#" class="btn" id="harvest"><span>Harvest</span></a>
-				<a href="#" class="btn" id="index"><span>Index</span></a>
 				<a href="#" class="btn" id="selectAll"><span>Select all</span></a>
+				<a href="#" class="btn" id="selectNone"><span>Select none</span></a>
 				
 				<span class="info" id="totalResultCount"></span>
 				<span class="info" id="selectionCount"></span>

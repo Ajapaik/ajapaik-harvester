@@ -9,6 +9,7 @@ public class Search implements Serializable {
 	
 	private int pageSize;
 	
+	private SearchField id;
 	private SearchField fullSearch;
 	private SearchField what; // title
 	private SearchField who; // creators
@@ -123,6 +124,14 @@ public class Search implements Serializable {
 		return getSearchPhrase().hashCode();
 	}
 	
+	public SearchField getId() {
+		return id;
+	}
+
+	public void setId(SearchField id) {
+		this.id = id;
+	}
+
 	public String getSearchPhrase() {
 		String phrase = "";
 		if (fullSearch != null && fullSearch.getValue() != null
@@ -144,10 +153,11 @@ public class Search implements Serializable {
 				&& description.getValue().length() != 0)
 			phrase += " " + description.getAndOr() + "DESCRIPTION:("
 					+ getTerm(description) + ")";
-		if (number != null && number.getValue() != null
-				&& number.getValue().length() != 0)
-			phrase += " " + number.getAndOr() + "NUMBER:(" + getTerm(number)
-					+ ")";
+		if (number != null && number.getValue() != null && number.getValue().length() != 0)
+			phrase += " " + number.getAndOr() + "NUMBER:(" + getTerm(number) + ")";
+		
+		if (id != null && id.getValue() != null && id.getValue().length() != 0)
+			phrase += " " + id.getAndOr() + "ID_NUMBER:(" + getTerm(id) + ")";
 
 		boolean hasStart = hasYearValue(yearStart);
 		boolean hasEnd = hasYearValue(yearEnd);
@@ -178,7 +188,6 @@ public class Search implements Serializable {
 		}
 		return field.value;
 	}
-
 
 	private boolean hasYearValue(YearField year) {
 		return year != null && year.getYear() != null && year.getYear().length() != 0;
