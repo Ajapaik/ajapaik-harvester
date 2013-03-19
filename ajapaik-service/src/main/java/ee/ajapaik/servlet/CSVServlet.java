@@ -21,7 +21,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
-import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -49,7 +48,7 @@ public class CSVServlet extends HttpServlet {
 		String ids = request.getParameter("ids");
 		
 		if(ids != null && ids.length() > 0) {
-			StringBuilder result = new StringBuilder("number;autor;title;description;date;place;url;image;\n");
+			StringBuilder result = new StringBuilder("institution;number;autor;title;description;date;place;url;image;\n");
 			
 			WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 			AjapaikService service = ctx.getBean("ajapaikService", AjapaikService.class);
