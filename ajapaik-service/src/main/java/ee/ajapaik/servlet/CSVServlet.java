@@ -49,7 +49,7 @@ public class CSVServlet extends HttpServlet {
 		String ids = request.getParameter("ids");
 		
 		if(ids != null && ids.length() > 0) {
-			StringBuilder result = new StringBuilder();
+			StringBuilder result = new StringBuilder("number;autor;title;description;date;place;url;image;\n");
 			
 			WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 			AjapaikService service = ctx.getBean("ajapaikService", AjapaikService.class);
@@ -57,6 +57,7 @@ public class CSVServlet extends HttpServlet {
 			String name = FORMAT.format(new Date());
 			
 			RecordView[] rw = service.getRecords(ids.split(","));
+			
 			for (RecordView recordView : rw) {
 				
 				String institution = recordView.getInstitution();
@@ -68,6 +69,7 @@ public class CSVServlet extends HttpServlet {
 				
 				addField(result, recordView.getIdentifyingNumber());
 				addField(result, recordView.getCreators());
+				addField(result, recordView.getTitle());
 				addField(result, recordView.getDescription());
 				addField(result, recordView.getDate() != null ? recordView.getDate() : ""); // date
 				addField(result, ""); // place
