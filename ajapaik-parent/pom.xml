@@ -97,6 +97,13 @@
 							<contextPath>/ajapaik-service</contextPath>
 						</contextHandler>
 					</contextHandlers>
+					<connectors>
+						<connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+							<port>8080</port>
+							<maxIdleTime>60000</maxIdleTime>
+							<requestHeaderSize>65535</requestHeaderSize>
+						</connector>
+					</connectors>
 				</configuration>
 
 				<dependencies>
