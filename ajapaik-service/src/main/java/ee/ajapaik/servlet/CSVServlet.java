@@ -1,13 +1,14 @@
 package ee.ajapaik.servlet;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -57,6 +58,10 @@ public class CSVServlet extends HttpServlet {
 			
 			RecordView[] rw = service.getRecords(ids.split(","));
 			
+			response.addHeader("Content-Disposition", "attachment;filename=" + name + ".zip");
+			
+			ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
+			
 			for (RecordView recordView : rw) {
 				
 				String institution = recordView.getInstitution();
@@ -73,20 +78,25 @@ public class CSVServlet extends HttpServlet {
 				addField(result, recordView.getDate() != null ? recordView.getDate() : ""); // date
 				addField(result, ""); // place
 				addField(result, recordView.getUrlToRecord());
-				addField(result, grabImage(name, recordView.getImageUrl()));
+				addField(result, grabImage(zos, name, recordView.getImageUrl()));
 				
 				result.append("\n");
 			}
 			
-			response.addHeader("Content-Disposition", "attachment;filename=" + name + ".csv");
+    		zos.putNextEntry(new ZipEntry(name + ".csv"));
+    		zos.write(result.toString().getBytes("UTF-8"));
+    		
+    		zos.closeEntry();
+    		
+			zos.close();
 			
-			response.setContentType("text/csv; charset=UTF-8");
-			response.setCharacterEncoding("UTF-8");
-			response.getWriter().write(result.toString());
+//			response.setContentType("text/csv; charset=UTF-8");
+//			response.setCharacterEncoding("UTF-8");
+//			response.getWriter().write(result.toString());
 		}
 	}
 
-	private String grabImage(String name, String query) throws IOException {
+	private String grabImage(ZipOutputStream zos, String name, String query) throws IOException {
 		File dir = new File(PATH + "/" + name);
 		if(!dir.exists()) {
 			dir.mkdirs();
@@ -105,15 +115,17 @@ public class CSVServlet extends HttpServlet {
 			if(entity != null) {
 				if (result.getStatusLine().getStatusCode() != 404) {
 					String[] split = query.split("/");
-					FileOutputStream fos = new FileOutputStream(PATH + "/" + name + "/" + split[split.length - 1]);
+					
+					ZipEntry ze = new ZipEntry(split[split.length - 1] + ".jpg");
+		    		zos.putNextEntry(ze);
+		    		
 					try {
-						IOUtils.copy(entity.getContent(), fos);
+						IOUtils.copy(entity.getContent(), zos);
 					} finally {
-						fos.close();
-						entity.getContent().close();
+						zos.closeEntry();
 					}
 					
-					return split[split.length - 1];
+					return split[split.length - 1] + ".jpg";
 				}
 			}
 		} catch (MalformedURLException e) {
