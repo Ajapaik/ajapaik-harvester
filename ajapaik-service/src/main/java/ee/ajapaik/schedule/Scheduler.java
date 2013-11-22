@@ -22,7 +22,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
 import ee.ajapaik.model.InfoSystem;
-import ee.ajapaik.model.Schedule;
 import ee.ajapaik.persist.SerializingPersister;
 
 /**
@@ -89,6 +88,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			is.setMapper(value.getProperty("mapper"));
 			is.setHomepageUrl(value.getProperty("homepageUrl"));
 			is.setEmail(value.getProperty("email"));
+			is.setSchedule(value.getProperty("schedule"));
 			
 			if(savedConf != null && savedConf.contains(is)) {
 				InfoSystem infoSystem = savedConf.get(savedConf.indexOf(is));
@@ -117,8 +117,8 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			try {
 				schedulerFactory.unscheduleJob(infoSystem.getName(), null);
 				
-				Schedule schedule = infoSystem.getSchedule();
-				if(schedule != null && schedule.isActive()) { 
+				String schedule = infoSystem.getSchedule();
+				if(schedule != null) { 
 					JobDetailBean job = (JobDetailBean) beanFactory.getBean("harvesterJob");
 					job.setJobClass(Class.forName(infoSystem.getMapper()));
 					job.setName(infoSystem.getName());
@@ -139,37 +139,10 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 	}
 
 	private CronTrigger getCronTrigger(InfoSystem infoSystem) throws ParseException {
-		Schedule schedule = infoSystem.getSchedule();
-
-		String[] hm = schedule.getUpdateTime().split(":");
-		
-		StringBuilder cron = new StringBuilder();
-		cron.append("0").append(" "); // SECOND
-		cron.append(hm[1]).append(" "); // MINUTE
-		cron.append(hm[0]).append(" "); // HOUR
-		cron.append("?").append(" "); // DAY OF MONTH
-		cron.append("*").append(" "); // MONTH
-		
-		StringBuilder days = new StringBuilder();
-		if(schedule.isMonday())
-			days.append("MON");
-		if(schedule.isTuesday())
-			days.append(days.length() > 0 ? "," : "").append("TUE");
-		if(schedule.isWednesday())
-			days.append(days.length() > 0 ? "," : "").append("WED");
-		if(schedule.isThursday())
-			days.append(days.length() > 0 ? "," : "").append("THU");
-		if(schedule.isFriday())
-			days.append(days.length() > 0 ? "," : "").append("FRI");
-		if(schedule.isSaturday())
-			days.append(days.length() > 0 ? "," : "").append("SAT");
-		if(schedule.isSunday())
-			days.append(days.length() > 0 ? "," : "").append("SUN");
-		
-		cron.append(days); // DAY OF WEEK
+		String schedule = infoSystem.getSchedule();
 		
 		CronTrigger cronTrigger = new CronTrigger(infoSystem.getName());
-		cronTrigger.setCronExpression(cron.toString());
+		cronTrigger.setCronExpression(schedule);
 		return cronTrigger;
 	}
 

@@ -7,6 +7,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -38,7 +39,7 @@ public class CSVServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private static final String SEPARATOR = ";";
-	private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
+	private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd_HHmmss", new Locale("et_EE"));
 	private static final String PATH = "export";
 	
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -138,6 +139,11 @@ public class CSVServlet extends HttpServlet {
 	}
 
 	private void addField(StringBuilder result, String data) {
-		result.append(data.replaceAll(SEPARATOR, ":").replaceAll("\n", "")).append(SEPARATOR);
+		result.append("\"").append(data
+			.replaceAll(SEPARATOR, ":")
+				.replaceAll("\n", "")
+					.replaceAll("\r", ""))
+						.append("\"")
+							.append(SEPARATOR);
 	}
 }

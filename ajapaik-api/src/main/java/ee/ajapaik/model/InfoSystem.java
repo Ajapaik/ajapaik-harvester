@@ -12,7 +12,7 @@ public class InfoSystem implements Serializable {
 	private String mapper;
 	private Date lastHarvestTime;
 	private Boolean running;
-	private Schedule schedule = new Schedule();
+	private String schedule;
 	private String email;
 	private String homepageUrl;
 
@@ -79,11 +79,11 @@ public class InfoSystem implements Serializable {
 		this.address = address;
 	}
 
-	public Schedule getSchedule() {
+	public String getSchedule() {
 		return schedule;
 	}
 
-	public void setSchedule(Schedule schedule) {
+	public void setSchedule(String schedule) {
 		this.schedule = schedule;
 	}
 

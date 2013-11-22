@@ -34,6 +34,7 @@
 						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
 						<prop key="email">muis@muis.ee</prop>
 						<prop key="homepageUrl">http://www.muis.ee</prop>
+						<prop key="schedule">0 0 0 1/15 * ?</prop>
 					</props>
 				</entry>
 				<!-- 
@@ -59,7 +60,7 @@
 			</map>
 		</property>
 		
-		<property name="indexerCronExpression" value="0 0 23 ? * *" />
+		<property name="indexerCronExpression" value="0 0 1 1 * ?" />
 		
 		<property name="schedulerFactory">
 			<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" />		
