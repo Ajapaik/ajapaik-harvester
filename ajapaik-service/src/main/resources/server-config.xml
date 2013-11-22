@@ -60,7 +60,7 @@
 			</map>
 		</property>
 		
-		<property name="indexerCronExpression" value="0 0 1 1 * ?" />
+		<property name="indexerCronExpression" value="0 0 1 * * ?" />
 		
 		<property name="schedulerFactory">
 			<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" />		
