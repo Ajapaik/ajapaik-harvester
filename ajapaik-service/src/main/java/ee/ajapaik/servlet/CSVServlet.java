@@ -141,9 +141,10 @@ public class CSVServlet extends HttpServlet {
 	private void addField(StringBuilder result, String data) {
 		result.append("\"").append(data
 			.replaceAll(SEPARATOR, ":")
-				.replaceAll("\n", "")
-					.replaceAll("\r", ""))
-						.append("\"")
-							.append(SEPARATOR);
+				.replaceAll("\"","\"\"")
+					.replaceAll("\n", "")
+						.replaceAll("\r", ""))
+							.append("\"")
+								.append(SEPARATOR);
 	}
 }
