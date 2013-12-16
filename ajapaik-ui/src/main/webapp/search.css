@@ -28,8 +28,9 @@
 /*	display: none;*/
     border: 1px solid #ccc;
     border-top: none;
+    min-height: 800px;
+    
     /* 
-    min-height: 200px; 
     width: 90%;
     */
     margin: 20px auto;
