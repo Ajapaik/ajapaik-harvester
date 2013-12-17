@@ -23,6 +23,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
+import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -38,6 +39,8 @@ import ee.ajapaik.service.AjapaikService;
 public class CSVServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
+	private static final Logger logger = Logger.getLogger(CachedImageServlet.class);
+	
 	private static final String SEPARATOR = ";";
 	private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd_HHmmss", new Locale("et_EE"));
 	private static final String PATH = "export";
@@ -48,6 +51,8 @@ public class CSVServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String ids = request.getParameter("ids");
+		
+		logger.debug("Building ZIP for ids: " + ids);
 		
 		if(ids != null && ids.length() > 0) {
 			StringBuilder result = new StringBuilder("institution;number;autor;title;description;date;place;url;image;\n");
@@ -64,6 +69,8 @@ public class CSVServlet extends HttpServlet {
 			ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
 			
 			for (RecordView recordView : rw) {
+				
+				logger.debug("Adding entry: " + recordView.getId());
 				
 				String institution = recordView.getInstitution();
 				if(institution.contains(",")) {
@@ -91,6 +98,8 @@ public class CSVServlet extends HttpServlet {
     		
 			zos.close();
 			
+			logger.debug("ZIP done: " + name);
+			
 //			response.setContentType("text/csv; charset=UTF-8");
 //			response.setCharacterEncoding("UTF-8");
 //			response.getWriter().write(result.toString());
@@ -107,6 +116,8 @@ public class CSVServlet extends HttpServlet {
 			URL url = new URL(query);
 			BaseHttpClient client = PlatformFactory.getInstance().getClient(url);
 			
+			logger.debug("Getting data from url: " + url);
+			
 			HttpGet get = new HttpGet(url.getFile());
 			get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
 			
@@ -117,7 +128,8 @@ public class CSVServlet extends HttpServlet {
 				if (result.getStatusLine().getStatusCode() != 404) {
 					String[] split = query.split("/");
 					
-					ZipEntry ze = new ZipEntry(split[split.length - 1] + ".jpg");
+					String fileName = split[split.length - 1] + ".jpg";
+					ZipEntry ze = new ZipEntry(fileName);
 		    		zos.putNextEntry(ze);
 		    		
 					try {
@@ -126,7 +138,9 @@ public class CSVServlet extends HttpServlet {
 						zos.closeEntry();
 					}
 					
-					return split[split.length - 1] + ".jpg";
+					logger.debug("Got data: " + fileName);
+					
+					return fileName;
 				}
 			}
 		} catch (MalformedURLException e) {
