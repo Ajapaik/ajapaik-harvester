@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -59,7 +63,8 @@ public class CSVServlet extends HttpServlet {
 	
 				String name = FORMAT.format(new Date());
 				
-				RecordView[] rw = service.getRecords(ids.split(","));
+				Set<String> set = new HashSet<String>(Arrays.asList(ids.split(",")));
+				RecordView[] rw = service.getRecords((String[]) set.toArray());
 				
 				response.addHeader("Content-Disposition", "attachment;filename=" + name + ".zip");
 				
