@@ -1,8 +1,6 @@
 package ee.ajapaik.servlet;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
@@ -43,110 +40,110 @@ public class CSVServlet extends HttpServlet {
 	
 	private static final String SEPARATOR = ";";
 	private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd_HHmmss", new Locale("et_EE"));
-	private static final String PATH = "export";
 	
 	public void init(ServletConfig servletConfig) throws ServletException {
 		super.init(servletConfig);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String ids = request.getParameter("ids");
-		
-		logger.debug("Building ZIP for ids: " + ids);
-		
-		if(ids != null && ids.length() > 0) {
-			StringBuilder result = new StringBuilder("institution;number;autor;title;description;date;place;url;image;\n");
+		try {
+			String ids = request.getParameter("ids");
 			
-			WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-			AjapaikService service = ctx.getBean("ajapaikService", AjapaikService.class);
-
-			String name = FORMAT.format(new Date());
+			logger.debug("Building ZIP for ids: " + ids);
 			
-			RecordView[] rw = service.getRecords(ids.split(","));
-			
-			response.addHeader("Content-Disposition", "attachment;filename=" + name + ".zip");
-			
-			ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
-			
-			for (RecordView recordView : rw) {
+			if(ids != null && ids.length() > 0) {
+				StringBuilder result = new StringBuilder("institution;number;autor;title;description;date;place;url;image;\n");
 				
-				logger.debug("Adding entry: " + recordView.getId());
+				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+				AjapaikService service = ctx.getBean("ajapaikService", AjapaikService.class);
+	
+				String name = FORMAT.format(new Date());
 				
-				String institution = recordView.getInstitution();
-				if(institution.contains(",")) {
-					addField(result, institution.split(",")[0]);
-				} else {
-					addField(result, institution);
+				RecordView[] rw = service.getRecords(ids.split(","));
+				
+				response.addHeader("Content-Disposition", "attachment;filename=" + name + ".zip");
+				
+				ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
+				
+				for (RecordView recordView : rw) {
+					
+					logger.debug("Adding entry: " + recordView.getId());
+					
+					String institution = recordView.getInstitution();
+					if(institution.contains(",")) {
+						addField(result, institution.split(",")[0]);
+					} else {
+						addField(result, institution);
+					}
+					
+					addField(result, recordView.getIdentifyingNumber());
+					addField(result, recordView.getCreators());
+					addField(result, recordView.getTitle());
+					addField(result, recordView.getDescription());
+					addField(result, recordView.getDate() != null ? recordView.getDate() : ""); // date
+					addField(result, ""); // place
+					addField(result, recordView.getUrlToRecord());
+					try {
+						addField(result, grabImage(zos, name, recordView.getImageUrl()));
+					} catch (Exception e) {
+						logger.error("Error getting data", e);
+					}
+					
+					result.append("\n");
+					
+					logger.debug("Entry added");
 				}
 				
-				addField(result, recordView.getIdentifyingNumber());
-				addField(result, recordView.getCreators());
-				addField(result, recordView.getTitle());
-				addField(result, recordView.getDescription());
-				addField(result, recordView.getDate() != null ? recordView.getDate() : ""); // date
-				addField(result, ""); // place
-				addField(result, recordView.getUrlToRecord());
-				addField(result, grabImage(zos, name, recordView.getImageUrl()));
+	    		zos.putNextEntry(new ZipEntry(name + ".csv"));
+	    		zos.write(result.toString().getBytes("UTF-8"));
+	    		
+	    		zos.closeEntry();
+	    		
+				zos.close();
 				
-				result.append("\n");
+				logger.debug("ZIP done: " + name);
+				
+	
+				
+	//			response.setContentType("text/csv; charset=UTF-8");
+	//			response.setCharacterEncoding("UTF-8");
+	//			response.getWriter().write(result.toString());
 			}
-			
-    		zos.putNextEntry(new ZipEntry(name + ".csv"));
-    		zos.write(result.toString().getBytes("UTF-8"));
-    		
-    		zos.closeEntry();
-    		
-			zos.close();
-			
-			logger.debug("ZIP done: " + name);
-			
-//			response.setContentType("text/csv; charset=UTF-8");
-//			response.setCharacterEncoding("UTF-8");
-//			response.getWriter().write(result.toString());
+		} catch (Exception e) {
+			logger.error("Error building ZIP", e);
 		}
 	}
 
-	private String grabImage(ZipOutputStream zos, String name, String query) throws IOException {
-		File dir = new File(PATH + "/" + name);
-		if(!dir.exists()) {
-			dir.mkdirs();
-		}
+	private String grabImage(ZipOutputStream zos, String name, String query) throws Exception {
+		URL url = new URL(query);
+		BaseHttpClient client = PlatformFactory.getInstance().getClient(url);
 		
-		try {
-			URL url = new URL(query);
-			BaseHttpClient client = PlatformFactory.getInstance().getClient(url);
-			
-			logger.debug("Getting data from url: " + url);
-			
-			HttpGet get = new HttpGet(url.getFile());
-			get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
-			
-			HttpResponse result = client.getHttpClient().execute(get);
-			HttpEntity entity = result.getEntity();
-			
-			if(entity != null) {
-				if (result.getStatusLine().getStatusCode() != 404) {
-					String[] split = query.split("/");
-					
-					String fileName = split[split.length - 1] + ".jpg";
-					ZipEntry ze = new ZipEntry(fileName);
-		    		zos.putNextEntry(ze);
-		    		
-					try {
-						IOUtils.copy(entity.getContent(), zos);
-					} finally {
-						zos.closeEntry();
-					}
-					
-					logger.debug("Got data: " + fileName);
-					
-					return fileName;
+		logger.debug("Getting data from url: " + url);
+		
+		HttpGet get = new HttpGet(url.getFile());
+		get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
+		
+		HttpResponse result = client.getHttpClient().execute(get);
+		HttpEntity entity = result.getEntity();
+		
+		if(entity != null) {
+			if (result.getStatusLine().getStatusCode() != 404) {
+				String[] split = query.split("/");
+				
+				String fileName = split[split.length - 1] + ".jpg";
+				ZipEntry ze = new ZipEntry(fileName);
+	    		zos.putNextEntry(ze);
+	    		
+				try {
+					IOUtils.copy(entity.getContent(), zos);
+				} finally {
+					zos.closeEntry();
 				}
+				
+				logger.debug("Got data: " + fileName);
+				
+				return fileName;
 			}
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		} catch (ClientProtocolException e) {
-			throw new RuntimeException(e);
 		}
 		
 		return null;
