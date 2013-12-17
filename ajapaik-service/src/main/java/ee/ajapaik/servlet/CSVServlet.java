@@ -64,7 +64,7 @@ public class CSVServlet extends HttpServlet {
 				String name = FORMAT.format(new Date());
 				
 				Set<String> set = new HashSet<String>(Arrays.asList(ids.split(",")));
-				RecordView[] rw = service.getRecords((String[]) set.toArray());
+				RecordView[] rw = service.getRecords(set.toArray(new String[set.size()]));
 				
 				response.addHeader("Content-Disposition", "attachment;filename=" + name + ".zip");
 				
