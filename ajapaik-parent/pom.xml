@@ -1,13 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<name>ajapaik-parent</name>
-
 	<modelVersion>4.0.0</modelVersion>
+
 	<groupId>ee.ajapaik</groupId>
 	<artifactId>ajapaik-parent</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+
+	<name>ajapaik-parent</name>
 
 	<modules>
 		<module>../ajapaik-api</module>
@@ -36,18 +37,17 @@
 			<url>http://repository.apache.org/snapshots/</url>
 			<layout>default</layout>
 		</repository>
-		
-	    <repository>
-	        <id>jsonrpc4j-webdav-maven-repo</id>
-	        <name>jsonrpc4j maven repository</name>
-	        <snapshots>
+		<repository>
+			<id>jsonrpc4j-webdav-maven-repo</id>
+			<name>jsonrpc4j maven repository</name>
+			<snapshots>
 				<enabled>false</enabled>
 				<updatePolicy>never</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
-	        <url>http://jsonrpc4j.googlecode.com/svn/maven/repo/</url>
-	        <layout>default</layout>
-	    </repository>		
+			<url>http://jsonrpc4j.googlecode.com/svn/maven/repo/</url>
+			<layout>default</layout>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>
@@ -68,9 +68,8 @@
 			<layout>default</layout>
 		</pluginRepository>
 	</pluginRepositories>
-	
-	<build>
 
+	<build>
 		<finalName>${project.name}</finalName>
 		<plugins>
 			<plugin>
@@ -85,7 +84,6 @@
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>8.1.4.v20120524</version>
-
 				<configuration>
 					<contextHandlers>
 						<contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
@@ -105,7 +103,6 @@
 						</connector>
 					</connectors>
 				</configuration>
-
 				<dependencies>
 					<dependency>
 						<groupId>org.eclipse.jetty</groupId>
@@ -115,7 +112,6 @@
 				</dependencies>
 			</plugin>
 		</plugins>
-
 	</build>
 
 </project>
