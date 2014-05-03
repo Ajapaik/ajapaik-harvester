@@ -63,6 +63,7 @@ public class CSVServlet extends HttpServlet {
 	
 				String name = FORMAT.format(new Date());
 				
+				// Remove duplicates
 				Set<String> set = new HashSet<String>(Arrays.asList(ids.split(",")));
 				RecordView[] rw = service.getRecords(set.toArray(new String[set.size()]));
 				
