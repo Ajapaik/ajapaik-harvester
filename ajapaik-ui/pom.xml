@@ -2,9 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	
-	<name>ajapaik-ui</name>
-	
+
 	<parent>
 		<groupId>ee.ajapaik</groupId>
 		<artifactId>ajapaik-parent</artifactId>
@@ -12,31 +10,13 @@
 		<relativePath>../ajapaik-parent</relativePath>
 	</parent>
 
-	<groupId>ee.ajapaik</groupId>
 	<artifactId>ajapaik-ui</artifactId>
-	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
-	
-	<!--
-	<dependencies>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-		</dependency>
-			
-		<dependency>
-			<groupId>org.eclipse.jetty.orbit</groupId>
-			<artifactId>javax.servlet</artifactId>
-			<version>3.0.0.v201112011016</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
- 	-->
- 
+
+	<name>ajapaik-ui</name>
+
 	<build>
 		<finalName>ajapaik-ui</finalName>
-	
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -50,7 +30,8 @@
 						</resource>
 					</webResources>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>
 	</build>
+
 </project>
