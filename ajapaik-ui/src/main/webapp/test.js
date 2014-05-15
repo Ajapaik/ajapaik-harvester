@@ -10,6 +10,8 @@ var gridSize = 90;
 
 var scrollTo = 0;
 
+var detailView = false;
+
 $(document).ready(function() {
 
 	// Search
@@ -42,6 +44,9 @@ $(document).ready(function() {
 			"number" : {
 				"value" : $("#number").val(),
 			},
+			
+			"luceneQuery" : $("#luceneQuery").val() == "" ? null : $("#luceneQuery").val(),
+			
 			"pageSize" : 200,
 			"digital" : true
 		}
@@ -87,12 +92,14 @@ $(document).ready(function() {
 	// Select all
 	$("#select-all").on("click", function(e) {
 		var items = $('.item');
-
-		self.loaded = false;
 		
-		$("#result-view").fadeOut(function() {
-			$("#result-view").html("");
-		});
+		items.addClass("selected");
+
+//		self.loaded = false;
+		
+//		$("#result-view").fadeOut(function() {
+//			$("#result-view").html("");
+//		});
 
 		for (var i = 0; i < items.length; i++) {
 			var value = $(items[i]).data("id");
@@ -117,7 +124,12 @@ $(document).ready(function() {
 	});
 
 	$("#download").on("click", function(e) {
-		console.log("download");
+		e.preventDefault();
+		
+		if(self.selection.length > 0) {
+			var win = window.open('../ajapaik-service/csv/?ids=' + self.selection, '_blank');
+			win.focus();
+		}
 	});
 	
 	// Thumb size
@@ -126,16 +138,15 @@ $(document).ready(function() {
 	self.thumbs("#lg", 200);
 	
 	$("#thumbnails").on("click", function(e) {
-		alert("TODO: thumbnails");
+		detailView = false;
 		
-//		$("#set-view div").removeClass("col-sm-6");
-//		$("#set-view div").addClass("item");
-//		
-//		buildGrid($("#set-view"));
+		parseSelection();
 	});
 
 	$("#list").on("click", function(e) {
-		alert("TODO: list");
+		detailView = true;
+		
+		parseSelection();
 	});
 });
 
@@ -237,9 +248,13 @@ function parseResult(result, scroll) {
 		
 		disableScroll();
 		
+		var tooltipData = {};
 		var loadedImages = 0;
 		for (var i = 0; i < result.length; i++) {
 			var record = result[i];
+			
+			tooltipData[record.id] = {"img":record.imageUrl,"desc":record.description,"title":record.title, "number":record.identifyingNumber};
+			
 			var img = $("<img height='" + self.gridSize + "' src='http://ajapaik.ee:8080/ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
 			
 			img.load(function(e) {
@@ -266,25 +281,31 @@ function parseResult(result, scroll) {
 			
 			var item = $("<div data-id='" + record.id + "' class='item'></div>");
 			item.on('click', function(e) {
-				var element = $(this);
-
-				element.fadeOut(function() {
-					element.remove();
-					self.buildGrid($("#result-view"));
-				});
-
-				var value = element.data("id");
-				if($.inArray(value, selection) == -1) {
-					selection.push(value);
-				}
+				var target = $(this);
+				var id = target.data("id");
 				
+				if(target.hasClass("selected")) {
+					target.removeClass("selected");
+					
+					selection.splice(selection.indexOf(id), 1);
+				} else {
+					target.addClass("selected");
+					
+					if($.inArray(id, selection) == -1) {
+						selection.push(id);
+					}
+				}
+
 				updateSelection();
 			});
 			
 			item.append(img);
 			
+			item.tooltip({'container': $("#result-view"), 'data':tooltipData}); // apply tooltip
+			
 			$("#result-view").append(item);
 		}
+		
 	} else {
 		alert("No result");
 	}
@@ -355,7 +376,68 @@ function parseSelection() {
 				var record = result[i];
 				
 				// Container
-				var recordContainer = $("<div class='record-container col-sm-12'></div>");
+				var recordContainer = {};
+				
+				if(detailView) {
+					recordContainer = $("<div class='record-container col-sm-12'></div>");
+					
+					// Description
+					var description = $("<div class='col-sm-9'></div>");
+					
+					description.append("<p><b>" + record.title + "</b></p>");
+					description.append("<p>" + record.identifyingNumber + "</p>");
+					description.append("<p>" + record.description + "</p>");
+					
+					// Image
+					var img = $("<img src='" + record.imageUrl + "'>");
+					
+					img.data(description);
+					
+					img.load(function(e) {
+						loadedImages++;
+						
+						$(this).data().append("<p>" + this.width + "x" + this.height + "</p>");
+						
+						this.height = 200;
+						
+						if(loadedImages == result.length) {
+							$("#set-view").fadeIn();
+							$("#backdrop").fadeOut();
+						}
+					});
+					
+					var item = $("<div class='col-sm-3'></div>");
+					
+					item.append(img);
+					
+					recordContainer.append(item);
+					recordContainer.append(description);
+					
+					$("#set-view").append(recordContainer);
+					
+				} else {
+					recordContainer = $("<div class='item'></div>");
+					
+					// Image
+					var img = $("<img height='90' src='http://ajapaik.ee:8080/ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
+					
+					img.data(description);
+					
+					img.load(function(e) {
+						loadedImages++;
+						
+						if(loadedImages == result.length) {
+							$("#set-view").fadeIn();
+							$("#backdrop").fadeOut();
+							
+							buildGrid($("#set-view"));
+						}
+					});
+					
+					recordContainer.append(img);
+					
+					$("#set-view").append(recordContainer);
+				}
 				
 				recordContainer.data(record.id);
 				
@@ -368,45 +450,13 @@ function parseSelection() {
 						var container = $(this);
 						container.fadeOut(function() {
 							container.remove();
+							
+							buildGrid($("#set-view"));
 						});
 						
 						updateSelection();
 					}
 				});
-				
-				// Description
-				var description = $("<div class='col-sm-9'></div>");
-				
-				description.append("<p><b>" + record.title + "</b></p>");
-				description.append("<p>" + record.identifyingNumber + "</p>");
-				description.append("<p>" + record.description + "</p>");
-				
-				// Image
-				var img = $("<img src='" + record.imageUrl + "'>");
-				
-				img.data(description);
-				
-				img.load(function(e) {
-					loadedImages++;
-					
-					$(this).data().append("<p>" + this.width + "x" + this.height + "</p>");
-					
-					this.height = 200;
-					
-					if(loadedImages == result.length) {
-						$("#set-view").fadeIn();
-						$("#backdrop").fadeOut();
-					}
-				});
-				
-				var item = $("<div class='col-sm-3'></div>");
-				
-				item.append(img);
-				
-				recordContainer.append(item);
-				recordContainer.append(description);
-				
-				$("#set-view").append(recordContainer);
 			}
 		});
 	}

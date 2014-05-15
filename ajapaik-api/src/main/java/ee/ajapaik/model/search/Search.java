@@ -19,6 +19,7 @@ public class Search implements Serializable {
 	private SearchField number; // identifying number
 	private YearField yearStart; // dates
 	private YearField yearEnd; // dates
+	private String luceneQuery;
 	private boolean digital; // urlToRecord peab olemas olema
 	private SortableField sortBy = SortableField.RELEVANCE; 
 	
@@ -133,57 +134,63 @@ public class Search implements Serializable {
 	}
 
 	public String getSearchPhrase() {
-		String phrase = "";
-		if (fullSearch != null && fullSearch.getValue() != null
-				&& fullSearch.getValue().length() != 0)
-			phrase += " " + fullSearch.getAndOr() + "FULL_SEARCH:(" + getTerm(fullSearch) + ")";
-		if (what != null && what.getValue() != null
-				&& what.getValue().length() != 0)
-			phrase += " " + what.getAndOr() + "WHAT:(" + getTerm(what) + ")";
-		if (who != null && who.getValue() != null
-				&& who.getValue().length() != 0)
-			phrase += " " + who.getAndOr() + "WHO:(" + getTerm(who) + ")";
-		if (where != null && where.getValue() != null
-				&& where.getValue().length() != 0)
-			phrase += " " + where.getAndOr() + "WHERE:(" + getTerm(where) + ")";
-		if (from != null && from.getValue() != null
-				&& from.getValue().length() != 0  && !"all".equals(from.getValue()))
-			phrase += " " + from.getAndOr() + "FROM:(" + getTerm(from) + ")";
-		if (description != null && description.getValue() != null
-				&& description.getValue().length() != 0)
-			phrase += " " + description.getAndOr() + "DESCRIPTION:("
-					+ getTerm(description) + ")";
-		if (number != null && number.getValue() != null && number.getValue().length() != 0)
-			phrase += " " + number.getAndOr() + "NUMBER:(" + getTerm(number) + ")";
-		
-		if (id != null && id.getValue() != null && id.getValue().length() != 0)
-			phrase += " " + id.getAndOr() + "ID_NUMBER:(" + getTerm(id) + ")";
-
-		boolean hasStart = hasYearValue(yearStart);
-		boolean hasEnd = hasYearValue(yearEnd);
-		if (hasStart || hasEnd) {
-			phrase += " +YEAR:";
-			if(hasStart && hasEnd) {
-				phrase += "[" + yearStart.getYear() + " TO " + yearEnd.getYear() + "]";
-			} else if(hasStart) {
-				phrase += yearStart.getYear();
-			} else if(hasEnd) {
-				phrase += yearEnd.getYear();
+		if(luceneQuery != null) {
+			return luceneQuery;
+		} else {
+			String phrase = "";
+			if (fullSearch != null && fullSearch.getValue() != null
+					&& fullSearch.getValue().length() != 0)
+				phrase += " " + fullSearch.getAndOr() + "FULL_SEARCH:(" + getTerm(fullSearch) + ")";
+			if (what != null && what.getValue() != null
+					&& what.getValue().length() != 0)
+				phrase += " " + what.getAndOr() + "WHAT:(" + getTerm(what) + ")";
+			if (who != null && who.getValue() != null
+					&& who.getValue().length() != 0)
+				phrase += " " + who.getAndOr() + "WHO:(" + getTerm(who) + ")";
+			if (where != null && where.getValue() != null
+					&& where.getValue().length() != 0)
+				phrase += " " + where.getAndOr() + "WHERE:(" + getTerm(where) + ")";
+			if (from != null && from.getValue() != null
+					&& from.getValue().length() != 0  && !"all".equals(from.getValue()))
+				phrase += " " + from.getAndOr() + "FROM:(" + getTerm(from) + ")";
+			if (description != null && description.getValue() != null
+					&& description.getValue().length() != 0)
+				phrase += " " + description.getAndOr() + "DESCRIPTION:("
+						+ getTerm(description) + ")";
+			if (number != null && number.getValue() != null && number.getValue().length() != 0)
+				phrase += " " + number.getAndOr() + "NUMBER:(" + getTerm(number) + ")";
+			
+			if (id != null && id.getValue() != null && id.getValue().length() != 0)
+				phrase += " " + id.getAndOr() + "ID_NUMBER:(" + getTerm(id) + ")";
+	
+			boolean hasStart = hasYearValue(yearStart);
+			boolean hasEnd = hasYearValue(yearEnd);
+			if (hasStart || hasEnd) {
+				phrase += " +YEAR:";
+				if(hasStart && hasEnd) {
+					phrase += "[" + yearStart.getYear() + " TO " + yearEnd.getYear() + "]";
+				} else if(hasStart) {
+					phrase += yearStart.getYear();
+				} else if(hasEnd) {
+					phrase += yearEnd.getYear();
+				}
 			}
+			
+			if (phrase.startsWith(" "))
+				phrase = phrase.substring(1);
+			return phrase;
 		}
-		
-		if (phrase.startsWith(" "))
-			phrase = phrase.substring(1);
-		return phrase;
 	}
 
 	private String getTerm(SearchField field) {
 		if(field.getType().equals(FieldType.AND)){
 			String[] words = field.getLuceneValue().split(" ");
 			StringBuilder sb = new StringBuilder();
-			for(String word: words)
-				if(word.length()>0)
+			for(String word: words) {
+				if(word.length()>0) {
 					sb.append("+"+word.toLowerCase()+" ");
+				}
+			}
 			return sb.toString();
 		}
 		return field.value;
@@ -210,6 +217,14 @@ public class Search implements Serializable {
 	
 	@Override
 	public String toString() {
-		return getSearchPhrase();
+		return luceneQuery != null ? luceneQuery : getSearchPhrase();
+	}
+
+	public String getLuceneQuery() {
+		return luceneQuery;
+	}
+
+	public void setLuceneQuery(String luceneQuery) {
+		this.luceneQuery = luceneQuery;
 	}
 }
