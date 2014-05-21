@@ -142,9 +142,9 @@ public class CSVServlet extends HttpServlet {
 		
 		if(entity != null) {
 			if (result.getStatusLine().getStatusCode() == 200) {
-				String[] split = query.split("/");
 				
-				String fileName = split[split.length - 1] + ".jpg";
+				String fileName = getFileName(query);
+				
 				ZipEntry ze = new ZipEntry(fileName);
 	    		zos.putNextEntry(ze);
 	    		
@@ -170,6 +170,25 @@ public class CSVServlet extends HttpServlet {
 		}
 		
 		c.notify("", 0, 0);
+	}
+
+	private String getFileName(String query) {
+		String[] split = query.split("/");
+		String lastPart = split[split.length - 1];
+		
+		String fileName;
+		if(lastPart.contains("=")) {
+			split = lastPart.split("=");
+			fileName = split[split.length - 1];
+		} else {
+			fileName = lastPart;
+		}
+		
+		if(!fileName.contains(".jpg")) {
+			fileName += ".jpg";
+		}
+		
+		return fileName;
 	}
 
 	private void addField(StringBuilder result, String data) {

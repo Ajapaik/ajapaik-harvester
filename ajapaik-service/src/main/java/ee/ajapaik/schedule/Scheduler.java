@@ -92,7 +92,6 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			
 			if(savedConf != null && savedConf.contains(is)) {
 				InfoSystem infoSystem = savedConf.get(savedConf.indexOf(is));
-				is.setSchedule(infoSystem.getSchedule());
 				is.setLastHarvestTime(infoSystem.getLastHarvestTime());
 			}
 			

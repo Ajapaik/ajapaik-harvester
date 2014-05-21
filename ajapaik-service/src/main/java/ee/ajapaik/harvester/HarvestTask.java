@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.GZIPInputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -22,8 +23,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Unmarshaller.Listener;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
@@ -421,15 +424,31 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 				HttpEntity entity = result.getEntity();
 				
 				if(entity != null) {
-					if (result.getStatusLine().getStatusCode() != 404) {
-						return entity.getContent();
-					}
+					return getInputStream(result);
 				}
 			}
 		} catch (Exception e) {
 			logger.error("Error opening stream data", e);
 		}
 		return null;
+	}
+
+	private InputStream getInputStream(HttpResponse response) throws Exception {
+		StatusLine statusLine = response.getStatusLine();
+		if(statusLine.getStatusCode() != 200) {
+			response.getEntity().getContent().close();
+			
+			throw new Exception(statusLine.getReasonPhrase());
+		}
+		
+		 Header[] headers = response.getHeaders("Content-Encoding");
+		 if(headers != null && headers.length > 0) {
+			 Header contentEncoding = headers[0];
+			 if("gzip".equalsIgnoreCase(contentEncoding.getValue())) {
+				return new GZIPInputStream(response.getEntity().getContent());
+			 }
+		 }
+		 return response.getEntity().getContent();
 	}
 	
 	protected void saveThumbnail(Record rec, String thumbnailUrl) {

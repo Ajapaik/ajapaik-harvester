@@ -62,10 +62,13 @@ public class MKAHarvestTask extends HarvestTask {
 			rec.setProviderName(infoSystem.getName());
 
 			String imageUrl = jaxbUtil.getValue(eseRec, "object");
-			if(imageUrl != null) {
+			
+			if(imageUrl != null && imageUrl.length() > 0) {
 				rec.setImageUrl(imageUrl);
 
-				saveThumbnail(rec, getThumbnailUrl(imageUrl));
+				String thumbnailUrl = getThumbnailUrl(imageUrl);
+				
+				saveThumbnail(rec, thumbnailUrl);
 			}
 			
 			rec.setInstitutionType(InstitutionType.ARCHIVE);
@@ -77,10 +80,6 @@ public class MKAHarvestTask extends HarvestTask {
 	}
 	
 	private String getThumbnailUrl(String url) {
-		if(url != null && url.length() > 0){
-			return url.replaceFirst("regular", "thumb110");
-		}
-		
-		return null;
+		return url.replaceFirst("regular", "thumb110");
 	}
 }

@@ -52,6 +52,14 @@ public class DigarHarvestTask extends HarvestTask {
 		
 		rec.setInstitutions(institutions);
 		rec.appendDescription(jaxbUtil.getValues(eseRec, "subject"));
+		
+		String thumbnailUrl = jaxbUtil.getValue(eseRec, "object");
+		if(thumbnailUrl != null) {
+			rec.setImageUrl(thumbnailUrl);
+			
+			saveThumbnail(rec, thumbnailUrl);
+		}
+		
 		rec.setInstitutionType(InstitutionType.LIBRARY);
 		
 		return rec;

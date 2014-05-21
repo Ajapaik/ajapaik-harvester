@@ -18,6 +18,8 @@ $(document).ready(function() {
 	$("form").on("submit", function(e) {
 		
 		e.preventDefault();
+		
+		$("#backdrop").fadeIn();
 
 		self.loaded = false;
 		
@@ -46,6 +48,7 @@ $(document).ready(function() {
 			},
 			
 			"luceneQuery" : $("#luceneQuery").val() == "" ? null : $("#luceneQuery").val(),
+			"institutionTypes" : [getValue("MUSEUM"), getValue("LIBRARY"), getValue("ARCHIVE")],
 			
 			"pageSize" : 200,
 			"digital" : true
@@ -160,6 +163,8 @@ $(document).scroll(function(e) {
 		if(ids.length > 0) {
 			self.loaded = false;
 			
+			$("#backdrop").fadeIn();
+			
 			self.request("getRecords", [ ids ], function(result) {
 				
 				self.scrollTo = $(window).scrollTop();
@@ -244,8 +249,6 @@ function viewport() {
 function parseResult(result, scroll) {
 	if (result != null && result.length > 0) {
 
-		$("#backdrop").fadeIn();
-		
 		disableScroll();
 		
 		var tooltipData = {};
@@ -265,8 +268,6 @@ function parseResult(result, scroll) {
 					
 					self.buildGrid($("#result-view"));
 					
-					$("#backdrop").fadeOut();
-					
 					self.loaded = true;
 					
 					enableScroll();
@@ -276,6 +277,8 @@ function parseResult(result, scroll) {
 					} else {
 						window.scroll(0, self.scrollTo);
 					}
+					
+					$("#backdrop").fadeOut();
 				}
 			});
 			
@@ -307,6 +310,8 @@ function parseResult(result, scroll) {
 		}
 		
 	} else {
+		$("#backdrop").fadeOut();
+		
 		alert("No result");
 	}
 }
@@ -360,6 +365,10 @@ function buildGrid(target) {
 		maxMargin : 25,
 		firstItemClass : "first-item"
 	});
+}
+
+function getValue(name) {
+	return $("#" + name).prop("checked") ? name : null;
 }
 
 function parseSelection() {

@@ -1,6 +1,8 @@
 package ee.ajapaik.model.search;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
 
 public class Search implements Serializable {
@@ -19,6 +21,7 @@ public class Search implements Serializable {
 	private SearchField number; // identifying number
 	private YearField yearStart; // dates
 	private YearField yearEnd; // dates
+	private List<InstitutionType> institutionTypes;
 	private String luceneQuery;
 	private boolean digital; // urlToRecord peab olemas olema
 	private SortableField sortBy = SortableField.RELEVANCE; 
@@ -135,7 +138,7 @@ public class Search implements Serializable {
 
 	public String getSearchPhrase() {
 		if(luceneQuery != null) {
-			return luceneQuery;
+			return luceneQuery + getInstitutions();
 		} else {
 			String phrase = "";
 			if (fullSearch != null && fullSearch.getValue() != null
@@ -163,23 +166,32 @@ public class Search implements Serializable {
 			if (id != null && id.getValue() != null && id.getValue().length() != 0)
 				phrase += " " + id.getAndOr() + "ID_NUMBER:(" + getTerm(id) + ")";
 	
-			boolean hasStart = hasYearValue(yearStart);
-			boolean hasEnd = hasYearValue(yearEnd);
-			if (hasStart || hasEnd) {
-				phrase += " +YEAR:";
-				if(hasStart && hasEnd) {
-					phrase += "[" + yearStart.getYear() + " TO " + yearEnd.getYear() + "]";
-				} else if(hasStart) {
-					phrase += yearStart.getYear();
-				} else if(hasEnd) {
-					phrase += yearEnd.getYear();
-				}
-			}
-			
 			if (phrase.startsWith(" "))
 				phrase = phrase.substring(1);
-			return phrase;
+			
+			return phrase + getInstitutions();
 		}
+	}
+
+	private String getInstitutions() {
+		StringBuilder builder = new StringBuilder();
+		
+		institutionTypes.removeAll(Collections.singleton(null));
+		
+		if(institutionTypes.size() > 0) {
+			builder.append(" +INSTITUTION_TYPE:(");
+			for (int i = 0; i < institutionTypes.size(); i++) {
+				InstitutionType institutionType = institutionTypes.get(i);
+				
+				builder.append(institutionType.toString());
+				
+				if(i < institutionTypes.size() - 1) {
+					builder.append(" OR ");	
+				}
+			}
+			builder.append(") ");
+		}
+		return builder.toString();
 	}
 
 	private String getTerm(SearchField field) {
@@ -194,17 +206,6 @@ public class Search implements Serializable {
 			return sb.toString();
 		}
 		return field.value;
-	}
-
-	private boolean hasYearValue(YearField year) {
-		return year != null && year.getYear() != null && year.getYear().length() != 0;
-	}
-
-	public boolean isSimpleSearch() {
-		if(fullSearch != null && fullSearch.getValue() != null && fullSearch.getValue().length() > 0)
-			return true;
-		
-		return false;
 	}
 
 	public void setResultsCount(int resultsCount) {
@@ -226,5 +227,13 @@ public class Search implements Serializable {
 
 	public void setLuceneQuery(String luceneQuery) {
 		this.luceneQuery = luceneQuery;
+	}
+
+	public List<InstitutionType> getInstitutionTypes() {
+		return institutionTypes;
+	}
+
+	public void setInstitutionTypes(List<InstitutionType> institutionTypes) {
+		this.institutionTypes = institutionTypes;
 	}
 }

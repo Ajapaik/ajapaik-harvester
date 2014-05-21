@@ -63,7 +63,7 @@ public class AjapaikServiceImpl implements AjapaikService {
 //		fillResult(search, InstitutionType.MUSEUM, result);
 //		fillResult(search, InstitutionType.LIBRARY, result);
 //		fillResult(search, InstitutionType.ARCHIVE, result);
-		fillResult(search, null, result);
+		fillResult(search, result);
 
 		result.setSearchTime(((double)(System.nanoTime() - start)) / 1000000.0);
 		return result;
@@ -105,43 +105,23 @@ public class AjapaikServiceImpl implements AjapaikService {
 		return result.toArray(new RecordView[result.size()]);
 	}
 	
-	private void fillResult(Search search, InstitutionType type, SearchResults result) throws Exception {
-		String phrase =search.getSearchPhrase();
+	private void fillResult(Search search, SearchResults result) throws Exception {
+		String phrase = search.getSearchPhrase();
 		StringBuilder query;
 		if("+FULL_SEARCH:(+match +all )".equals(phrase.trim()))
 			query = new StringBuilder();
 		else
 			query = new StringBuilder(phrase);
-		
-		if(type != null)
-			query.append(" +INSTITUTION_TYPE:").append(type.name());
+
 		if(search.isDigital())
 			query.append(" +DIGITAL:true");
 		
 		Result r = indexer.search(query.toString(), search.getSortBy(), Integer.MAX_VALUE);
 		
 		List<Document> documents = r.getResult();
-		if(type != null) {
-			switch (type) {
-			case ARCHIVE:
-				result.setArchiveIds(getRecordIds(documents));
-				result.setTotalArchiveIds(r.getTotalHits());
-				break;
-			case MUSEUM:
-				result.setMuseumIds(getRecordIds(documents));
-				result.setTotalMuseumIds(r.getTotalHits());			
-				break;
-			case LIBRARY:
-				result.setLibraryIds(getRecordIds(documents));
-				result.setTotalLibraryIds(r.getTotalHits());
-				break;
-	
-			}
-		} else {
-			result.setIds(getRecordIds(documents));
-			result.setFirstRecordViews(getRecordViews(documents, 
-					(search.getPageSize() > documents.size() ? documents.size() : search.getPageSize())));
-		}
+		result.setIds(getRecordIds(documents));
+		result.setFirstRecordViews(getRecordViews(documents, 
+				(search.getPageSize() > documents.size() ? documents.size() : search.getPageSize())));
 	}
 
 	private RecordView[] getRecordViews(List<Document> documents, int count) {
