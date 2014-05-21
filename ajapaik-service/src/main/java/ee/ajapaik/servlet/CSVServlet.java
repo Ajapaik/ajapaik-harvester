@@ -1,5 +1,6 @@
 package ee.ajapaik.servlet;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -7,19 +8,18 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -56,7 +56,7 @@ public class CSVServlet extends HttpServlet {
 			logger.debug("Building ZIP for ids: " + ids);
 			
 			if(ids != null && ids.length() > 0) {
-				StringBuilder result = new StringBuilder("institution;number;autor;title;description;date;place;url;image;\n");
+				final StringBuilder result = new StringBuilder("institution;number;autor;title;description;date;place;url;image;width;height;\n");
 				
 				WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 				AjapaikService service = ctx.getBean("ajapaikService", AjapaikService.class);
@@ -90,7 +90,15 @@ public class CSVServlet extends HttpServlet {
 					addField(result, ""); // place
 					addField(result, recordView.getUrlToRecord());
 					try {
-						addField(result, grabImage(zos, name, recordView.getImageUrl()));
+						grabImage(zos, name, recordView.getImageUrl(), new Callback() {
+							
+							@Override
+							public void notify(String name, Integer width, Integer height) {
+								addField(result, name);
+								addField(result, width.toString());
+								addField(result, height.toString());
+							}
+						});
 					} catch (Exception e) {
 						logger.error("Error getting data", e);
 					}
@@ -120,7 +128,7 @@ public class CSVServlet extends HttpServlet {
 		}
 	}
 
-	private String grabImage(ZipOutputStream zos, String name, String query) throws Exception {
+	private void grabImage(ZipOutputStream zos, String name, String query, Callback c) throws Exception {
 		URL url = new URL(query);
 		BaseHttpClient client = PlatformFactory.getInstance().getClient(url);
 		
@@ -133,26 +141,35 @@ public class CSVServlet extends HttpServlet {
 		HttpEntity entity = result.getEntity();
 		
 		if(entity != null) {
-			if (result.getStatusLine().getStatusCode() != 404) {
+			if (result.getStatusLine().getStatusCode() == 200) {
 				String[] split = query.split("/");
 				
 				String fileName = split[split.length - 1] + ".jpg";
 				ZipEntry ze = new ZipEntry(fileName);
 	    		zos.putNextEntry(ze);
 	    		
+				int width = 0;
+				int height = 0;
 				try {
-					IOUtils.copy(entity.getContent(), zos);
+					BufferedImage bimg = ImageIO.read(entity.getContent());
+					
+					width = bimg.getWidth();
+					height = bimg.getHeight();
+					
+					ImageIO.write( bimg, "jpg", zos );
 				} finally {
 					zos.closeEntry();
 				}
 				
 				logger.debug("Got data: " + fileName);
 				
-				return fileName;
+				c.notify(fileName, width, height);
+				
+				return;
 			}
 		}
 		
-		return null;
+		c.notify("", 0, 0);
 	}
 
 	private void addField(StringBuilder result, String data) {

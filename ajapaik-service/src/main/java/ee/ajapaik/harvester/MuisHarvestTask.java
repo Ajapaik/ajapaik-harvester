@@ -15,10 +15,6 @@ import ee.ajapaik.util.JaxbUtil;
 
 public class MuisHarvestTask extends HarvestTask {
 
-	public MuisHarvestTask() {
-
-	}
-
 	@Override
 	protected Record mapRecord(RecordType jaxbRecord) {
 		Record rec = new Record();
@@ -72,6 +68,7 @@ public class MuisHarvestTask extends HarvestTask {
 				if (mat.group().length() == 4)
 					dates.add(mat.group());
 			}
+			rec.setDates(dates);
 			
 			List<String> types = jaxbUtil.getValues(eseRec, "type");
 			for (int i = 0; i < types.size(); i++) {
