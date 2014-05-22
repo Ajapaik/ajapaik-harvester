@@ -1,8 +1,5 @@
 package ee.ajapaik.index;
 
-/**
- * @author <a href="mailto:kaido@urania.ee?subject=IndexedFields">Kaido Kalda</a>
- */
 public enum IndexedFields {
 	CODE,
 	DESCRIPTION,

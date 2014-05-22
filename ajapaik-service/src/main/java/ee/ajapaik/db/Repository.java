@@ -21,7 +21,7 @@ import ee.ajapaik.model.search.Record;
 import ee.ajapaik.serialize.Serializer;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=Repository">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=Repository">Kaido Kalda</a>
  */
 public class Repository implements InitializingBean {
 

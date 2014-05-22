@@ -6,7 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.CharBuffer;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=FilteredInputStreamReader">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=FilteredInputStreamReader">Kaido Kalda</a>
  */
 public abstract class FilteredInputStreamReader extends InputStreamReader {
 

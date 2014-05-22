@@ -14,14 +14,13 @@ import ee.ajapaik.index.IndexedFields;
 import ee.ajapaik.index.Indexer;
 import ee.ajapaik.index.Result;
 import ee.ajapaik.model.InfoSystem;
-import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.Search;
 import ee.ajapaik.model.search.SearchResults;
 import ee.ajapaik.schedule.Scheduler;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=BamService">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=AjapaikServiceImpl">Kaido Kalda</a>
  */
 public class AjapaikServiceImpl implements AjapaikService {
 
@@ -60,9 +59,6 @@ public class AjapaikServiceImpl implements AjapaikService {
 		if(!StringUtils.hasText(search.getSearchPhrase()))
 			return result;
 			
-//		fillResult(search, InstitutionType.MUSEUM, result);
-//		fillResult(search, InstitutionType.LIBRARY, result);
-//		fillResult(search, InstitutionType.ARCHIVE, result);
 		fillResult(search, result);
 
 		result.setSearchTime(((double)(System.nanoTime() - start)) / 1000000.0);
@@ -116,7 +112,7 @@ public class AjapaikServiceImpl implements AjapaikService {
 		if(search.isDigital())
 			query.append(" +DIGITAL:true");
 		
-		Result r = indexer.search(query.toString(), search.getSortBy(), Integer.MAX_VALUE);
+		Result r = indexer.search(query.toString(), search.getSortBy(), search.getMaxResult());
 		
 		List<Document> documents = r.getResult();
 		result.setIds(getRecordIds(documents));

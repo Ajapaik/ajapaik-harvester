@@ -62,7 +62,7 @@ import ee.ajapaik.model.search.SortableField;
 import ee.ajapaik.util.Tracer;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=Indexer">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=Indexer">Kaido Kalda</a>
  */
 public class Indexer implements InitializingBean {
 
@@ -127,12 +127,12 @@ public class Indexer implements InitializingBean {
 	public void closeSearcher(IndexSearcher searcher) {
 		if(searcher != null) {
 			synchronized (searchers) {
-				logger.debug("Closing searcher! Opened searchers: " + searchers.size());
 				
-				Tracer.trace();
+				logger.debug("Closing searcher! Opened searchers: " + searchers.size());
 				
 				searchers.remove(searcher);
 				searchers.notifyAll();
+				
 				try {
 					searcher.close();
 				} catch (IOException e) {
@@ -146,12 +146,11 @@ public class Indexer implements InitializingBean {
 		synchronized (searchers) {
 			logger.debug("Opening searcher! Opened searchers: " + searchers.size());
 			
-			Tracer.trace();
-			
 			File directory = new File(indexDirectory, AVAILABLE);
 			IndexSearcher searcher = new IndexSearcher(FSDirectory.open(directory), false);
 			
 			searchers.add(searcher);
+			
 			return searcher;
 		}
 	}
@@ -259,11 +258,13 @@ public class Indexer implements InitializingBean {
 
 	public Result search(Query query, SortableField sort, int maxResult) {
 		List<Document> result = new ArrayList<Document>();
+		
 		TopDocs docs;
+		IndexSearcher searcher = null;
 		try {
 			logger.debug(query.toString());
 			
-			IndexSearcher searcher = openSearcher();
+			searcher = openSearcher();
 			if(sort == null || SortableField.RELEVANCE.equals(sort))
 				docs = searcher.search(query, maxResult);
 			else
@@ -273,10 +274,11 @@ public class Indexer implements InitializingBean {
 				result.add(searcher.doc(docs.scoreDocs[i].doc));
 			}
 			
-			closeSearcher(searcher);
 			return new Result(result, docs.totalHits);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to search index", e);
+		} finally {
+			closeSearcher(searcher);
 		}
 	}
 
@@ -398,15 +400,5 @@ public class Indexer implements InitializingBean {
 				FSDirectory.open(writerDirectory), 
 				analyzer, 
 				MaxFieldLength.UNLIMITED);
-	}
-
-	public void deleteDocument(String recordId) {
-		try {
-			IndexSearcher searcher = openSearcher();
-			searcher.getIndexReader().deleteDocuments(new Term(ID.name(), recordId));
-			closeSearcher(searcher);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 }

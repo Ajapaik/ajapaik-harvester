@@ -13,7 +13,7 @@ import com.sleepycat.je.DatabaseEntry;
 import ee.ajapaik.model.search.Record;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=JavaSerializer">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=JavaSerializer">Kaido Kalda</a>
  */
 public class JavaSerializer implements Serializer {
 

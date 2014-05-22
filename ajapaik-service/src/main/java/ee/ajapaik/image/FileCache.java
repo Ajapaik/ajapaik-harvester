@@ -1,11 +1,8 @@
 package ee.ajapaik.image;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -17,11 +14,9 @@ import org.apache.log4j.Logger;
 
 import ee.ajapaik.platform.BaseHttpClient;
 import ee.ajapaik.platform.PlatformFactory;
-import ee.ajapaik.util.Digester;
-import ee.ajapaik.util.Digester.DataCallback;
 
 /**
- * @author Kaido
+ * @author <a href="mailto:kaido@quest.ee?subject=FileCache">Kaido Kalda</a>
  */
 public class FileCache {
 	

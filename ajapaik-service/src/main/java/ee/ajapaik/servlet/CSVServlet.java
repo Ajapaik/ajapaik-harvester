@@ -35,7 +35,7 @@ import ee.ajapaik.service.AjapaikService;
 
 /**
  * 
- * @author Kaido
+ * @author <a href="mailto:kaido@quest.ee?subject=CSVServlet">Kaido Kalda</a>
  */
 public class CSVServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

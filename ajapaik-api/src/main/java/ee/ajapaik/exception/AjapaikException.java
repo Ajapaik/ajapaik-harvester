@@ -4,7 +4,7 @@ package ee.ajapaik.exception;
 /**
  * Default exception class used in various cases
  * 
- * @author <a href="mailto:kaido@quest.ee?subject=BillingException">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=AjapaikException">Kaido Kalda</a>
  */
 public class AjapaikException extends Exception {
 	

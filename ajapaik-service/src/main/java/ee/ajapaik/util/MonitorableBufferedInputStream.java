@@ -4,7 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=MonitorableBufferedInputStream">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=MonitorableBufferedInputStream">Kaido Kalda</a>
  */
 public class MonitorableBufferedInputStream extends BufferedInputStream {
 

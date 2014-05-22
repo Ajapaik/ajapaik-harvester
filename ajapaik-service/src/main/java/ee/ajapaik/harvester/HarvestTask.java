@@ -55,7 +55,7 @@ import ee.ajapaik.util.FilteredInputStreamReader;
 import ee.ajapaik.util.MonitorableBufferedInputStream;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=HarvestTask">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=HarvestTask">Kaido Kalda</a>
  */
 public abstract class HarvestTask extends QuartzJobBean implements ListRecordsType.Listener {
 
@@ -322,8 +322,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			MonitorableBufferedInputStream bis = null;
 			try {
 				bis = new MonitorableBufferedInputStream(is, 8192 + 1024);
-				JAXBContext jc = JAXBContext
-						.newInstance("org.openarchives.oai._2:"
+				JAXBContext jc = JAXBContext.newInstance("org.openarchives.oai._2:"
 								+ "org.openarchives.oai._2_0.oai_dc:"
 								+ "org.purl.dc.elements._1:"
 								+ "org.purl.dc.terms:"
@@ -335,8 +334,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 					u.setListener(listener);
 
 				if (allowInvalidCharacters) {
-					FilteredInputStreamReader fisr = new FilteredInputStreamReader(
-							bis, "UTF-8") {
+					FilteredInputStreamReader fisr = new FilteredInputStreamReader(bis, "UTF-8") {
 						@Override
 						public char filter(char b) {
 							if (b == 0 || b == 0x9 || b == 0xA || b == 0xD
@@ -370,7 +368,13 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 					return (JAXBElement<OAIPMHtype>) u.unmarshal(bis);
 				}
 			} catch (JAXBException e) {
-				logger.error("Error in buffer: " + new String(bis.getBuffer(), "UTF-8").trim());
+				byte[] buffer = bis.getBuffer();
+				if(buffer == null) {
+					logger.error("Buffer is null", e);
+				} else {
+					logger.error("Error in buffer: " + new String(buffer, "UTF-8").trim(), e);
+				}
+				
 				throw e;
 			} finally {
 				try {
@@ -383,7 +387,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		}
 		return null;
 	}
-
+	
 	private String getOperationAddress(String verb, Map<String, String> additionalParams) {
 		StringBuilder builder = new StringBuilder(infoSystem.getAddress());
 

@@ -3,7 +3,7 @@ package ee.ajapaik.util;
 import java.security.MessageDigest;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=Digester">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=Digester">Kaido Kalda</a>
  */
 public class Digester {
 	

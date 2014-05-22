@@ -40,7 +40,7 @@ import org.apache.http.protocol.HttpContext;
 /**
  * Base class for all http clients
  * 
- * @author <a href="mailto:kaido@quest.ee?subject=AbstractHttpClient">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=BaseHttpClient">Kaido Kalda</a>
  */
 public class BaseHttpClient extends BaseClient {
 	

@@ -25,7 +25,7 @@ import ee.ajapaik.model.InfoSystem;
 import ee.ajapaik.persist.SerializingPersister;
 
 /**
- * @author <a href="mailto:kaido@urania.ee?subject=Scheduler">Kaido Kalda</a>
+ * @author <a href="mailto:kaido@quest.ee?subject=Scheduler">Kaido Kalda</a>
  */
 public class Scheduler implements BeanFactoryAware, InitializingBean {
 	private static final String JOB_MAP_INFO_SYSTEM = "infoSystem";

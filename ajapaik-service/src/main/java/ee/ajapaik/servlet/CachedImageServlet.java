@@ -15,7 +15,7 @@ import ee.ajapaik.db.Repository;
 
 /**
  * 
- * @author Kaido
+ * @author <a href="mailto:kaido@quest.ee?subject=CachedImageServlet">Kaido Kalda</a>
  */
 public class CachedImageServlet extends HttpServlet {
 

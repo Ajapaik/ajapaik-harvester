@@ -9,8 +9,6 @@ public class Search implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private int pageSize;
-	
 	private SearchField id;
 	private SearchField fullSearch;
 	private SearchField what; // title
@@ -19,14 +17,21 @@ public class Search implements Serializable {
 	private SearchField from; // institution
 	private SearchField description; // description
 	private SearchField number; // identifying number
-	private YearField yearStart; // dates
-	private YearField yearEnd; // dates
 	private List<InstitutionType> institutionTypes;
 	private String luceneQuery;
 	private boolean digital; // urlToRecord peab olemas olema
 	private SortableField sortBy = SortableField.RELEVANCE; 
 	
-	private int resultsCount; // for previousSearches page
+	private int maxResult = 10000; // Maximum total results
+	private int pageSize; // Initial result size
+	
+	public int getMaxResult() {
+		return maxResult;
+	}
+
+	public void setMaxResult(int maxResult) {
+		this.maxResult = maxResult;
+	}
 
 	public int getPageSize() {
 		return pageSize;
@@ -82,22 +87,6 @@ public class Search implements Serializable {
 
 	public void setNumber(SearchField number) {
 		this.number = number;
-	}
-
-	public void setYearStart(YearField yearStart) {
-		this.yearStart = yearStart;
-	}
-
-	public YearField getYearStart() {
-		return yearStart;
-	}
-
-	public void setYearEnd(YearField yearEnd) {
-		this.yearEnd = yearEnd;
-	}
-
-	public YearField getYearEnd() {
-		return yearEnd;
 	}
 
 	public void setDigital(boolean digital) {
@@ -208,14 +197,6 @@ public class Search implements Serializable {
 		return field.value;
 	}
 
-	public void setResultsCount(int resultsCount) {
-		this.resultsCount = resultsCount;
-	}
-
-	public int getResultsCount() {
-		return resultsCount;
-	}
-	
 	@Override
 	public String toString() {
 		return luceneQuery != null ? luceneQuery : getSearchPhrase();
