@@ -15,6 +15,7 @@ public class InfoSystem implements Serializable {
 	private String schedule;
 	private String email;
 	private String homepageUrl;
+	private String ignoreSet; 
 
 	public InfoSystem() {
 	}
@@ -93,6 +94,14 @@ public class InfoSystem implements Serializable {
 
 	public void setMapper(String mapper) {
 		this.mapper = mapper;
+	}
+	
+	public String getIgnoreSet() {
+		return ignoreSet;
+	}
+
+	public void setIgnoreSet(String ignoreSet) {
+		this.ignoreSet = ignoreSet;
 	}
 
 	@Override

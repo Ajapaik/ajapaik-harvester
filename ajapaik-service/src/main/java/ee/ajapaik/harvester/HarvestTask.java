@@ -9,9 +9,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
@@ -190,18 +193,28 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	}
 
 	private void iterateSets(HashMap<String, String> params, Date lastHarvest) throws ClientProtocolException, IOException, JAXBException {
+		
+		List<String> setsToIgnore = new ArrayList<String>();
+		if(infoSystem.getIgnoreSet() != null) {
+			setsToIgnore = Arrays.asList(infoSystem.getIgnoreSet().split(","));
+		}
+		
 		for (String set : this.sets.keySet()) {
-			logger.debug("Opening set: " + set);
-
-			addParameter(params, "set", set);
-			addParameter(params, "metadataPrefix", format);
-			
-			if (lastHarvest != null)
-				addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
-
-			iterateRecords(params);
-
-			logger.debug("Set iterated: " + set);
+			if(!setsToIgnore.contains(set)) {
+				logger.debug("Opening set: " + set);
+	
+				addParameter(params, "set", set);
+				addParameter(params, "metadataPrefix", format);
+				
+				if (lastHarvest != null)
+					addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
+	
+				iterateRecords(params);
+	
+				logger.debug("Set iterated: " + set);
+			} else {
+				logger.debug("Set ignored: " + set);
+			}
 		}
 	}
 	
@@ -370,12 +383,12 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			} catch (JAXBException e) {
 				byte[] buffer = bis.getBuffer();
 				if(buffer == null) {
-					logger.warn("Buffer red fully", e);
+					logger.error("Buffer is null", e);
 				} else {
 					logger.error("Error in buffer: " + new String(buffer, "UTF-8").trim(), e);
-					
-					throw e;
 				}
+				
+				throw e;
 			} finally {
 				try {
 					if (bis != null)
@@ -425,6 +438,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
 				
 				HttpResponse result = bc.getHttpClient().execute(get);
+				
 				HttpEntity entity = result.getEntity();
 				
 				if(entity != null) {
