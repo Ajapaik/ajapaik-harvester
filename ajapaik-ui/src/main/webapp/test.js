@@ -258,7 +258,7 @@ function parseResult(result, scroll) {
 			
 			tooltipData[record.id] = {"img":record.imageUrl,"desc":record.description,"title":record.title, "number":record.identifyingNumber};
 			
-			var img = $("<img height='" + self.gridSize + "' src='http://ajapaik.ee:8080/ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
+			var img = $("<img height='" + self.gridSize + "' src='../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
 			
 			img.load(function(e) {
 				loadedImages++;
@@ -428,7 +428,7 @@ function parseSelection() {
 					recordContainer = $("<div class='item'></div>");
 					
 					// Image
-					var img = $("<img height='90' src='http://ajapaik.ee:8080/ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
+					var img = $("<img height='90' src='../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
 					
 					img.data(description);
 					
