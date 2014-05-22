@@ -370,12 +370,12 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			} catch (JAXBException e) {
 				byte[] buffer = bis.getBuffer();
 				if(buffer == null) {
-					logger.error("Buffer is null", e);
+					logger.warn("Buffer red fully", e);
 				} else {
 					logger.error("Error in buffer: " + new String(buffer, "UTF-8").trim(), e);
+					
+					throw e;
 				}
-				
-				throw e;
 			} finally {
 				try {
 					if (bis != null)
