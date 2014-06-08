@@ -397,7 +397,7 @@ function parseSelection() {
 					
 					description.append("<p><b><a href='" + record.urlToRecord + "' target='_blank'>" + record.title + "</a></b></p>");
 					description.append("<p>" + record.identifyingNumber + "</p>");
-					description.append("<p>" + record.providerName + "</p>");
+					description.append("<p>" + record.providerName.replace("NLIB", "Digar") + "</p>");
 					description.append("<p>" + record.description.replace("<", "").replace(">", "") + "</p>");
 					
 					// Image
