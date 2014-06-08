@@ -128,36 +128,41 @@
 
 			self.setRange(e);
 
-			$(self.img).bind(
-					'load',
-					function() {
+			$(self.img).bind('load', function() {
+				self.getImageSize(self.img); // after image is loaded we can get image size
+				
+				var $image = self.$tooltip.find('img');
+				self.$tooltip.find('.spinner').remove(); // remove spinner
+				$image.show();
 
-						// console.log("image loaded");
-						self.getImageSize(self.img); // after image is loaded
-														// we can get image size
+				
+				var vp = self.viewport();
+				var ratio = self.size.img.h / self.size.img.w;
+				
+				if(self.size.img.h > vp.h) {
+					self.size.img.h = vp.h - 80;
+					self.size.img.w = self.size.img.h / ratio; 
+				}
+				
+				if(self.size.img.w > vp.w / 2) {
+					self.size.img.w = (vp.w / 2);
+					self.size.img.h = self.size.img.w / ratio; 
+				}
+				
+				var imageW = self.size.img.w;
+				
+				$image.width(imageW);
+				self.setTooltipSize(imageW); // set tooltip size according to image width
 
-						var $image = self.$tooltip.find('img');
-						self.$tooltip.find('.spinner').remove(); // remove
-																	// spinner
+				var pos = self.calcPosition(e);
+				
+				self.$tooltip.css("top", pos.y + "px").css("left",
+						pos.x + "px");
 
-						$image.show();
-
-						var imageW = 600; //self.imageWidth(self.getMousePosition(e)) - 100;
-
-						$image.width(imageW);
-
-						self.setTooltipSize(imageW); // set tooltip size
-														// according to image
-														// width
-
-						var pos = self.calcPosition(e);
-						self.$tooltip.css("top", pos.y + "px").css("left",
-								pos.x + "px");
-
-						if (!self.timer) {
-							self.$tooltip.show();
-						}
-					});
+				if (!self.timer) {
+					self.$tooltip.show();
+				}
+			});
 			self.img.src = data.img;
 
 			var content = '<div class="tooltip-content">'
@@ -288,37 +293,50 @@
 	 */
 	Tooltip.prototype.calcPosition = function(e) {
 
-		// console.log(this.size);
-
+		var img_size = this.size.img;
 		var pos = this.getMousePosition(e);
-
-		if (pos.y + this.size.h > this.size.max.y) {
-			pos.y = this.size.max.y - this.size.h - (this.opts.tolerance / 2);
+		var vp = this.viewport();
+		var t = $(window).scrollTop();
+		
+		pos.y = t + Math.max(((vp.h - img_size.h) / 2) - 10, 10);
+		
+		if((pos.x + img_size.w + 20) > vp.w) {
+			pos.x = pos.x - img_size.w - 50; 
 		}
-
-		if (pos.x + this.size.w > this.size.max.x) {
-
-			if (this.size.w > 0 && this.size.min.x + this.size.w > pos.x) {
-
-				var w = this.size.w - 100;
-				this.$tooltip.find('img.image').width(w);
-				this.setTooltipSize(w);
-				return this.calcPosition();
-
-			} else {
-				pos.x = pos.x - this.size.w - 2 * this.opts.xOffset;
-			}
-
-		}
-
-		if (pos.x < 0)
-			pos.x = 0;
-		if (pos.y < 0)
-			pos.y = 0;
-
+		
 		return pos;
 	}
+	
+	Tooltip.prototype.viewport = function() {
+		var viewPortWidth;
+		var viewPortHeight;
 
+		// the more standards compliant browsers (mozilla/netscape/opera/IE7) use window.innerWidth and window.innerHeight
+		if (typeof window.innerWidth != 'undefined') {
+			viewPortWidth = window.innerWidth,
+			viewPortHeight = window.innerHeight
+		}
+
+		// IE6 in standards compliant mode (i.e. with a valid doctype as the first line in the document)
+		else if (typeof document.documentElement != 'undefined'
+			&& typeof document.documentElement.clientWidth !=
+			'undefined' && document.documentElement.clientWidth != 0) {
+			viewPortWidth = document.documentElement.clientWidth,
+			viewPortHeight = document.documentElement.clientHeight
+		}
+
+		// older versions of IE
+		else {
+			viewPortWidth = document.getElementsByTagName('body')[0].clientWidth,
+			viewPortHeight = document.getElementsByTagName('body')[0].clientHeight
+		}
+
+		this.viewport.height = viewPortHeight;
+		this.viewport.width = viewPortWidth;
+		
+		return {w:viewPortWidth, h:viewPortHeight};
+	}
+	
 	// initialises our jQuery plugin
 	$.fn.tooltip = function(opts) {
 		new Tooltip(this, opts);

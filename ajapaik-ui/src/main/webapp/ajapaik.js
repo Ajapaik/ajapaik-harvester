@@ -12,6 +12,8 @@ var scrollTo = 0;
 
 var detailView = false;
 
+var url = ""; //"http://ajapaik.ee:8080/ajapaik-ui/";
+
 $(document).ready(function() {
 
 	// Search
@@ -258,7 +260,7 @@ function parseResult(result, scroll) {
 			
 			tooltipData[record.id] = {"img":record.imageUrl,"desc":record.description,"title":record.title, "number":record.identifyingNumber};
 			
-			var img = $("<img height='" + self.gridSize + "' src='../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
+			var img = $("<img height='" + self.gridSize + "' src='" + url + "../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
 			
 			img.load(function(e) {
 				loadedImages++;
@@ -391,11 +393,12 @@ function parseSelection() {
 					recordContainer = $("<div class='record-container col-sm-12'></div>");
 					
 					// Description
-					var description = $("<div class='col-sm-9'></div>");
+					var description = $("<div class='col-sm-8'></div>");
 					
-					description.append("<p><b>" + record.title + "</b></p>");
+					description.append("<p><b><a href='" + record.urlToRecord + "' target='_blank'>" + record.title + "</a></b></p>");
 					description.append("<p>" + record.identifyingNumber + "</p>");
-					description.append("<p>" + record.description + "</p>");
+					description.append("<p>" + record.providerName + "</p>");
+					description.append("<p>" + record.description.replace("<", "").replace(">", "") + "</p>");
 					
 					// Image
 					var img = $("<img src='" + record.imageUrl + "'>");
@@ -415,7 +418,7 @@ function parseSelection() {
 						}
 					});
 					
-					var item = $("<div class='col-sm-3'></div>");
+					var item = $("<div class='col-sm-4'></div>");
 					
 					item.append(img);
 					
@@ -428,7 +431,7 @@ function parseSelection() {
 					recordContainer = $("<div class='item'></div>");
 					
 					// Image
-					var img = $("<img height='90' src='../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
+					var img = $("<img height='90' src='" + url + "../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
 					
 					img.data(description);
 					
@@ -451,7 +454,10 @@ function parseSelection() {
 				recordContainer.data(record.id);
 				
 				recordContainer.on("click", function(e) {
-					if(confirm("Eemalda valikust?")) {
+					
+					var target = e.target;
+					
+					if(target.nodeName != "A" && confirm("Eemalda valikust?")) {
 						
 						// Remove from selection
 						selection.splice(selection.indexOf($(this).data()), 1);
