@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+        
+<xs:schema 
+    attributeFormDefault="qualified" 
+    elementFormDefault="qualified" 
+    targetNamespace="http://ais.ra.ee/schemas/task" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!--
+    Reserved for future use
+    <element name="task" type="anyType" />
+    -->
+
+  <xs:element name="taskObjectListRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="taskId" type="xs:integer" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="taskObjectListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="taskObjectList">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="taskObject" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:integer" name="taskId"/>
+                    <xs:element type="xs:string" name="xTaskObjectTypeId"/>
+                    <xs:element type="xs:integer" name="objectId"/>
+                    <xs:element name="objectPuris">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element type="xs:string" name="objectPuri" maxOccurs="unbounded" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

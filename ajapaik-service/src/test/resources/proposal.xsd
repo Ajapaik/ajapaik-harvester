@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="qualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://ais.ra.ee/schemas/proposal"
+           xmlns="http://ais.ra.ee/schemas/proposal"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="proposal">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="xs:string" name="xProposalObjectTypeId">
+                    <xs:annotation>
+                        <xs:documentation>Objekti tüübi klassifikaator, mille kohta muudatusettepanek on tehtud (vajalik
+                            siis, kui tag'i objectPuri ei ole antud).
+                            Võimalikud tüübid on: ADMIN_UNIT, DESCRIPTION_UNIT, PERSON, SUBJECT_AREA, TOPIC
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:int" name="objectId">
+                    <xs:annotation>
+                        <xs:documentation>Objekti id, mille kohta muudatusettepanek on tehtud (vajalik siis, kui tag'i
+                            objectPuri ei ole antud)
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:anyURI" name="objectPuri">
+                    <xs:annotation>
+                        <xs:documentation>Muudatusettepaneku objekti puri (vajalik siis, kui objekti tüüpi ja id'd ei
+                            ole antud)
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:byte" name="taskId">
+                    <xs:annotation>
+                        <xs:documentation>Ülesande id, mille alla muudatusettepanek lisatakse</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:string" name="notes"/>
+                <xs:element type="xs:string" name="xProposalTypeId">
+                    <xs:annotation>
+                        <xs:documentation>Muudatusettepaneku tüüp on FIELD_CHANGE</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="object">
+                    <xs:annotation>
+                        <xs:documentation>Muudetud objekti andmed XMLina (andmeid, mis ei ole muutunud, ei ole vaja siia
+                            lisada)
+                        </xs:documentation>
+                    </xs:annotation>
+                    
+					<xs:complexType>
+					    <xs:sequence>
+							<xs:element ref="descriptionUnit" />
+				    	</xs:sequence>
+			    	</xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="setRequest">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="proposal"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="setResponse">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="result" type="xs:string" minOccurs="0"/>
+                <xs:element name="warnings" type="xs:string" minOccurs="0"/>
+                <xs:element name="errors" type="xs:string" minOccurs="0"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+	<xs:element name="descriptionUnit">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="descriptionUnitMetas" />
+				<xs:element ref="referencesReferences" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+    
+	<xs:element name="descriptionUnitMetas">
+   		<xs:complexType>
+   			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="descriptionUnitMeta" />
+   			</xs:sequence>
+   		</xs:complexType>
+   	</xs:element>
+    
+	<xs:element name="descriptionUnitMeta">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="xMetadataGroupId" type="xs:string" />
+				<xs:element name="xMetadataId" type="xs:string" />
+				<xs:element name="value" type="xs:string" />
+			</xs:all>
+		</xs:complexType>
+	</xs:element>    
+    
+   	<xs:element name="referencesReferences">
+   		<xs:complexType>
+   			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="reference" />
+   			</xs:sequence>
+   		</xs:complexType>
+   	</xs:element>
+   	
+	<xs:element name="reference">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="referenceTypeId" type="xs:string" />
+				<xs:element name="referenceValue" type="xs:string" />
+				<xs:element name="name" type="xs:string" />
+			</xs:all>
+		</xs:complexType>
+	</xs:element>    
+</xs:schema>

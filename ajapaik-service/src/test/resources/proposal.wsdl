@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions name="Proposal"
+             targetNamespace="http://ais.ra.ee/services"
+             xmlns:dira="http://ais.ra.ee/schemas/dira"
+             xmlns:tns="http://ais.ra.ee/services"
+             xmlns:xsd="http://ais.ra.ee/schemas/proposal"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <import namespace="http://ais.ra.ee/schemas/dira" schemaLocation="dira.xsd" />
+            <import namespace="http://ais.ra.ee/schemas/proposal" schemaLocation="proposal.xsd" />
+        </schema>
+    </types>
+
+    <message name="setRequest">
+        <part name="body" element="xsd:setRequest"/>
+    </message>
+
+    <message name="setResponse">
+        <part name="body" element="xsd:setResponse"/>
+    </message>
+
+
+    <portType name="ProposalPortType">
+        <operation name="set">
+            <input message="tns:setRequest"/>
+            <output message="tns:setResponse"/>
+        </operation>
+    </portType>
+
+
+    <binding name="ProposalBinding" type="tns:ProposalPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="set">
+            <soap:operation soapAction="/service/proposal"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+
+    <service name="ProposalService">
+        <documentation>Proposal service</documentation>
+        <port name="ProposalPort" binding="tns:ProposalBinding">
+            <soap:address location="http://rahvusarhiiv.tietotest.ee/service/proposal/" />
+        </port>
+    </service>
+</definitions>

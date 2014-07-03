@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema targetNamespace="http://ais.ra.ee/schemas/dira"
+        xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:tns="http://ais.ra.ee/schemas/dira"
+        xmlns:soap-auth="http://soap-authentication.org/basic/2001/10/"
+        xmlns="http://www.w3.org/2001/XMLSchema">
+     
+     <import namespace="http://schemas.xmlsoap.org/soap/envelope/" schemaLocation="http://schemas.xmlsoap.org/soap/envelope/" />   
+
+    <!--<complexType name="stringArray">
+        <complexContent>
+            <restriction base="SOAP-ENC:Array">
+                <attribute ref="SOAP-ENC:arrayType" wsdl:arrayType="string[]" />
+            </restriction>
+        </complexContent>
+    </complexType>-->
+    
+    
+    <element name="fault">
+        <complexType>
+            <all>
+                <element name="errorMessage" type="string"/>
+            </all>
+        </complexType>
+    </element>
+    
+    <element name="basicAuth">
+        <complexType>
+            <sequence>
+                <element name="name" type="string"/>
+                <element name="password" type="string"/>
+            </sequence>
+            <attribute ref="SOAP-ENV:actor" use="optional"/>
+            <attribute ref="SOAP-ENV:mustUnderstand" use="optional"/>
+        </complexType>
+    </element>
+    
+</schema>
