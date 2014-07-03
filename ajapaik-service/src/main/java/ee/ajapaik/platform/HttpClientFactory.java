@@ -10,20 +10,20 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
-public class PlatformFactory implements BeanFactoryAware, InitializingBean{
+public class HttpClientFactory implements BeanFactoryAware, InitializingBean{
 
 	private Map<String, BaseHttpClient> clients = new HashMap<String, BaseHttpClient>();
 	private PlatformParametersOverridePostProcessor processor = new PlatformParametersOverridePostProcessor();
 	
 	private ConfigurableListableBeanFactory ctx;
 	
-	private static PlatformFactory instance;
+	private static HttpClientFactory instance;
 	
-	private PlatformFactory() {}
+	private HttpClientFactory() {}
 	
-	public static PlatformFactory getInstance() {
+	public static HttpClientFactory getInstance() {
 		if(instance == null) {
-			instance = new PlatformFactory();
+			instance = new HttpClientFactory();
 		}
 		return instance;
 	}

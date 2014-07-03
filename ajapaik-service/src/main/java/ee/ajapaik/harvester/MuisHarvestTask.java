@@ -11,6 +11,7 @@ import org.openarchives.oai._2.RecordType;
 
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
+import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.JaxbUtil;
 
 public class MuisHarvestTask extends HarvestTask {
@@ -87,7 +88,7 @@ public class MuisHarvestTask extends HarvestTask {
 			if(thumbnailUrl != null) {
 				rec.setImageUrl(getImageUrl(thumbnailUrl));
 				
-				saveThumbnail(rec, thumbnailUrl);
+				IOHandler.saveThumbnail(rec, thumbnailUrl, repository, taskCode);
 			}
 			rec.setInstitutionType(InstitutionType.MUSEUM);
 		} else {

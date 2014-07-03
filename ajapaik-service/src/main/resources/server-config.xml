@@ -56,11 +56,12 @@
 						<prop key="homepageUrl">http://register.muinas.ee</prop>
 						<prop key="schedule">0 53 21 22 * ?</prop>
 					</props>
-				</entry>
+				</entry>				
 			</map>
 		</property>
 		
-		<property name="indexerCronExpression" value="0 27 18 * * ?" />
+		<property name="indexerCronExpression" value="0 49 5 * * ?" />
+		<property name="aisCronExpression" value="0 48 5 * * ?" />
 		
 		<property name="schedulerFactory">
 			<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" />		
@@ -72,8 +73,6 @@
 		<property name="location" value="database" />
 		<property name="fileName" value="data.ser" />
 	</bean>
-	
-	<bean id="platformFactory" class="ee.ajapaik.platform.PlatformFactory" factory-method="getInstance" lazy-init="false" />
 	
 	<bean name="harvesterJob" class="org.springframework.scheduling.quartz.JobDetailBean">
 		<property name="jobDataAsMap">
@@ -97,33 +96,78 @@
 		
 		<property name="jobClass" value="ee.ajapaik.index.IndexerTask" />
 		<property name="name" value="indexer" />
-	</bean>	
+	</bean>
+	
+	<bean name="aisJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="ajapaikDao" value-ref="ajapaikDao" />
+				<entry key="repository" value-ref="repository" />
+				<entry key="taskServiceClient" value-ref="taskServiceClient" />
+				<entry key="proposalServiceClient" value-ref="proposalServiceClient" />
+			</map>
+		</property>
+		
+		<property name="jobClass" value="ee.ajapaik.harvester.AISHarvestTask" />
+		<property name="name" value="aisJob" />
+	</bean>		
 	
 	<bean id="fileCache" class="ee.ajapaik.image.FileCache" lazy-init="false">
 		<property name="fileStore" value="cache" />
 	</bean>
 	
 	<!-- Clients -->
+	
+	<bean class="ee.ajapaik.platform.HttpClientFactory" factory-method="getInstance" lazy-init="false" />
+	
 	<bean id="baseClient" class="ee.ajapaik.platform.BaseClient" abstract="true">
-		<property name="timeout" value="30000" />
+		<property name="timeout" value="60000" />
 		<property name="port" value="80" />
 		<property name="host" value="localhost" />
 	</bean>
 	
 	<bean id="baseHttpClient" class="ee.ajapaik.platform.BaseHttpClient" parent="baseClient" scope="prototype">
 		<property name="retryCount" value="3" />
-		<property name="maxConcurrentConnections" value="10" />
-		<property name="protocol" value="http" />
+		<property name="maxConcurrentConnections" value="1" />
 		<property name="userAgent" value="ee.ajapaik/1.0" />
 		<property name="useBasicAuth" value="false" />
-		<property name="username" value="" />
-		<property name="password" value="" />
 	</bean>
+
+	<bean id="abstractSOAPClient" class="ee.mobi.billing.platform.AbstractSOAPClient" parent="baseHttpClient" abstract="true">
+		<property name="acceptGzip" value="false" />
+		<property name="gzipRequest" value="false" />
+		<property name="chunked" value="true" />
+	</bean>
+	
+	<bean id="taskServiceClient" class="ee.ajapaik.axis.service.TaskServiceClient" parent="abstractSOAPClient">
+		<property name="endpoint" value="http://rahvusarhiiv.tietotest.ee/service/task/" />
+	</bean>
+	
+	<bean id="proposalServiceClient" class="ee.ajapaik.axis.service.ProposalServiceClient" parent="abstractSOAPClient">
+		<property name="endpoint" value="http://rahvusarhiiv.tietotest.ee/service/proposal/" />
+	</bean>	
 	
 	<!-- Services -->
 	<bean id="ajapaikService" class="ee.ajapaik.service.AjapaikServiceImpl">
 		<property name="scheduler" ref="scheduler" />
 		<property name="indexer" ref="indexer" />
 		<property name="repository" ref="repository" />
+		<property name="taskServiceClient" ref="taskServiceClient" />
+	</bean>
+	
+	<!-- Database -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://localhost:5443/rephoto" />
+		<property name="username" value="valimimoodul" />
+		<property name="password" value="valimimoodul" />
+	</bean>
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>		
+	
+	<bean id="ajapaikDao" class="ee.ajapaik.dao.AjapaikDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 </beans>

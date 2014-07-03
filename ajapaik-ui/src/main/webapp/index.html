@@ -21,6 +21,7 @@
 		<ul class="nav nav-tabs">
 			<li class="active" id="search"><a href="#">Otsing <span class="badge">0</span></a></li>
 			<li id="set"><a href="#">Valim <span class="badge">0</span></a></li>
+			<li id="task"><a href="#">Ylesanded</a></li>
 		</ul>
 
 		<div id="panel">
@@ -123,7 +124,17 @@
 						</div>
 					</div>				
 				</div>
-
+				
+				<div id="task-form" style="display: none;">
+					<div class="form-group">
+						<div class="col-sm-10"  >
+							<input value="" id="taskId" placeholder="Task id" class="form-control">
+						</div>
+						<div class="col-sm-2">
+							<button type="button" class="btn btn-primary" id="openTask">Ava ylesanne</button>
+						</div>
+					</div>
+				</div>
 			</form>
 		</div>
 	</div>

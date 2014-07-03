@@ -20,7 +20,7 @@ public class PlatformParametersOverridePostProcessor implements BeanPostProcesso
 	
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		if(bean instanceof BaseHttpClient) {
+		if(bean instanceof BaseHttpClient && url != null) {
 			BaseHttpClient baseClient = (BaseHttpClient) bean;
 
 			String protocol = url.getProtocol();

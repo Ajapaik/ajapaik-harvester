@@ -158,15 +158,16 @@ public class BaseHttpClient extends BaseClient {
 			
 			@Override
 			public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
-				
+				beforeResponse(response);
 			}
 		}, 0);
 		
 		this.httpClient = base;
 	}
 
-	protected void beforeRequest(HttpRequest request) {
-	}
+	protected void beforeResponse(HttpResponse response) {}
+
+	protected void beforeRequest(HttpRequest request) {}
 
 	private SchemeSocketFactory getSocketFactory() throws Exception {
 		if("http".equals(protocol)) {

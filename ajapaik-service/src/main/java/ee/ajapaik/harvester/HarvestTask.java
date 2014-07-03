@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -17,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -25,14 +23,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Unmarshaller.Listener;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
 import org.openarchives.oai._2.DeletedRecordType;
 import org.openarchives.oai._2.IdentifyType;
@@ -51,10 +42,9 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import ee.ajapaik.db.Repository;
 import ee.ajapaik.model.InfoSystem;
 import ee.ajapaik.model.search.Record;
-import ee.ajapaik.platform.BaseHttpClient;
-import ee.ajapaik.platform.PlatformFactory;
 import ee.ajapaik.util.Digester;
 import ee.ajapaik.util.FilteredInputStreamReader;
+import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.MonitorableBufferedInputStream;
 
 /**
@@ -329,7 +319,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 
 		URL url = new URL(operation);
 		
-		InputStream is = openStream(url);
+		InputStream is = IOHandler.openStream(url);
 
 		if (is != null) {
 			MonitorableBufferedInputStream bis = null;
@@ -427,66 +417,4 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		return builder.toString();
 	}
 	
-	public InputStream openStream(URL url) {
-		try {
-			if(url != null) {
-				logger.debug("About to make query for url: " + url);
-				
-				BaseHttpClient bc = PlatformFactory.getInstance().getClient(url);
-				
-				HttpGet get = new HttpGet(url.getFile());
-				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
-				
-				HttpResponse result = bc.getHttpClient().execute(get);
-				
-				HttpEntity entity = result.getEntity();
-				
-				if(entity != null) {
-					return getInputStream(result);
-				}
-			}
-		} catch (Exception e) {
-			logger.error("Error opening stream data", e);
-		}
-		return null;
-	}
-
-	private InputStream getInputStream(HttpResponse response) throws Exception {
-		StatusLine statusLine = response.getStatusLine();
-		if(statusLine.getStatusCode() != 200) {
-			response.getEntity().getContent().close();
-			
-			throw new Exception(statusLine.getReasonPhrase());
-		}
-		
-		 Header[] headers = response.getHeaders("Content-Encoding");
-		 if(headers != null && headers.length > 0) {
-			 Header contentEncoding = headers[0];
-			 if("gzip".equalsIgnoreCase(contentEncoding.getValue())) {
-				return new GZIPInputStream(response.getEntity().getContent());
-			 }
-		 }
-		 return response.getEntity().getContent();
-	}
-	
-	protected void saveThumbnail(Record rec, String thumbnailUrl) {
-		try {
-			URL url = new URL(thumbnailUrl);
-			
-			InputStream is = openStream(url);
-			
-			if(is != null) {
-				byte[] data = IOUtils.toByteArray(is);
-				String key = Digester.digestToString(data);
-				
-				repository.saveImage(key, data, taskCode);
-				
-				rec.setCachedThumbnailUrl(key);
-			}
-		} catch (MalformedURLException e) {
-			logger.error("Error parsing url: " + thumbnailUrl, e);
-		} catch (IOException e) {
-			logger.error("Error reading stream", e);
-		}
-	}
 }

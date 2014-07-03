@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import ee.ajapaik.model.InfoSystem;
+import ee.ajapaik.model.Task;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.Search;
 import ee.ajapaik.model.search.SearchResults;
@@ -27,4 +28,6 @@ public interface AjapaikService {
 	boolean isIndexUpdated(long lastTimestamp);
 
 	Collection<String> getAllSets();
+	
+	List<Task> getTaskList(Long taskId) throws Exception;
 }

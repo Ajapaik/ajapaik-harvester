@@ -84,13 +84,22 @@ $(document).ready(function() {
 			
 			$("#set-form").hide();
 			$("#set-view").hide();
-		} else {
+			$("#task-form").hide();
+		} else if(target[0].id == "set") {
 			$("#search-form").hide();
 			$("#result-view").hide();
+			$("#task-form").hide();
 			
 			$("#set-form").show();
 
 			self.parseSelection();
+		} else {
+			$("#task-form").show();
+			
+			$("#set-form").hide();
+			$("#set-view").hide();
+			$("#search-form").hide();
+			$("#result-view").hide();
 		}
 	});
 
@@ -135,6 +144,19 @@ $(document).ready(function() {
 			var win = window.open('../ajapaik-service/csv/?ids=' + self.selection, '_blank');
 			win.focus();
 		}
+	});
+	
+	$("#openTask").on("click", function(e) {
+		e.preventDefault();
+		
+		console.log("open task", $("#taskId").val());
+		
+		self.request("getTaskList", [ $("#taskId").val() ], function(result) {
+			
+			console.log(result);
+			
+		});
+		
 	});
 	
 	// Thumb size
@@ -258,7 +280,7 @@ function parseResult(result, scroll) {
 		for (var i = 0; i < result.length; i++) {
 			var record = result[i];
 			
-			tooltipData[record.id] = {"img":record.imageUrl,"desc":record.description,"title":record.title, "number":record.identifyingNumber};
+			tooltipData[record.id] = {"img":(record.imageUrl != "null" ? record.imageUrl : (url + "../ajapaik-service/images/" + record.cachedThumbnailUrl)), "desc":record.description,"title":record.title, "number":record.id};
 			
 			var img = $("<img height='" + self.gridSize + "' src='" + url + "../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
 			
@@ -396,12 +418,13 @@ function parseSelection() {
 					var description = $("<div class='col-sm-8'></div>");
 					
 					description.append("<p><b><a href='" + record.urlToRecord + "' target='_blank'>" + record.title + "</a></b></p>");
-					description.append("<p>" + record.identifyingNumber + "</p>");
+					description.append("<p>" + record.id + "</p>");
 					description.append("<p>" + record.providerName.replace("NLIB", "Digar") + "</p>");
 					description.append("<p>" + record.description.replace("<", "").replace(">", "") + "</p>");
 					
 					// Image
-					var img = $("<img src='" + record.imageUrl + "'>");
+					//{"img":(record.imageUrl != "null" ? record.imageUrl : (url + "../ajapaik-service/images/" + record.cachedThumbnailUrl))
+					var img = $("<img src='" + (record.imageUrl != "null" ? record.imageUrl : (url + "../ajapaik-service/images/" + record.cachedThumbnailUrl)) + "'>");
 					
 					img.data(description);
 					

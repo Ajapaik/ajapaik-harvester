@@ -13,7 +13,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
 
 import ee.ajapaik.platform.BaseHttpClient;
-import ee.ajapaik.platform.PlatformFactory;
+import ee.ajapaik.platform.HttpClientFactory;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=FileCache">Kaido Kalda</a>
@@ -42,7 +42,7 @@ public class FileCache {
 			if(url != null) {
 				logger.debug("About to make query for url: " + url);
 				
-				BaseHttpClient bc = PlatformFactory.getInstance().getClient(url);
+				BaseHttpClient bc = HttpClientFactory.getInstance().getClient(url);
 				
 				HttpGet get = new HttpGet(url.getFile());
 				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));

@@ -30,7 +30,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.platform.BaseHttpClient;
-import ee.ajapaik.platform.PlatformFactory;
+import ee.ajapaik.platform.HttpClientFactory;
 import ee.ajapaik.service.AjapaikService;
 
 /**
@@ -130,7 +130,7 @@ public class CSVServlet extends HttpServlet {
 
 	private void grabImage(ZipOutputStream zos, String name, String query, Callback c) throws Exception {
 		URL url = new URL(query);
-		BaseHttpClient client = PlatformFactory.getInstance().getClient(url);
+		BaseHttpClient client = HttpClientFactory.getInstance().getClient(url);
 		
 		logger.debug("Getting data from url: " + url);
 		

@@ -9,6 +9,7 @@ import org.openarchives.oai._2.RecordType;
 
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
+import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.JaxbUtil;
 
 public class MKAHarvestTask extends HarvestTask {
@@ -68,7 +69,7 @@ public class MKAHarvestTask extends HarvestTask {
 
 				String thumbnailUrl = getThumbnailUrl(imageUrl);
 				
-				saveThumbnail(rec, thumbnailUrl);
+				IOHandler.saveThumbnail(rec, thumbnailUrl, repository, taskCode);
 			}
 			
 			rec.setInstitutionType(InstitutionType.ARCHIVE);

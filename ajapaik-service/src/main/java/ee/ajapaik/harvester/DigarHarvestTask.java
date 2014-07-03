@@ -9,6 +9,7 @@ import org.openarchives.oai._2.StatusType;
 
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
+import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.JaxbUtil;
 
 public class DigarHarvestTask extends HarvestTask {
@@ -57,7 +58,7 @@ public class DigarHarvestTask extends HarvestTask {
 		if(thumbnailUrl != null) {
 			rec.setImageUrl(thumbnailUrl);
 			
-			saveThumbnail(rec, thumbnailUrl);
+			IOHandler.saveThumbnail(rec, thumbnailUrl, repository, taskCode);
 		}
 		
 		rec.setInstitutionType(InstitutionType.LIBRARY);
