@@ -68,8 +68,7 @@ public class MKAHarvestTask extends HarvestTask {
 				rec.setImageUrl(imageUrl);
 
 				String thumbnailUrl = getThumbnailUrl(imageUrl);
-				
-				IOHandler.saveThumbnail(rec, thumbnailUrl, repository, taskCode);
+				rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
 			}
 			
 			rec.setInstitutionType(InstitutionType.ARCHIVE);

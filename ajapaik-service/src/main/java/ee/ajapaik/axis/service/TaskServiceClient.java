@@ -10,7 +10,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.http.HttpResponse;
 
-import ee.ajapaik.model.Task;
+import ee.ajapaik.xml.model.Task;
 import ee.ra.ais.TaskServiceStub;
 import ee.ra.ais.TaskServiceStub.TaskObjectList_type0;
 import ee.ra.ais.TaskServiceStub.TaskObject_type0;

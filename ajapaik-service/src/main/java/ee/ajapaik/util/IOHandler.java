@@ -42,7 +42,7 @@ public class IOHandler {
 		 return response.getEntity().getContent();
 	}
 	
-	public static void saveThumbnail(Record rec, String thumbnailUrl, Repository repository, String taskCode) {
+	public static String saveThumbnail(String thumbnailUrl, Repository repository, String taskCode) {
 		try {
 			URL url = new URL(thumbnailUrl);
 			
@@ -56,13 +56,15 @@ public class IOHandler {
 				
 				repository.saveImage(key, data, taskCode);
 				
-				rec.setCachedThumbnailUrl(key);
+				return key;
 			}
 		} catch (MalformedURLException e) {
 			logger.error("Error parsing url: " + thumbnailUrl, e);
 		} catch (IOException e) {
 			logger.error("Error reading stream", e);
 		}
+		
+		return null;
 	}
 	
 	public static InputStream openStream(URL url) {

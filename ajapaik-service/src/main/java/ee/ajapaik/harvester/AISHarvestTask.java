@@ -23,7 +23,7 @@ import ee.ajapaik.axis.service.ProposalServiceClient;
 import ee.ajapaik.axis.service.TaskServiceClient;
 import ee.ajapaik.dao.AjapaikDao;
 import ee.ajapaik.db.Repository;
-import ee.ajapaik.model.Task;
+import ee.ajapaik.index.Indexer;
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
 import ee.ajapaik.platform.HttpClientFactory;
@@ -32,6 +32,7 @@ import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.xml.MediaHandler;
 import ee.ajapaik.xml.MetaHandler;
 import ee.ajapaik.xml.model.Meta;
+import ee.ajapaik.xml.model.Task;
 
 public class AISHarvestTask extends QuartzJobBean {
 	
@@ -39,8 +40,18 @@ public class AISHarvestTask extends QuartzJobBean {
 
 	private AjapaikDao ajapaikDao;
 	private Repository repository;
+	private Indexer indexer;
 	private TaskServiceClient taskServiceClient;
 	private ProposalServiceClient proposalServiceClient;
+	private Long taskId;
+	
+	public void setIndexer(Indexer indexer) {
+		this.indexer = indexer;
+	}
+
+	public void setTaskId(Long taskId) {
+		this.taskId = taskId;
+	}
 
 	public void setAjapaikDao(AjapaikDao ajapaikDao) {
 		this.ajapaikDao = ajapaikDao;
@@ -62,52 +73,69 @@ public class AISHarvestTask extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		String taskCode = Digester.digestToString(context.getJobDetail().getName());
 		
-		try {
-			List<Task> list = taskServiceClient.getTaskList(9L);
+		if(!ajapaikDao.hasTask(taskId)) {
 			
-			logger.info("Tasks: " + list);
+			ajapaikDao.taskStarted(taskId);
 			
-			for (Task task : list) {
-				List<String> puris = task.getObjectPuris();
+			try {
+				List<Task> list = taskServiceClient.getTaskList(taskId);
 				
-				logger.info("PURIS: " + puris);
+				logger.info("Tasks: " + list);
 				
-				for (String puri : puris) {
-					Meta meta = parsePuri(puri);
+				boolean hasMedia = false;
+				
+				for (Task task : list) {
+					List<String> puris = task.getObjectPuris();
 					
-					logger.info("Meta: " + meta);
+					logger.info("PURIS: " + puris);
 					
-					List<String> medias = parseMediaList(meta.getAbout());
-					
-					logger.info("Medias: " + medias);
-					
-					for (int i = 0; i < medias.size(); i++) {
-						String media = medias.get(i);
+					for (String puri : puris) {
+						Meta meta = parsePuri(puri);
 						
-						Record record = new Record();
-						record.setId(meta.getIdentifier() + (medias.size() > 1 ? ("_" + i) : ""));
-						record.setIdentifyingNumber(record.getId());
-						record.setInstitutions(Arrays.asList(meta.getPublisher()));
-						record.setTitle(meta.getTitle());
-						record.setProviderName("AIS");
-						record.setSetSpec(Arrays.asList("AIS"));
-						record.setDateCreated(new Date());
-						record.setInstitutionType(InstitutionType.AIS);
-						record.setUrlToRecord(media);
+						logger.info("Meta: " + meta);
 						
-						IOHandler.saveThumbnail(record, media, repository, taskCode);
+						List<String> medias = parseMediaList(meta.getAbout());
 						
-						repository.saveSingleRecord(record.getId(), record, taskCode);
+						logger.info("Medias: " + medias);
+						
+						for (int i = 0; i < medias.size(); i++) {
+							String media = medias.get(i);
+							
+							String id = meta.getIdentifier() + (medias.size() > 1 ? ("_" + i) : "");
+							String thumbnailUrl = IOHandler.saveThumbnail(media, repository, taskCode);
+							
+							Record record = new Record();
+							record.setId(id);
+							record.setIdentifyingNumber(record.getId());
+							record.setInstitutions(Arrays.asList(meta.getPublisher()));
+							record.setTitle(meta.getTitle());
+							record.setProviderName("AIS");
+							record.setSetSpec(Arrays.asList("AIS"));
+							record.setDateCreated(new Date());
+							record.setInstitutionType(InstitutionType.AIS);
+							record.setUrlToRecord(media);
+							record.setCachedThumbnailUrl(thumbnailUrl);
+							
+							repository.saveSingleRecord(id, record, taskCode);
+							
+							ajapaikDao.saveMedia(id, task, meta, thumbnailUrl);
+							
+							hasMedia = true;
+						}
 					}
 				}
+				
+				if(hasMedia) {
+					indexer.index();
+				}
+			} catch (Exception e) {
+				throw new JobExecutionException("Failed to complete job", e);
+			} finally {
+				ajapaikDao.taskFinished(taskId);
+				
+				logger.info("AIS job complete");	
 			}
-			
-			
-		} catch (Exception e) {
-			throw new JobExecutionException("Failed to complete job", e);
 		}
-		
-		logger.info("AIS job complete");
 	}
 
 	private List<String> parseMediaList(String about) throws Exception {
@@ -119,27 +147,11 @@ public class AISHarvestTask extends QuartzJobBean {
 	}
 
 	private Meta parsePuri(String puri) throws Exception {
-//		URL url = new URL(puri + );
-//		
-//		HttpClient client = HttpClientFactory.getInstance().getClient(url).getHttpClient();
-//		HttpGet request = new HttpGet(url.getFile() + "?rdf");
-//		HttpResponse response = client.execute(request);
-		
-		
-		
 		MetaHandler metaHandler = new MetaHandler();
 		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 		parser.parse(IOHandler.openStream(new URL(puri + "?rdf")), metaHandler);
 		
 		return metaHandler.getMeta();
-	}
-	
-	public static void main(String[] args) throws Exception {
-		MediaHandler mediaHandler = new MediaHandler();
-		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-		parser.parse(ClassLoader.getSystemResourceAsStream("628286.rdf"), mediaHandler);
-		
-		System.out.println(mediaHandler.getMedias());
 	}
 }
 

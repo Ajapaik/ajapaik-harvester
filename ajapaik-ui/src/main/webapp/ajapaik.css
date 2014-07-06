@@ -25,22 +25,24 @@
 	cursor: pointer;
 }
 
-#result-view {
+#result-view, #set-view, #task-view {
 	background: #F1F1F1;
+}
+
+#result-view {
 	padding: 270px 10px 10px;
 }
 
-#set-view {
-	background: #F1F1F1;
+#set-view, #task-view {
 	padding: 140px 10px 10px;
 }
 
-#result-view:before, #result-view:after,#set-view:before, #set-view:after {
+#result-view:before, #result-view:after,#set-view:before, #set-view:after,#task-view:before, #task-view:after {
 	content: "";
 	display: table;
 }
 
-#result-view:after, #set-view:after {
+#result-view:after, #set-view:after, #task-view:after {
 	clear: both;
 }
 
@@ -95,6 +97,14 @@
 
 .record-container img {
 	border: 1px solid;
+}
+
+#add-box {
+    margin-top: 5px;
+}
+
+#tasks {
+	cursor: pointer;
 }
 
 

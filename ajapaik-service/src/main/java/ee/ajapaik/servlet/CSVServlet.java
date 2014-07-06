@@ -1,6 +1,7 @@
 package ee.ajapaik.servlet;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -28,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import ee.ajapaik.db.Repository;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.platform.BaseHttpClient;
 import ee.ajapaik.platform.HttpClientFactory;
@@ -90,15 +92,42 @@ public class CSVServlet extends HttpServlet {
 					addField(result, ""); // place
 					addField(result, recordView.getUrlToRecord());
 					try {
-						grabImage(zos, name, recordView.getImageUrl(), new Callback() {
+						if(recordView.getImageUrl() != null && !recordView.getImageUrl().equals("null")) {
+							grabImage(zos, name, recordView.getImageUrl(), new Callback() {
+								
+								@Override
+								public void notify(String name, Integer width, Integer height) {
+									addField(result, name);
+									addField(result, width.toString());
+									addField(result, height.toString());
+								}
+							});
+						} else if(recordView.getCachedThumbnailUrl() != null) {
+							Repository repository = ctx.getBean("repository", Repository.class);
 							
-							@Override
-							public void notify(String name, Integer width, Integer height) {
-								addField(result, name);
-								addField(result, width.toString());
-								addField(result, height.toString());
+							byte[] data = repository.queryImage(recordView.getCachedThumbnailUrl());
+							if (data != null) {
+								ZipEntry ze = new ZipEntry(recordView.getCachedThumbnailUrl() + ".jpg");
+					    		zos.putNextEntry(ze);
+					    		
+								int width = 0;
+								int height = 0;
+								try {
+									BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(data));
+									
+									width = bimg.getWidth();
+									height = bimg.getHeight();
+									
+									ImageIO.write( bimg, "jpg", zos );
+								} finally {
+									zos.closeEntry();
+								}
+								
+								addField(result, recordView.getCachedThumbnailUrl() + ".jpg");
+								addField(result, String.valueOf(width));
+								addField(result, String.valueOf(height));
 							}
-						});
+						}
 					} catch (Exception e) {
 						logger.error("Error getting data", e);
 					}

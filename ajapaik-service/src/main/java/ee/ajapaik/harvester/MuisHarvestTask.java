@@ -87,8 +87,7 @@ public class MuisHarvestTask extends HarvestTask {
 			String thumbnailUrl = fixMuisUrl(jaxbUtil.getValue(eseRec, "object"));
 			if(thumbnailUrl != null) {
 				rec.setImageUrl(getImageUrl(thumbnailUrl));
-				
-				IOHandler.saveThumbnail(rec, thumbnailUrl, repository, taskCode);
+				rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
 			}
 			rec.setInstitutionType(InstitutionType.MUSEUM);
 		} else {

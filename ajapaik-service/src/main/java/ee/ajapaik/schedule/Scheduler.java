@@ -13,6 +13,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
 import org.springframework.beans.BeansException;
@@ -43,12 +44,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 	private StdScheduler schedulerFactory;
 	private SerializingPersister persister;
 	private String indexerCronExpression;
-	private String aisCronExpression;
 	
-	public void setAisCronExpression(String aisCronExpression) {
-		this.aisCronExpression = aisCronExpression;
-	}
-
 	public HarvestJobListener getHarvestJobListener() {
 		return harvestJobListener;
 	}
@@ -159,21 +155,23 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			
 			scheduleIndexing();
 			scheduleHarvest();
-			scheduleAIS();
 		} catch (SchedulerException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void scheduleAIS() {
-		CronTrigger cronTrigger = new CronTrigger(JOB_AIS_NAME, null);
-		try {
-			cronTrigger.setCronExpression(aisCronExpression);
+	public void scheduleAIS(Long taskId) {
+		String name = Scheduler.JOB_AIS_NAME + "_" + taskId;
 		
+		SimpleTrigger trigger = new SimpleTrigger(name);
+		trigger.setJobName(name);
+		
+		try {
 			JobDetailBean job = (JobDetailBean) beanFactory.getBean("aisJob");
-			job.getJobDataMap().put(JOB_MAP_HARVEST_JOB_LISTENER, harvestJobListener);
+			job.setName(name);
+			job.getJobDataMap().put("taskId", taskId);
 
-			schedulerFactory.scheduleJob(job, cronTrigger);
+			schedulerFactory.scheduleJob(job, trigger);
 		} catch (Exception e) {
 			logger.error("Scheduler failed to schedule AIS job: ", e);
 		}
@@ -285,5 +283,10 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 		public String getName() {
 			return "globalJobListener";
 		}
+	}
+
+	public void scheduleTask(Long taskId) {
+		// TODO Auto-generated method stub
+		
 	}
 }

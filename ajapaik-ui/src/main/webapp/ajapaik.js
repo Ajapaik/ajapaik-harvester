@@ -85,21 +85,26 @@ $(document).ready(function() {
 			$("#set-form").hide();
 			$("#set-view").hide();
 			$("#task-form").hide();
+			$("#task-view").hide();
 		} else if(target[0].id == "set") {
 			$("#search-form").hide();
 			$("#result-view").hide();
 			$("#task-form").hide();
+			$("#task-view").hide();
 			
 			$("#set-form").show();
 
 			self.parseSelection();
 		} else {
 			$("#task-form").show();
+			$("#task-view").show();
 			
 			$("#set-form").hide();
 			$("#set-view").hide();
 			$("#search-form").hide();
 			$("#result-view").hide();
+			
+			parseTasks();
 		}
 	});
 
@@ -146,17 +151,16 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("#openTask").on("click", function(e) {
-		e.preventDefault();
+	$("#add-box .glyphicon-ok").on("click", function(e) {
+		var value = $("#add-box .form-control").val();
 		
-		console.log("open task", $("#taskId").val());
-		
-		self.request("getTaskList", [ $("#taskId").val() ], function(result) {
+		if(value != "") {
+			drawTask(value, false);
 			
-			console.log(result);
+			self.request("scheduleTask", [ value ], function(result) {});
 			
-		});
-		
+			$("#add-box .form-control").val("");
+		}
 	});
 	
 	// Thumb size
@@ -498,4 +502,88 @@ function parseSelection() {
 			}
 		});
 	}
+}
+
+function drawTask(value, finished) {
+	var li = $("<li><a>Ülesanne " + value + ": " + (finished ? "Valmis" : "Töös") + "</a></li>");
+	li.data("id", value);
+	li.on("click", function(e) {
+		
+		var target = $(e.currentTarget);
+		
+		_.each($("#tasks").children(), function (li, i) {
+			$(li).removeClass("active");
+		});
+		
+		target.addClass("active");
+		
+		if(finished) {
+			self.request("getMediaViews", [ target.data("id") ], function(result) {
+				self.parseMediaViews(result);
+			});
+		} else {
+			$("#medias").html("");
+			$("#medias").append("<div class='record-container col-sm-12'><div class='alert alert-warning' role='alert'><b>Task running!</b> Task has not completed yet.</div></div>");
+		}
+	});
+	
+	$("#tasks").append(li);
+}
+
+function parseTasks() {
+	$("#tasks").html("");
+	$("#medias").html("");
+	
+	self.request("getTasks", [], function(result) {
+		_.each(result, function (task, i) {
+			drawTask(task.id, task.finished != null);
+		});
+	});
+}
+
+function parseMediaViews(data) {
+	$("#medias").html("");
+	
+	if(data.length > 0) {
+		_.each(data, function (media, i) {
+			var task = 
+				$("<div class='record-container col-sm-12'>" +
+					"<div class='col-sm-4'>" +
+						"<img height='200' src='../ajapaik-service/images/" + media.media + "'>" +
+					"</div>" +		
+					"<div class='col-sm-8'>" +
+						"<p><b>" + media.title + "</b></p>" +
+						"<p>" + media.identifier + "</p>" +
+						"<p>AIS</p>" +
+					"</div>" +
+				"</div>");
+			
+			task.data("id", media.identifier);
+			task.on("click", function(e) {
+				console.log("task click", $(e.currentTarget).data("id"));
+				
+				var target = $(this);
+				var id = target.data("id");
+				
+				if(target.hasClass("selected")) {
+					target.removeClass("selected");
+					
+					selection.splice(selection.indexOf(id), 1);
+				} else {
+					target.addClass("selected");
+					
+					if($.inArray(id, selection) == -1) {
+						selection.push(id);
+					}
+				}
+
+				updateSelection();
+			});
+			
+			$("#medias").append(task);
+		});	
+	} else {
+		$("#medias").append("<div class='record-container col-sm-12'><div class='alert alert-danger' role='alert'><b>No result!</b> Given task returned no result.</div></div>");
+	}
+	
 }

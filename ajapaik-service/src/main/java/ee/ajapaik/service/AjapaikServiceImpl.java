@@ -1,6 +1,5 @@
 package ee.ajapaik.service;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,13 +9,14 @@ import org.apache.lucene.search.IndexSearcher;
 import org.quartz.SimpleTrigger;
 import org.springframework.util.StringUtils;
 
-import ee.ajapaik.axis.service.TaskServiceClient;
+import ee.ajapaik.dao.AjapaikDao;
 import ee.ajapaik.db.Repository;
 import ee.ajapaik.index.IndexedFields;
 import ee.ajapaik.index.Indexer;
 import ee.ajapaik.index.Result;
 import ee.ajapaik.model.InfoSystem;
-import ee.ajapaik.model.Task;
+import ee.ajapaik.model.MediaView;
+import ee.ajapaik.model.TaskView;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.Search;
 import ee.ajapaik.model.search.SearchResults;
@@ -30,10 +30,10 @@ public class AjapaikServiceImpl implements AjapaikService {
 	private Scheduler scheduler;
 	private Indexer indexer;
 	private Repository repository;
-	private TaskServiceClient taskServiceClient;
-	
-	public void setTaskServiceClient(TaskServiceClient taskServiceClient) {
-		this.taskServiceClient = taskServiceClient;
+	private AjapaikDao ajapaikDao;
+
+	public void setAjapaikDao(AjapaikDao ajapaikDao) {
+		this.ajapaikDao = ajapaikDao;
 	}
 
 	public void setRepository(Repository repository) {
@@ -172,11 +172,18 @@ public class AjapaikServiceImpl implements AjapaikService {
 	}
 
 	@Override
-	public List<Task> getTaskList(Long taskId) throws Exception {
-		try {
-			return taskServiceClient.getTaskList(taskId);
-		} catch (RemoteException e) {
-			throw new Exception(e);
-		}
+	public List<MediaView> getMediaViews(Long taskId) throws Exception {
+		return ajapaikDao.getMediaViews(taskId);
 	}
+
+	@Override
+	public void scheduleTask(Long taskId) {
+		scheduler.scheduleAIS(taskId);
+	}
+
+	@Override
+	public List<TaskView> getTasks() {
+		return ajapaikDao.getTasks();
+	}
+
 }

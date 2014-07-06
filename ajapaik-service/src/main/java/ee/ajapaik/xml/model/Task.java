@@ -1,4 +1,4 @@
-package ee.ajapaik.model;
+package ee.ajapaik.xml.model;
 
 import java.io.Serializable;
 import java.util.List;

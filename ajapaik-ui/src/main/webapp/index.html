@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="jquery.min.js"></script>
 	<script type="text/javascript" src="jquery.row-grid.js"></script>
 	<script type="text/javascript" src="jquery.tooltip.js"></script>
+	<script type="text/javascript" src="underscore.min.js"></script>
 	<script type="text/javascript" src="ajapaik.js"></script>
 
 </head>
@@ -20,8 +21,8 @@
 
 		<ul class="nav nav-tabs">
 			<li class="active" id="search"><a href="#">Otsing <span class="badge">0</span></a></li>
+			<li id="task"><a href="#">Ülesanded</a></li>
 			<li id="set"><a href="#">Valim <span class="badge">0</span></a></li>
-			<li id="task"><a href="#">Ylesanded</a></li>
 		</ul>
 
 		<div id="panel">
@@ -124,14 +125,14 @@
 						</div>
 					</div>				
 				</div>
-				
+
 				<div id="task-form" style="display: none;">
 					<div class="form-group">
-						<div class="col-sm-10"  >
-							<input value="" id="taskId" placeholder="Task id" class="form-control">
-						</div>
-						<div class="col-sm-2">
-							<button type="button" class="btn btn-primary" id="openTask">Ava ylesanne</button>
+						<div class="col-sm-12">
+							<div style="float: right; margin-right: 5px;">
+								<img id="task_thumbnails" src="large-thumbnails-48.png" style="border: 1px solid; padding: 2px;">
+								<img id="task_list" src="list-with-thumbnails-48.png" style="border: 1px solid; padding: 2px;">
+							</div>
 						</div>
 					</div>
 				</div>
@@ -142,6 +143,25 @@
 	<div id="result-view" style="display: none;"></div>
 	
 	<div id="set-view" style="display: none;"></div>
+	
+	<div id="task-view" style="display: none;">
+		<div class="row">
+			<div class="col-sm-2">
+				<div class="panel panel-default">
+					<div class="panel-heading">Ülesanded</div>
+					<div class="panel-body">
+						<ul id="tasks" class="nav nav-pills nav-stacked" style="">
+						</ul>
+						<div id="add-box" class="input-group" style="">
+							<input class="form-control" type="text" placeholder="Ülesande ID">
+							<span class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="medias" class="col-sm-10"></div>
+		</div>
+	</div>
 	
 	<div id="backdrop" style="display: none;"><img class="loader" src="ajax_loader_blue_64.gif"></div>
 </body>
