@@ -1,23 +1,17 @@
 package ee.ajapaik.harvester;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.log4j.Logger;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.xml.sax.SAXException;
 
 import ee.ajapaik.axis.service.ProposalServiceClient;
 import ee.ajapaik.axis.service.TaskServiceClient;
@@ -26,7 +20,6 @@ import ee.ajapaik.db.Repository;
 import ee.ajapaik.index.Indexer;
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
-import ee.ajapaik.platform.HttpClientFactory;
 import ee.ajapaik.util.Digester;
 import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.xml.MediaHandler;
@@ -42,7 +35,6 @@ public class AISHarvestTask extends QuartzJobBean {
 	private Repository repository;
 	private Indexer indexer;
 	private TaskServiceClient taskServiceClient;
-	private ProposalServiceClient proposalServiceClient;
 	private Long taskId;
 	
 	public void setIndexer(Indexer indexer) {
@@ -63,10 +55,6 @@ public class AISHarvestTask extends QuartzJobBean {
 	
 	public void setTaskServiceClient(TaskServiceClient taskServiceClient) {
 		this.taskServiceClient = taskServiceClient;
-	}
-
-	public void setProposalServiceClient(ProposalServiceClient proposalServiceClient) {
-		this.proposalServiceClient = proposalServiceClient;
 	}
 
 	@Override

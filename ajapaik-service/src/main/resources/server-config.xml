@@ -103,7 +103,7 @@
 				<entry key="ajapaikDao" value-ref="ajapaikDao" />
 				<entry key="repository" value-ref="repository" />
 				<entry key="taskServiceClient" value-ref="taskServiceClient" />
-				<entry key="proposalServiceClient" value-ref="proposalServiceClient" />
+				<entry key="indexer" value-ref="indexer" />
 			</map>
 		</property>
 		
