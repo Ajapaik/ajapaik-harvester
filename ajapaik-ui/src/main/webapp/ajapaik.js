@@ -84,27 +84,13 @@ $(document).ready(function() {
 			
 			$("#set-form").hide();
 			$("#set-view").hide();
-			$("#task-form").hide();
-			$("#task-view").hide();
 		} else if(target[0].id == "set") {
 			$("#search-form").hide();
 			$("#result-view").hide();
-			$("#task-form").hide();
-			$("#task-view").hide();
 			
 			$("#set-form").show();
 
 			self.parseSelection();
-		} else {
-			$("#task-form").show();
-			$("#task-view").show();
-			
-			$("#set-form").hide();
-			$("#set-view").hide();
-			$("#search-form").hide();
-			$("#result-view").hide();
-			
-			parseTasks();
 		}
 	});
 
@@ -151,16 +137,24 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("#add-box .glyphicon-ok").on("click", function(e) {
-		var value = $("#add-box .form-control").val();
+	$("#add-task").on("click", function(e) {
+		var value = $("#task-input").val();
 		
 		if(value != "") {
-			drawTask(value, false);
-			
 			self.request("scheduleTask", [ value ], function(result) {});
 			
-			$("#add-box .form-control").val("");
+			$("#task-input").val("");
 		}
+	});
+	
+	$("#show-tasks").on("click", function(e) {
+		$("#task-select .dropdown-menu").html("");
+		
+		self.request("getTasks", [], function(result) {
+			_.each(result, function (task, i) {
+				drawTask(task);
+			});
+		});
 	});
 	
 	// Thumb size
@@ -504,41 +498,29 @@ function parseSelection() {
 	}
 }
 
-function drawTask(value, finished) {
-	var li = $("<li><a>Ülesanne " + value + ": " + (finished ? "Valmis" : "Töös") + "</a></li>");
-	li.data("id", value);
+function drawTask(task) {
+	var li = $("<li " + (task.finished ? "" : "class='disabled'") + "><a>Ülesanne " + task.id + "<span class='badge'>" + task.taskIds.length + "</span></a></li>");
+	li.data("id", task.id);
 	li.on("click", function(e) {
 		
-		var target = $(e.currentTarget);
+		$("#result-view").html("");
 		
-		_.each($("#tasks").children(), function (li, i) {
-			$(li).removeClass("active");
-		});
-		
-		target.addClass("active");
-		
-		if(finished) {
-			self.request("getMediaViews", [ target.data("id") ], function(result) {
-				self.parseMediaViews(result);
+		if(task.taskIds.length > 0) {
+			self.loaded = false;
+			
+			$("#backdrop").fadeIn();
+			
+			self.request("getRecords", [ task.taskIds ], function(result) {
+				self.result = result;
+				
+				$("#search span").text(result.length);
+				
+				self.parseResult(result, true);
 			});
-		} else {
-			$("#medias").html("");
-			$("#medias").append("<div class='record-container col-sm-12'><div class='alert alert-warning' role='alert'><b>Task running!</b> Task has not completed yet.</div></div>");
 		}
 	});
 	
-	$("#tasks").append(li);
-}
-
-function parseTasks() {
-	$("#tasks").html("");
-	$("#medias").html("");
-	
-	self.request("getTasks", [], function(result) {
-		_.each(result, function (task, i) {
-			drawTask(task.id, task.finished != null);
-		});
-	});
+	$("#task-select .dropdown-menu").append(li);
 }
 
 function parseMediaViews(data) {

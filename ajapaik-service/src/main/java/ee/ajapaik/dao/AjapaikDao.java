@@ -2,9 +2,13 @@ package ee.ajapaik.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 
 import ee.ajapaik.model.MediaView;
@@ -60,16 +64,34 @@ public class AjapaikDao {
 	}
 
 	public List<TaskView> getTasks() {
-		return jdbcTemplate.query("select * from task", new RowMapper<TaskView>() {
+		final Map<Long, TaskView> taskMap = new HashMap<Long, TaskView>();
+		jdbcTemplate.query(
+				" select t.task_id, t.finished, m.identifier from task t " +
+				" left join media m on m.task_id = t.task_id ", 
+				new RowCallbackHandler() {
 
-			@Override
-			public TaskView mapRow(ResultSet rs, int rowNum) throws SQLException {
-				TaskView taskView = new TaskView();
-				taskView.setId(rs.getLong("task_id"));
-				taskView.setFinished(rs.getTimestamp("finished"));
-				
-				return taskView;
-			}
+					@Override
+					public void processRow(ResultSet rs) throws SQLException {
+						long id = rs.getLong("task_id");
+
+						TaskView taskView = null;
+						if(!taskMap.containsKey(id)) {
+							taskView = new TaskView();
+							taskView.setId(id);
+							taskView.setFinished(rs.getTimestamp("finished"));
+							
+							taskMap.put(id, taskView);
+						} else  {
+							taskView = taskMap.get(id);
+						}
+
+						String identifier = rs.getString("identifier");
+						if(identifier != null) {
+							taskView.getTaskIds().add(identifier);
+						}
+					}
 		});
+		
+		return new ArrayList<TaskView>(taskMap.values());
 	}
 }

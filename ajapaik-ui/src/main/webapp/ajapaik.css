@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'Glyphicons Halflings';
+
+  src: url('fonts/glyphicons-halflings-regular.eot');
+  src: url('fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('fonts/glyphicons-halflings-regular.woff') format('woff'), url('fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
 .header {
 	position: fixed;
 	background: #FFFFFF;
@@ -103,8 +110,16 @@
     margin-top: 5px;
 }
 
-#tasks {
+.dropdown-menu li {
 	cursor: pointer;
+}
+
+#task-select {
+	width: 220px;
+}
+
+#task-select .badge {
+	margin-left: 55px;
 }
 
 

@@ -1,7 +1,9 @@
 package ee.ajapaik.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class TaskView implements Serializable {
 
@@ -9,6 +11,7 @@ public class TaskView implements Serializable {
 
 	private Long id;
 	private Date finished;
+	private List<String> taskIds = new ArrayList<String>();
 
 	public Long getId() {
 		return id;
@@ -24,5 +27,13 @@ public class TaskView implements Serializable {
 
 	public void setFinished(Date finished) {
 		this.finished = finished;
+	}
+
+	public List<String> getTaskIds() {
+		return taskIds;
+	}
+
+	public void setTaskIds(List<String> taskIds) {
+		this.taskIds = taskIds;
 	}
 }
