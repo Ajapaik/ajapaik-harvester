@@ -36,4 +36,6 @@ public interface AjapaikService {
 	
 	void scheduleTask(Long taskId);
 	
+	void removeTask(Long taskId);
+	
 }

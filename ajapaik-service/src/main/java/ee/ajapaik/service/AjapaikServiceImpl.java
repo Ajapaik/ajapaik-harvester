@@ -186,4 +186,9 @@ public class AjapaikServiceImpl implements AjapaikService {
 		return ajapaikDao.getTasks();
 	}
 
+	@Override
+	public void removeTask(Long taskId) {
+		ajapaikDao.removeTask(taskId);
+	}
+
 }

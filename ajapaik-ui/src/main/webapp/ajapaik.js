@@ -119,6 +119,14 @@ $(document).ready(function() {
 
 	// Select none
 	$("#select-none").on("click", function(e) {
+		_.each($("#result-view").children(), function (task, i) {
+			_.each(selection, function (s, i) {
+				if($(task).data("id") == s) {
+					$(task).removeClass("selected");
+				}
+			});
+		});
+		
 		selection = [];
 		
 		$("#set-view").fadeOut(function(e) {
@@ -141,7 +149,7 @@ $(document).ready(function() {
 		var value = $("#task-input").val();
 		
 		if(value != "") {
-			self.request("scheduleTask", [ value ], function(result) {});
+			self.request("scheduleTask", [ value ]);
 			
 			$("#task-input").val("");
 		}
@@ -326,7 +334,7 @@ function parseResult(result, scroll) {
 			
 			item.append(img);
 			
-			item.tooltip({'container': $("#result-view"), 'data':tooltipData}); // apply tooltip
+			item._tooltip({'container': $("#result-view"), 'data':tooltipData}); // apply tooltip
 			
 			$("#result-view").append(item);
 		}
@@ -472,16 +480,23 @@ function parseSelection() {
 					$("#set-view").append(recordContainer);
 				}
 				
-				recordContainer.data(record.id);
+				recordContainer.data("id", record.id);
 				
 				recordContainer.on("click", function(e) {
-					
 					var target = e.target;
-					
+					var id = $(this).data("id");
 					if(target.nodeName != "A" && confirm("Eemalda valikust?")) {
 						
+						// Unselect in result-view
+						_.each($("#result-view").children(), function (task, i) {
+							if($(task).data("id") == id) {
+								$(task).removeClass("selected");
+							}
+						});
+						
 						// Remove from selection
-						selection.splice(selection.indexOf($(this).data()), 1);
+						var index = selection.indexOf(id);
+						selection.splice(index, 1);
 						
 						var container = $(this);
 						container.fadeOut(function() {
@@ -499,73 +514,40 @@ function parseSelection() {
 }
 
 function drawTask(task) {
-	var li = $("<li " + (task.finished ? "" : "class='disabled'") + "><a>Ülesanne " + task.id + "<span class='badge'>" + task.taskIds.length + "</span></a></li>");
-	li.data("id", task.id);
+	var li = null;
+	if(task.finished != null) {
+		li = $("<li><a><span class='glyphicon glyphicon-remove'></span> <span class='badge'>" + task.taskIds.length + "</span> Ülesanne " + task.id + "</a></li>");
+	} else {
+		li = $("<li class='disabled'><a><img width='14' src='ajax-loader.gif' style='margin-top: -5px;'>  <span class='badge'>" + task.taskIds.length + "</span> Ülesanne " + task.id + "</a></li>");
+	}
+	
+	li.data(id, task.id);
+	
 	li.on("click", function(e) {
-		
-		$("#result-view").html("");
-		
-		if(task.taskIds.length > 0) {
-			self.loaded = false;
+		if(!$(this).hasClass("disabled") && !$(e.target).hasClass("glyphicon-remove")) {
+			$("#result-view").html("");
 			
-			$("#backdrop").fadeIn();
-			
-			self.request("getRecords", [ task.taskIds ], function(result) {
-				self.result = result;
+			if(task.taskIds.length > 0) {
+				self.loaded = false;
 				
-				$("#search span").text(result.length);
+				$("#backdrop").fadeIn();
 				
-				self.parseResult(result, true);
-			});
+				self.request("getRecords", [ task.taskIds ], function(result) {
+					self.result = result;
+					
+					$("#search span").text(result.length);
+					
+					self.parseResult(result, true);
+				});
+			}
+		}
+	});
+	
+	li.find(".glyphicon-remove").on("click", function(e) {
+		if(!li.hasClass("disabled")) {
+			self.request("removeTask", [ task.id ]);
 		}
 	});
 	
 	$("#task-select .dropdown-menu").append(li);
-}
-
-function parseMediaViews(data) {
-	$("#medias").html("");
-	
-	if(data.length > 0) {
-		_.each(data, function (media, i) {
-			var task = 
-				$("<div class='record-container col-sm-12'>" +
-					"<div class='col-sm-4'>" +
-						"<img height='200' src='../ajapaik-service/images/" + media.media + "'>" +
-					"</div>" +		
-					"<div class='col-sm-8'>" +
-						"<p><b>" + media.title + "</b></p>" +
-						"<p>" + media.identifier + "</p>" +
-						"<p>AIS</p>" +
-					"</div>" +
-				"</div>");
-			
-			task.data("id", media.identifier);
-			task.on("click", function(e) {
-				console.log("task click", $(e.currentTarget).data("id"));
-				
-				var target = $(this);
-				var id = target.data("id");
-				
-				if(target.hasClass("selected")) {
-					target.removeClass("selected");
-					
-					selection.splice(selection.indexOf(id), 1);
-				} else {
-					target.addClass("selected");
-					
-					if($.inArray(id, selection) == -1) {
-						selection.push(id);
-					}
-				}
-
-				updateSelection();
-			});
-			
-			$("#medias").append(task);
-		});	
-	} else {
-		$("#medias").append("<div class='record-container col-sm-12'><div class='alert alert-danger' role='alert'><b>No result!</b> Given task returned no result.</div></div>");
-	}
-	
 }

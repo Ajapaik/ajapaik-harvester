@@ -338,7 +338,7 @@
 	}
 	
 	// initialises our jQuery plugin
-	$.fn.tooltip = function(opts) {
+	$.fn._tooltip = function(opts) {
 		new Tooltip(this, opts);
 	};
 

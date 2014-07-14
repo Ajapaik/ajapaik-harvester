@@ -5,6 +5,10 @@
   src: url('fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('fonts/glyphicons-halflings-regular.woff') format('woff'), url('fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
+body {
+	margin-top: 10px;
+}
+
 .header {
 	position: fixed;
 	background: #FFFFFF;
@@ -37,7 +41,7 @@
 }
 
 #result-view {
-	padding: 270px 10px 10px;
+	padding: 325px 10px 10px;
 }
 
 #set-view, #task-view {
@@ -106,8 +110,8 @@
 	border: 1px solid;
 }
 
-#add-box {
-    margin-top: 5px;
+.dropdown-menu {
+	min-width: 190px;
 }
 
 .dropdown-menu li {
@@ -119,9 +123,9 @@
 }
 
 #task-select .badge {
-	margin-left: 55px;
+	width: 35px;
+	margin-top: -20px;
 }
-
 
 /*** TOOLTIP ***/
 

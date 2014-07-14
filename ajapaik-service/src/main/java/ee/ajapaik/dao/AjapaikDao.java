@@ -25,11 +25,11 @@ public class AjapaikDao {
 	}
 
 	public void taskStarted(Long taskId) {
-		jdbcTemplate.update("insert into task (task_id, started) values (?, now())", taskId);
+		jdbcTemplate.update("insert into task (id, started) values (?, now())", taskId);
 	}
 
 	public void taskFinished(Long taskId) {
-		jdbcTemplate.update("update task set finished = now() where task_id = ?", taskId);
+		jdbcTemplate.update("update task set finished = now() where id = ?", taskId);
 	}
 
 	public void saveMedia(String identifier, Task task, Meta meta, String thumbnailUrl) {
@@ -60,19 +60,19 @@ public class AjapaikDao {
 	}
 
 	public boolean hasTask(Long taskId) {
-		return jdbcTemplate.queryForInt("select count(*) from task where task_id = ?", taskId) == 1;
+		return jdbcTemplate.queryForInt("select count(*) from task where id = ?", taskId) == 1;
 	}
 
 	public List<TaskView> getTasks() {
 		final Map<Long, TaskView> taskMap = new HashMap<Long, TaskView>();
 		jdbcTemplate.query(
-				" select t.task_id, t.finished, m.identifier from task t " +
-				" left join media m on m.task_id = t.task_id ", 
+				" select t.id, t.finished, m.identifier from task t " +
+				" left join media m on m.task_id = t.id ", 
 				new RowCallbackHandler() {
 
 					@Override
 					public void processRow(ResultSet rs) throws SQLException {
-						long id = rs.getLong("task_id");
+						long id = rs.getLong("id");
 
 						TaskView taskView = null;
 						if(!taskMap.containsKey(id)) {
@@ -93,5 +93,9 @@ public class AjapaikDao {
 		});
 		
 		return new ArrayList<TaskView>(taskMap.values());
+	}
+
+	public void removeTask(Long taskId) {
+		jdbcTemplate.update("delete from task where id = ?", taskId);
 	}
 }
