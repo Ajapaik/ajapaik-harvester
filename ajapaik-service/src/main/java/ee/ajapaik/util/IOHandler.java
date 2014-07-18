@@ -16,7 +16,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
 
 import ee.ajapaik.db.Repository;
-import ee.ajapaik.model.search.Record;
 import ee.ajapaik.platform.BaseHttpClient;
 import ee.ajapaik.platform.HttpClientFactory;
 

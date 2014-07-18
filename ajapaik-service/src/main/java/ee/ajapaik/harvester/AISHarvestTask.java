@@ -1,5 +1,6 @@
 package ee.ajapaik.harvester;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,7 +14,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import ee.ajapaik.axis.service.ProposalServiceClient;
 import ee.ajapaik.axis.service.TaskServiceClient;
 import ee.ajapaik.dao.AjapaikDao;
 import ee.ajapaik.db.Repository;
@@ -81,34 +81,36 @@ public class AISHarvestTask extends QuartzJobBean {
 						Meta meta = parsePuri(puri);
 						
 						logger.info("Meta: " + meta);
-						
-						List<String> medias = parseMediaList(meta.getAbout());
-						
-						logger.info("Medias: " + medias);
-						
-						for (int i = 0; i < medias.size(); i++) {
-							String media = medias.get(i);
+
+						if(meta != null) {
+							List<String> medias = parseMediaList(meta.getAbout());
 							
-							String id = meta.getIdentifier() + (medias.size() > 1 ? ("_" + i) : "");
-							String thumbnailUrl = IOHandler.saveThumbnail(media, repository, taskCode);
+							logger.info("Medias: " + medias);
 							
-							Record record = new Record();
-							record.setId(id);
-							record.setIdentifyingNumber(record.getId());
-							record.setInstitutions(Arrays.asList(meta.getPublisher()));
-							record.setTitle(meta.getTitle());
-							record.setProviderName("AIS");
-							record.setSetSpec(Arrays.asList("AIS"));
-							record.setDateCreated(new Date());
-							record.setInstitutionType(InstitutionType.AIS);
-							record.setUrlToRecord(media);
-							record.setCachedThumbnailUrl(thumbnailUrl);
-							
-							repository.saveSingleRecord(id, record, taskCode);
-							
-							ajapaikDao.saveMedia(id, task, meta, thumbnailUrl);
-							
-							hasMedia = true;
+							for (int i = 0; i < medias.size(); i++) {
+								String media = medias.get(i);
+								
+								String id = meta.getIdentifier() + (medias.size() > 1 ? ("_" + i) : "");
+								String thumbnailUrl = IOHandler.saveThumbnail(media, repository, taskCode);
+								
+								Record record = new Record();
+								record.setId(id);
+								record.setIdentifyingNumber(record.getId());
+								record.setInstitutions(Arrays.asList(meta.getPublisher()));
+								record.setTitle(meta.getTitle());
+								record.setProviderName("AIS");
+								record.setSetSpec(Arrays.asList("AIS"));
+								record.setDateCreated(new Date());
+								record.setInstitutionType(InstitutionType.AIS);
+								record.setUrlToRecord(media);
+								record.setCachedThumbnailUrl(thumbnailUrl);
+								
+								repository.saveSingleRecord(id, record, taskCode);
+								
+								ajapaikDao.saveMedia(id, task, meta, thumbnailUrl);
+								
+								hasMedia = true;
+							}
 						}
 					}
 				}
@@ -135,11 +137,17 @@ public class AISHarvestTask extends QuartzJobBean {
 	}
 
 	private Meta parsePuri(String puri) throws Exception {
-		MetaHandler metaHandler = new MetaHandler();
-		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-		parser.parse(IOHandler.openStream(new URL(puri + "?rdf")), metaHandler);
-		
-		return metaHandler.getMeta();
+		InputStream is = IOHandler.openStream(new URL(puri + "?rdf"));
+
+		if(is != null) {
+			MetaHandler metaHandler = new MetaHandler();
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			parser.parse(is, metaHandler);
+			
+			return metaHandler.getMeta();
+		} else {
+			return null;
+		}
 	}
 }
 

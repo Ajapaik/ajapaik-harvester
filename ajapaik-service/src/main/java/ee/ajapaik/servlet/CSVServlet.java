@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
@@ -107,20 +108,20 @@ public class CSVServlet extends HttpServlet {
 							
 							byte[] data = repository.queryImage(recordView.getCachedThumbnailUrl());
 							if (data != null) {
-								ZipEntry ze = new ZipEntry(recordView.getCachedThumbnailUrl() + ".jpg");
-					    		zos.putNextEntry(ze);
-					    		
-								int width = 0;
-								int height = 0;
+								BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(data));
+								
+								int width = bimg.getWidth();
+								int height = bimg.getHeight();
+								
 								try {
-									BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(data));
-									
-									width = bimg.getWidth();
-									height = bimg.getHeight();
-									
+									ZipEntry ze = new ZipEntry(recordView.getCachedThumbnailUrl() + ".jpg");
+						    		zos.putNextEntry(ze);
+						    		
 									ImageIO.write( bimg, "jpg", zos );
-								} finally {
+									
 									zos.closeEntry();
+								} catch (ZipException e) {
+									logger.warn("Error adding entry", e);
 								}
 								
 								addField(result, recordView.getCachedThumbnailUrl() + ".jpg");

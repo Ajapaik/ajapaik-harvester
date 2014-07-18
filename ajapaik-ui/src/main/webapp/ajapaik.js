@@ -98,18 +98,12 @@ $(document).ready(function() {
 	$("#select-all").on("click", function(e) {
 		var items = $('.item');
 		
-		items.addClass("selected");
-
-//		self.loaded = false;
-		
-//		$("#result-view").fadeOut(function() {
-//			$("#result-view").html("");
-//		});
-
 		for (var i = 0; i < items.length; i++) {
 			var value = $(items[i]).data("id");
 			
 			if($.inArray(value, selection) == -1) {
+				$(items[i]).addClass("selected");
+				
 				selection.push(value);
 			}
 		}
