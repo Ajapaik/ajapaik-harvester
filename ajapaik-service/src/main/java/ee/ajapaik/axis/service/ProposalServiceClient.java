@@ -1,10 +1,13 @@
 package ee.ajapaik.axis.service;
 
+import java.io.IOException;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import ee.ajapaik.model.Location;
@@ -101,8 +104,14 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		if(entity != null) {
 			logger.debug("Closing entity");
 			
-			entity.getContent().close();
-			
+            try {
+                EntityUtils.consume(entity);
+                
+//                entity.getContent().close();
+            } catch (IOException e) {
+                logger.error("Error while cleaning response", e);
+            }
+            
 			this.entity = null;
 		}
 	}
@@ -125,7 +134,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	protected void beforeResponse(HttpResponse response) {
 		response.removeHeaders("Content-Type");
 		
-//		this.entity = response.getEntity();
+		this.entity = response.getEntity();
 	}
 
 	private ReferencesReferences_type0 getReference(String name, String type, String value) {
