@@ -81,11 +81,7 @@ public class AjapaikDao {
 
 						String identifier = rs.getString("identifier");
 						if(identifier != null) {
-							if(identifier.contains(" ")) {
-								taskView.getTaskIds().add("\"" + identifier + "\"");
-							} else {
-								taskView.getTaskIds().add(identifier);
-							}
+							taskView.getTaskIds().add(identifier);
 						}
 					}
 		});
