@@ -94,9 +94,6 @@ public abstract class AbstractSOAPClient<T extends Stub> extends BaseHttpClient 
 		options.setProperty(CHUNKED, Boolean.valueOf(chunked));
 		//options.setProperty(HTTP_PROTOCOL_VERSION, HEADER_PROTOCOL_10);
 		options.setProperty(USER_AGENT, httpClient.getParams().getParameter(CoreProtocolPNames.USER_AGENT));
-
-		options.setProperty(CLEANUP_RESPONSE, true);
-		
 		// Override Axis default timeout and let client to set it
 		options.setTimeOutInMilliSeconds(0);
 		

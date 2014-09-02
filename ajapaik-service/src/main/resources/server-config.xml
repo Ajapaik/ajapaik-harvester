@@ -156,6 +156,7 @@
 	
 	<bean id="proposalServiceClient" class="ee.ajapaik.axis.service.ProposalServiceClient" parent="abstractSOAPClient">
 		<property name="endpoint" value="http://rahvusarhiiv.tietotest.ee/service/proposal/" />
+		<property name="maxConcurrentConnections" value="100" />
 	</bean>	
 	
 	<!-- Services -->
