@@ -1,9 +1,12 @@
 package ee.ajapaik.axis.service;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.log4j.Logger;
 
 import ee.ajapaik.model.Location;
@@ -25,9 +28,16 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	
 	protected static final Logger logger = Logger.getLogger(ProposalServiceClient.class);
 	
+	private HttpPost post;
+	
 	@Override
 	protected ProposalServiceStub getService(ConfigurationContext context, String endpoint) throws AxisFault {
 		return new ProposalServiceStub(context, endpoint);
+	}
+	
+	@Override
+	protected void beforeRequest(HttpRequest request) {
+		post = ((HttpPost)request);
 	}
 	
 	public void proposePermalink(MediaView mediaView, String link) throws Exception {
@@ -55,6 +65,10 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		request.setProposal(proposalType);
 		
 		parseResponse(service.set(request));
+		
+		if(post != null) {
+			post.reset();
+		}
 	}
 	
 	public void proposeLocation(MediaView mediaView, Location location) throws Exception {
@@ -85,6 +99,10 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		request.setProposal(proposalType);
 		
 		parseResponse(service.set(request));
+		
+		if(post != null) {
+			post.reset();
+		}
 	}
 
 	private void parseResponse(SetResponse response) throws Exception {
