@@ -125,7 +125,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	protected void beforeResponse(HttpResponse response) {
 		response.removeHeaders("Content-Type");
 		
-		this.entity = response.getEntity();
+//		this.entity = response.getEntity();
 	}
 
 	private ReferencesReferences_type0 getReference(String name, String type, String value) {
