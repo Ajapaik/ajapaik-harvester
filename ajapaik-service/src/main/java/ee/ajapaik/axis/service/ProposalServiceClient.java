@@ -1,14 +1,13 @@
 package ee.ajapaik.axis.service;
 
-import java.math.BigDecimal;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
-import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.http.HttpResponse;
+import org.apache.log4j.Logger;
 
-import ee.ajapaik.model.Proposal;
+import ee.ajapaik.model.Location;
+import ee.ajapaik.model.MediaView;
 import ee.ra.ais.ProposalServiceStub;
 import ee.ra.ais.ProposalServiceStub.DescriptionUnitMeta_type0;
 import ee.ra.ais.ProposalServiceStub.DescriptionUnitMetasSequence;
@@ -23,47 +22,29 @@ import ee.ra.ais.ProposalServiceStub.SetRequest;
 import ee.ra.ais.ProposalServiceStub.SetResponse;
 
 public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStub> {
+	
+	protected static final Logger logger = Logger.getLogger(ProposalServiceClient.class);
 
 	@Override
 	protected ProposalServiceStub getService(ConfigurationContext context, String endpoint) throws AxisFault {
 		return new ProposalServiceStub(context, endpoint);
 	}
-
-	public void propose(Proposal proposal) throws Exception {
-		SetRequest request = getRequest(proposal);
-
-		SetResponse x = service.set(request);
-		
-		String e = x.getErrors();
-		String r = x.getResult();
-		String w = x.getWarnings();
-		
-		return;
-	}
 	
-	@Override
-	protected void beforeResponse(HttpResponse response) {
-		response.removeHeaders("Content-Type");
-	}
-
-	private SetRequest getRequest(Proposal proposal) throws MalformedURIException {
+	public void proposePermalink(MediaView mediaView, String link) throws Exception {
 		Proposal_type0 proposalType = new Proposal_type0();
-		proposalType.setNotes(proposal.getNotes());
-		proposalType.setObjectId(proposal.getObjectId().intValue());
-		proposalType.setObjectPuri(new URI(proposal.getObjectPuri()));
-		proposalType.setTaskId(proposal.getTaskId().byteValue());
+		proposalType.setNotes("permalink");
+		proposalType.setObjectId(mediaView.getObjectId().intValue());
+		proposalType.setObjectPuri(new URI(mediaView.getPuri()));
+		proposalType.setTaskId(mediaView.getTaskId().byteValue());
 		proposalType.setXProposalObjectTypeId("DESCRIPTION_UNIT");
 		proposalType.setXProposalTypeId("FIELD_CHANGE");
 		
-		DescriptionUnitMetas_type0 metas = new DescriptionUnitMetas_type0();
-		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "PHOTO_FORMAT", "A4"));
-		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LATITUDE", proposal.getLat().toString()));
-		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LONGITUDE", proposal.getLon().toString()));
-		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_AZIMUTH", proposal.getAzi().toString()));
+//		DescriptionUnitMetas_type0 metas = new DescriptionUnitMetas_type0();
+//		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "PHOTO_FORMAT", "A4"));
 		
 		DescriptionUnit_type0 descriptionUnitType = new DescriptionUnit_type0();
-		descriptionUnitType.setDescriptionUnitMetas(metas);
-		descriptionUnitType.setReferencesReferences(getReference(proposal.getUrl()));
+//		descriptionUnitType.setDescriptionUnitMetas(metas);
+		descriptionUnitType.setReferencesReferences(getReference("", "URL", link));
 		
 		Object_type0 objectType = new Object_type0();
 		objectType.setDescriptionUnit(descriptionUnitType);
@@ -73,13 +54,62 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		SetRequest request = new SetRequest();
 		request.setProposal(proposalType);
 		
-		return request;
+		parseResponse(service.set(request));
 	}
 
-	private ReferencesReferences_type0 getReference(String value) {
+	public void proposeLocation(MediaView mediaView, Location location) throws Exception {
+		Proposal_type0 proposalType = new Proposal_type0();
+		proposalType.setNotes("Usaldusväärsus: " + location.getNotes());
+		proposalType.setObjectId(mediaView.getObjectId().intValue());
+		proposalType.setObjectPuri(new URI(mediaView.getPuri()));
+		proposalType.setTaskId(mediaView.getTaskId().byteValue());
+		proposalType.setXProposalObjectTypeId("DESCRIPTION_UNIT");
+		proposalType.setXProposalTypeId("FIELD_CHANGE");
+		
+		DescriptionUnitMetas_type0 metas = new DescriptionUnitMetas_type0();
+		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "PHOTO_FORMAT", "A4"));
+		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LATITUDE", location.getLat()));
+		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LONGITUDE", location.getLon()));
+//		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_AZIMUTH", proposal.getAzi().toString()));
+		
+		DescriptionUnit_type0 descriptionUnitType = new DescriptionUnit_type0();
+		descriptionUnitType.setDescriptionUnitMetas(metas);
+//		descriptionUnitType.setReferencesReferences(getReference("", "", ""));
+		
+		Object_type0 objectType = new Object_type0();
+		objectType.setDescriptionUnit(descriptionUnitType);
+		
+		proposalType.setObject(objectType);
+		
+		SetRequest request = new SetRequest();
+		request.setProposal(proposalType);
+		
+		parseResponse(service.set(request));
+	}
+
+	private void parseResponse(SetResponse response) throws Exception {
+		if(response.getErrors() != null) {
+			throw new Exception(response.getErrors());
+		}
+		
+		if(response.getWarnings() != null) {
+			logger.warn("Proposal returned warning: " + response.getWarnings());
+		}
+		
+		if(response.getResult() != null) {
+			logger.info("Proposal returned result: " + response.getResult());
+		}
+	}
+
+	@Override
+	protected void beforeResponse(HttpResponse response) {
+		response.removeHeaders("Content-Type");
+	}
+
+	private ReferencesReferences_type0 getReference(String name, String type, String value) {
 		Reference_type0 referenceType = new Reference_type0();
-		referenceType.setName("");
-		referenceType.setReferenceTypeId("URL");
+		referenceType.setName(name);
+		referenceType.setReferenceTypeId(type);
 		referenceType.setReferenceValue(value);
 		
 		ReferencesReferencesSequence seq = new ReferencesReferencesSequence();
@@ -101,31 +131,5 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		seq.setDescriptionUnitMeta(descriptionUnitMeta);
 		
 		return seq;
-	}
-	
-	public static void main(String[] args) throws Exception {
-		ProposalServiceClient c = new ProposalServiceClient();
-		c.setEndpoint("http://rahvusarhiiv.tietotest.ee/service/proposal/");
-		c.setAcceptGzip(false);
-		c.setGzipRequest(false);
-		c.setChunked(true);
-		c.setUseBasicAuth(false);
-		c.setUserAgent("test agent");
-		c.setMaxConcurrentConnections(1);
-		c.setRetryCount(3);
-		c.afterPropertiesSet();
-		
-		
-		Proposal proposal = new Proposal();
-		proposal.setAzi(new BigDecimal("10.1"));
-		proposal.setLat(new BigDecimal("59.437897"));
-		proposal.setLon(new BigDecimal("24.749004"));
-		proposal.setNotes("Usaldusv22rsus: 60%");
-		proposal.setObjectId(577744L);
-		proposal.setObjectPuri("http://opendata.rahvusarhiiv.tietotest.ee/du/4a5168f868a1");
-		proposal.setTaskId(9L);
-		proposal.setUrl("http://ajapaik.ee");
-		
-		c.propose(proposal);
 	}
 }

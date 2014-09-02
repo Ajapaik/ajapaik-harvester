@@ -1,6 +1,8 @@
 package ee.ajapaik.harvester;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.xml.sax.InputSource;
 
 import ee.ajapaik.axis.service.TaskServiceClient;
 import ee.ajapaik.dao.AjapaikDao;
@@ -131,13 +134,13 @@ public class AISHarvestTask extends QuartzJobBean {
 	private List<String> parseMediaList(String about) throws Exception {
 		MediaHandler mediaHandler = new MediaHandler();
 		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-		parser.parse(IOHandler.openStream(new URL(about + "/medialist")), mediaHandler);
+		parser.parse(getSource(about + "/medialist"), mediaHandler);
 
 		return mediaHandler.getMedias();
 	}
 
 	private Meta parsePuri(String puri) throws Exception {
-		InputStream is = IOHandler.openStream(new URL(puri + "?rdf"));
+		InputSource is = getSource(puri + "?rdf");
 
 		if(is != null) {
 			MetaHandler metaHandler = new MetaHandler();
@@ -148,6 +151,16 @@ public class AISHarvestTask extends QuartzJobBean {
 		} else {
 			return null;
 		}
+	}
+	
+	private InputSource getSource(String url) throws Exception {
+		InputStream is = IOHandler.openStream(new URL(url));
+		Reader reader = new InputStreamReader(is, "UTF-8");
+		 
+		InputSource isrc = new InputSource(reader);
+		isrc.setEncoding("UTF-8");
+		
+		return isrc;
 	}
 }
 

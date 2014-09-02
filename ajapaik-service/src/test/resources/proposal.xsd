@@ -79,8 +79,8 @@
 	<xs:element name="descriptionUnit">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="descriptionUnitMetas" />
-				<xs:element ref="referencesReferences" />
+				<xs:element ref="descriptionUnitMetas" maxOccurs="1" minOccurs="0"/>
+				<xs:element ref="referencesReferences" maxOccurs="1" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

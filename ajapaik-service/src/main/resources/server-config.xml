@@ -54,13 +54,15 @@
 						<prop key="email">info@muinas.ee</prop>
 						<prop key="ignoreSet">rehemaja</prop>
 						<prop key="homepageUrl">http://register.muinas.ee</prop>
-						<prop key="schedule">0 53 21 22 * ?</prop>
+						<prop key="schedule">0 0 0 3/17 * ?</prop>
 					</props>
 				</entry>				
 			</map>
 		</property>
 		
 		<property name="indexerCronExpression" value="0 49 5 * * ?" />
+		
+		<property name="proposalCronExpression" value="0 02 19 * * ?" />
 		
 		<property name="schedulerFactory">
 			<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" />		
@@ -108,6 +110,17 @@
 		</property>
 		
 		<property name="jobClass" value="ee.ajapaik.harvester.AISHarvestTask" />
+	</bean>
+	
+	<bean name="proposalJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="ajapaikDao" value-ref="ajapaikDao" />
+				<entry key="proposalServiceClient" value-ref="proposalServiceClient" />
+			</map>
+		</property>
+		
+		<property name="jobClass" value="ee.ajapaik.axis.service.ProposalTask" />
 	</bean>		
 	
 	<bean id="fileCache" class="ee.ajapaik.image.FileCache" lazy-init="false">
@@ -131,10 +144,10 @@
 		<property name="useBasicAuth" value="false" />
 	</bean>
 
-	<bean id="abstractSOAPClient" class="ee.mobi.billing.platform.AbstractSOAPClient" parent="baseHttpClient" abstract="true">
+	<bean id="abstractSOAPClient" class="ee.ajapaik.axis.service.AbstractSOAPClient" parent="baseHttpClient" abstract="true">
 		<property name="acceptGzip" value="false" />
 		<property name="gzipRequest" value="false" />
-		<property name="chunked" value="true" />
+		<property name="chunked" value="false" />
 	</bean>
 	
 	<bean id="taskServiceClient" class="ee.ajapaik.axis.service.TaskServiceClient" parent="abstractSOAPClient">

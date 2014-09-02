@@ -31,11 +31,12 @@ import ee.ajapaik.persist.SerializingPersister;
 public class Scheduler implements BeanFactoryAware, InitializingBean {
 	private static final String JOB_MAP_INFO_SYSTEM = "infoSystem";
 	private static final String JOB_MAP_HARVEST_JOB_LISTENER = "harvestJobListener";
-	
+	private static final String JOB_PROPOSAL_NAME = "proposal";
 	public static final String JOB_INDEXER_NAME = "indexer";
 	public static final String JOB_AIS_NAME = "ais";
 	
 	private static final Logger logger = Logger.getLogger(Scheduler.class);
+	
 	
 	private HarvestJobListener harvestJobListener = new HarvestJobListener();
 	
@@ -44,7 +45,12 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 	private StdScheduler schedulerFactory;
 	private SerializingPersister persister;
 	private String indexerCronExpression;
+	private String proposalCronExpression;
 	
+	public void setProposalCronExpression(String proposalCronExpression) {
+		this.proposalCronExpression = proposalCronExpression;
+	}
+
 	public HarvestJobListener getHarvestJobListener() {
 		return harvestJobListener;
 	}
@@ -155,6 +161,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			
 			scheduleIndexing();
 			scheduleHarvest();
+			scheduleProposal();
 		} catch (SchedulerException e) {
 			throw new RuntimeException(e);
 		}
@@ -184,6 +191,22 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			scheduleIndexing(cronTrigger);
 		} catch (ParseException e) {
 			logger.error("Failed to parse cron expression: ", e);
+		}
+	}
+	
+	private void scheduleProposal() {
+		CronTrigger cronTrigger = new CronTrigger(JOB_PROPOSAL_NAME, null);
+		try {
+			cronTrigger.setCronExpression(proposalCronExpression);
+			
+			JobDetailBean job = (JobDetailBean) beanFactory.getBean("proposalJob");
+			job.setName(JOB_PROPOSAL_NAME);
+			
+			schedulerFactory.scheduleJob(job, cronTrigger);
+		} catch (ParseException e) {
+			logger.error("Failed to parse cron expression: ", e);
+		} catch (SchedulerException e) {
+			logger.error("Scheduler failed to schedule propsal job: ", e);
 		}
 	}
 	
@@ -283,10 +306,5 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 		public String getName() {
 			return "globalJobListener";
 		}
-	}
-
-	public void scheduleTask(Long taskId) {
-		// TODO Auto-generated method stub
-		
 	}
 }

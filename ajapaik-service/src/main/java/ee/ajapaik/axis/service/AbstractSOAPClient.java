@@ -1,11 +1,6 @@
 package ee.ajapaik.axis.service;
 
-import static org.apache.axis2.transport.http.HTTPConstants.CACHED_HTTP_CLIENT;
-import static org.apache.axis2.transport.http.HTTPConstants.CHUNKED;
-import static org.apache.axis2.transport.http.HTTPConstants.MC_ACCEPT_GZIP;
-import static org.apache.axis2.transport.http.HTTPConstants.MC_GZIP_REQUEST;
-import static org.apache.axis2.transport.http.HTTPConstants.REUSE_HTTP_CLIENT;
-import static org.apache.axis2.transport.http.HTTPConstants.USER_AGENT;
+import static org.apache.axis2.transport.http.HTTPConstants.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -97,6 +92,7 @@ public abstract class AbstractSOAPClient<T extends Stub> extends BaseHttpClient 
 		options.setProperty(MC_ACCEPT_GZIP, Boolean.valueOf(acceptGzip));
 		// Use chunked transfer
 		options.setProperty(CHUNKED, Boolean.valueOf(chunked));
+		//options.setProperty(HTTP_PROTOCOL_VERSION, HEADER_PROTOCOL_10);
 		options.setProperty(USER_AGENT, httpClient.getParams().getParameter(CoreProtocolPNames.USER_AGENT));
 
 		// Override Axis default timeout and let client to set it
