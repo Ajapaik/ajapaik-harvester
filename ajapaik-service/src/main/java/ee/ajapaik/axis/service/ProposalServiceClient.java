@@ -5,9 +5,9 @@ import java.io.IOException;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
-import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -38,13 +38,23 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		
-		((DefaultHttpClient)getHttpClient()).setReuseStrategy(new ConnectionReuseStrategy() {
-
+		DefaultHttpClient httpClient = (DefaultHttpClient)getHttpClient();
+		
+		httpClient.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
+			
 			@Override
-			public boolean keepAlive(HttpResponse response, HttpContext context) {
-				return false;
+			public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
+				return 1000;
 			}
 		});
+		
+//		httpClient.setReuseStrategy(new ConnectionReuseStrategy() {
+//
+//			@Override
+//			public boolean keepAlive(HttpResponse response, HttpContext context) {
+//				return false;
+//			}
+//		});
 	}
 
 	@Override
