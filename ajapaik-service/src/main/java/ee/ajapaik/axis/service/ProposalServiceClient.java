@@ -5,8 +5,11 @@ import java.io.IOException;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
+import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -30,6 +33,19 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	protected static final Logger logger = Logger.getLogger(ProposalServiceClient.class);
 	
 	private HttpEntity entity;
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		
+		((DefaultHttpClient)getHttpClient()).setReuseStrategy(new ConnectionReuseStrategy() {
+
+			@Override
+			public boolean keepAlive(HttpResponse response, HttpContext context) {
+				return false;
+			}
+		});
+	}
 
 	@Override
 	protected ProposalServiceStub getService(ConfigurationContext context, String endpoint) throws AxisFault {
