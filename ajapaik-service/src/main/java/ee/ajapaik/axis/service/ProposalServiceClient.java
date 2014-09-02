@@ -44,7 +44,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 			
 			@Override
 			public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
-				return 1000;
+				return 0;
 			}
 		});
 		
