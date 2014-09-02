@@ -1,15 +1,13 @@
 package ee.ajapaik.axis.service;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -34,29 +32,6 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	
 	private HttpEntity entity;
 	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		
-		DefaultHttpClient httpClient = (DefaultHttpClient)getHttpClient();
-		
-		httpClient.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
-			
-			@Override
-			public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
-				return 1;
-			}
-		});
-		
-//		httpClient.setReuseStrategy(new ConnectionReuseStrategy() {
-//
-//			@Override
-//			public boolean keepAlive(HttpResponse response, HttpContext context) {
-//				return false;
-//			}
-//		});
-	}
-
 	@Override
 	protected ProposalServiceStub getService(ConfigurationContext context, String endpoint) throws AxisFault {
 		return new ProposalServiceStub(context, endpoint);
@@ -92,6 +67,9 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 			logger.debug("Closing entity");
 			
 			entity.getContent().close();
+			
+			connectionManager.closeExpiredConnections();
+			connectionManager.closeIdleConnections(1, TimeUnit.MILLISECONDS);
 			
 			this.entity = null;
 		}

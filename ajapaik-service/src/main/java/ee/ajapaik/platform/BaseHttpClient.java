@@ -53,6 +53,7 @@ public class BaseHttpClient extends BaseClient {
 	protected String username;
 	protected String password;
 	protected boolean useBasicAuth;
+	protected PoolingClientConnectionManager connectionManager;
 	
 	public void setUserAgent(String userAgent) {
 		this.userAgent = userAgent;
@@ -110,7 +111,7 @@ public class BaseHttpClient extends BaseClient {
         httpClientParams.setParameter(CoreProtocolPNames.USER_AGENT, userAgent);
         
         // Maximum total connections client can handle
-        PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager(schemeRegistry) {
+        connectionManager = new PoolingClientConnectionManager(schemeRegistry) {
         	@Override
         	public ClientConnectionRequest requestConnection(HttpRoute route, Object state) {
         		ClientConnectionRequest connection = super.requestConnection(route, state);
