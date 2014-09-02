@@ -1,12 +1,12 @@
 package ee.ajapaik.axis.service;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
 import org.apache.log4j.Logger;
 
 import ee.ajapaik.model.Location;
@@ -37,7 +37,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	
 	@Override
 	protected void beforeRequest(HttpRequest request) {
-		post = ((HttpPost)request);
+		post = (HttpPost) ((EntityEnclosingRequestWrapper) request).getOriginal();
 	}
 	
 	public void proposePermalink(MediaView mediaView, String link) throws Exception {
