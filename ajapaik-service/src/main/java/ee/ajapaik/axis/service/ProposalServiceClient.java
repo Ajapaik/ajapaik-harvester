@@ -3,6 +3,7 @@ package ee.ajapaik.axis.service;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.log4j.Logger;
 
@@ -24,6 +25,8 @@ import ee.ra.ais.ProposalServiceStub.SetResponse;
 public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStub> {
 	
 	protected static final Logger logger = Logger.getLogger(ProposalServiceClient.class);
+	
+	private HttpEntity entity;
 
 	@Override
 	protected ProposalServiceStub getService(ConfigurationContext context, String endpoint) throws AxisFault {
@@ -55,6 +58,14 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		request.setProposal(proposalType);
 		
 		parseResponse(service.set(request));
+		
+		if(entity != null) {
+			logger.debug("Closing entity");
+			
+			entity.getContent().close();
+			
+			this.entity = null;
+		}
 	}
 
 	public void proposeLocation(MediaView mediaView, Location location) throws Exception {
@@ -85,6 +96,15 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		request.setProposal(proposalType);
 		
 		parseResponse(service.set(request));
+		
+		
+		if(entity != null) {
+			logger.debug("Closing entity");
+			
+			entity.getContent().close();
+			
+			this.entity = null;
+		}
 	}
 
 	private void parseResponse(SetResponse response) throws Exception {
@@ -104,6 +124,8 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	@Override
 	protected void beforeResponse(HttpResponse response) {
 		response.removeHeaders("Content-Type");
+		
+		this.entity = response.getEntity();
 	}
 
 	private ReferencesReferences_type0 getReference(String name, String type, String value) {

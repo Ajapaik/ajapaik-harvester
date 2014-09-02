@@ -25,7 +25,7 @@ public class ProposalTask extends QuartzJobBean {
 	public void setAjapaikDao(AjapaikDao ajapaikDao) {
 		this.ajapaikDao = ajapaikDao;
 	}
-
+	
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		try {
@@ -36,7 +36,7 @@ public class ProposalTask extends QuartzJobBean {
 					if(link != null) {
 						try {
 							proposalServiceClient.proposePermalink(mediaView, "http://staging.ajapaik.ee/foto/" + link);
-							
+
 							ajapaikDao.updateLinkProposed(mediaView.getId());
 						} catch (Exception e) {
 							logger.error("Error while proposed URL '" + link + "' for " + mediaView, e);
