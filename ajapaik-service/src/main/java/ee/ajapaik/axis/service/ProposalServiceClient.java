@@ -28,7 +28,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	
 	protected static final Logger logger = Logger.getLogger(ProposalServiceClient.class);
 	
-	private HttpPost post;
+	private ThreadLocal<HttpPost> posts = new ThreadLocal<HttpPost>();
 	
 	@Override
 	protected ProposalServiceStub getService(ConfigurationContext context, String endpoint) throws AxisFault {
@@ -37,7 +37,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 	
 	@Override
 	protected void beforeRequest(HttpRequest request) {
-		post = (HttpPost) ((EntityEnclosingRequestWrapper) request).getOriginal();
+		posts.set((HttpPost) ((EntityEnclosingRequestWrapper) request).getOriginal());
 	}
 	
 	public void proposePermalink(MediaView mediaView, String link) throws Exception {
@@ -66,8 +66,9 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		
 		parseResponse(service.set(request));
 		
-		if(post != null) {
-			post.reset();
+		if(posts.get() != null) {
+			posts.get().reset();
+			posts.remove();
 		}
 	}
 	
@@ -100,8 +101,9 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		
 		parseResponse(service.set(request));
 		
-		if(post != null) {
-			post.reset();
+		if(posts.get() != null) {
+			posts.get().reset();
+			posts.remove();
 		}
 	}
 
