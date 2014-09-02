@@ -2,6 +2,8 @@ package ee.ajapaik.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,8 @@ import ee.ajapaik.xml.model.Task;
 
 public class AjapaikDao {
 
+	public static final NumberFormat FORMAT_2 = new DecimalFormat("0.00");
+	
 	private JdbcTemplate jdbcTemplate;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -118,7 +122,7 @@ public class AjapaikDao {
 					Location location = new Location();
 					location.setLat(rs.getString("lat"));
 					location.setLon(rs.getString("lon"));
-					location.setNotes(rs.getString("confidence"));
+					location.setNotes(FORMAT_2.format(rs.getDouble("confidence") * 100D) + "%");
 					
 					return location;
 				}
