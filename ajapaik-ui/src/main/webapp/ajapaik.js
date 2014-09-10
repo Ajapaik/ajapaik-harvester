@@ -16,10 +16,13 @@ var url = ""; //"http://ajapaik.ee:8080/ajapaik-ui/";
 
 $(document).ready(function() {
 
-	// Search
+	// Submit
 	$("form").on("submit", function(e) {
-		
 		e.preventDefault();
+	});
+
+	// Search
+	$("#search-button").on("click", function(e) {
 		
 		$("#backdrop").fadeIn();
 
@@ -139,14 +142,16 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("#add-task").on("click", function(e) {
-		var value = $("#task-input").val();
+	$("#task-input").on("keypress", function(e) {
+		console.log("keypress", e);
 		
-		if(value != "") {
-			self.request("scheduleTask", [ value ]);
-			
-			$("#task-input").val("");
+		if(e.keyCode == 13) {
+			scheduleTask();
 		}
+	});
+	
+	$("#add-task").on("click", function(e) {
+		scheduleTask();
 	});
 	
 	$("#show-tasks").on("click", function(e) {
@@ -176,6 +181,16 @@ $(document).ready(function() {
 		parseSelection();
 	});
 });
+
+function scheduleTask() {
+	var value = $("#task-input").val();
+	
+	if(value != "") {
+		self.request("scheduleTask", [ value ]);
+		
+		$("#task-input").val("");
+	}
+}
 
 $(document).scroll(function(e) {
 	var vp = viewport();
