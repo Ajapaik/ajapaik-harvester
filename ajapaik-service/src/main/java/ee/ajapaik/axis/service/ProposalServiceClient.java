@@ -54,7 +54,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		
 		DescriptionUnit_type0 descriptionUnitType = new DescriptionUnit_type0();
 //		descriptionUnitType.setDescriptionUnitMetas(metas);
-		descriptionUnitType.setReferencesReferences(getReference("Photo", "URL", link));
+		descriptionUnitType.setReferencesReferences(getReference("Foto Ajapaigas", "URL", link));
 		
 		Object_type0 objectType = new Object_type0();
 		objectType.setDescriptionUnit(descriptionUnitType);

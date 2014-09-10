@@ -10,7 +10,7 @@ var gridSize = 90;
 
 var scrollTo = 0;
 
-var detailView = false;
+var detailView = true;
 
 var url = ""; //"http://ajapaik.ee:8080/ajapaik-ui/";
 
