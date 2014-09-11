@@ -20,6 +20,7 @@ import ee.ajapaik.model.TaskView;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.Search;
 import ee.ajapaik.model.search.SearchResults;
+import ee.ajapaik.platform.AjapaikClient;
 import ee.ajapaik.schedule.Scheduler;
 
 /**
@@ -31,6 +32,7 @@ public class AjapaikServiceImpl implements AjapaikService {
 	private Indexer indexer;
 	private Repository repository;
 	private AjapaikDao ajapaikDao;
+	private AjapaikClient ajapaikClient;
 
 	public void setAjapaikDao(AjapaikDao ajapaikDao) {
 		this.ajapaikDao = ajapaikDao;
@@ -58,6 +60,9 @@ public class AjapaikServiceImpl implements AjapaikService {
 		scheduler.updateInfoSystem(infoSystem);
 	}
 
+	public void setAjapaikClient(AjapaikClient ajapaikClient) {
+		this.ajapaikClient = ajapaikClient;
+	}
 
 	@Override
 	public SearchResults search(Search search) throws Exception {
@@ -191,4 +196,8 @@ public class AjapaikServiceImpl implements AjapaikService {
 		ajapaikDao.removeTask(taskId);
 	}
 
+	@Override
+	public void postImages(String... ids) throws Exception {
+		ajapaikClient.postImages(getRecords(ids));
+	}
 }

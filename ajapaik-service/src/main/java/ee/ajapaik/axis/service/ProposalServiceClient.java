@@ -66,6 +66,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		
 		parseResponse(service.set(request));
 		
+		// XXX: nasty hack to close connections with AIS		
 		if(posts.get() != null) {
 			posts.get().reset();
 			posts.remove();
@@ -85,11 +86,12 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "PHOTO_FORMAT", "A4"));
 		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LATITUDE", location.getLat()));
 		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LONGITUDE", location.getLon()));
+		
+//		FIXME: fill azimuth info when available
 //		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_AZIMUTH", proposal.getAzi().toString()));
 		
 		DescriptionUnit_type0 descriptionUnitType = new DescriptionUnit_type0();
 		descriptionUnitType.setDescriptionUnitMetas(metas);
-//		descriptionUnitType.setReferencesReferences(getReference("", "", ""));
 		
 		Object_type0 objectType = new Object_type0();
 		objectType.setDescriptionUnit(descriptionUnitType);
@@ -101,6 +103,7 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		
 		parseResponse(service.set(request));
 		
+		// XXX: nasty hack to close connections with AIS
 		if(posts.get() != null) {
 			posts.get().reset();
 			posts.remove();

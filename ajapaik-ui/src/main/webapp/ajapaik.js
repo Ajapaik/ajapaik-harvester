@@ -116,29 +116,23 @@ $(document).ready(function() {
 
 	// Select none
 	$("#select-none").on("click", function(e) {
-		_.each($("#result-view").children(), function (task, i) {
-			_.each(selection, function (s, i) {
-				if($(task).data("id") == s) {
-					$(task).removeClass("selected");
-				}
-			});
-		});
-		
-		selection = [];
-		
-		$("#set-view").fadeOut(function(e) {
-			$("#set-view").html("");	
-		});
-		
-		updateSelection();
+		selectNone();
 	});
 
 	$("#download").on("click", function(e) {
 		e.preventDefault();
 		
-		if(self.selection.length > 0) {
-			var win = window.open('../ajapaik-service/csv/?ids=' + self.selection, '_blank');
-			win.focus();
+		if(self.selection.length > 0 && confirm("Oled kindel, et soovid valimi saata Ajapaika?")) {
+//			var win = window.open('../ajapaik-service/csv/?ids=' + self.selection, '_blank');
+//			win.focus();
+			
+			$("#backdrop").fadeIn();
+			
+			self.request("postImages", [self.selection], function(result) {
+				selectNone();
+				
+				$("#backdrop").fadeOut();
+			});
 		}
 	});
 	
@@ -181,6 +175,24 @@ $(document).ready(function() {
 		parseSelection();
 	});
 });
+
+function selectNone() {
+	_.each($("#result-view").children(), function (task, i) {
+		_.each(selection, function (s, i) {
+			if($(task).data("id") == s) {
+				$(task).removeClass("selected");
+			}
+		});
+	});
+	
+	selection = [];
+	
+	$("#set-view").fadeOut(function(e) {
+		$("#set-view").html("");	
+	});
+	
+	updateSelection();
+}
 
 function scheduleTask() {
 	var value = $("#task-input").val();
@@ -295,7 +307,7 @@ function parseResult(result, scroll) {
 		for (var i = 0; i < result.length; i++) {
 			var record = result[i];
 			
-			tooltipData[record.id] = {"img":(record.imageUrl != "null" ? record.imageUrl : (url + "../ajapaik-service/images/" + record.cachedThumbnailUrl)), "desc":record.description,"title":record.title, "number":record.id};
+			tooltipData[record.id] = {"img":(record.imageUrl != "null" ? record.imageUrl : (url + "../ajapaik-service/images/" + record.cachedThumbnailUrl)), "desc":record.description,"title":record.title, "number":record.identifyingNumber};
 			
 			var img = $("<img height='" + self.gridSize + "' src='" + url + "../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
 			
@@ -388,7 +400,7 @@ function request(method, params, callback) {
 		contentType : 'application/json',
 		data : JSON.stringify(requestParams),
 		success : function(msg) {
-			if (msg.result != null) {
+			if (typeof msg.result != 'undefined' && typeof callback != 'undefined') {
 				callback(msg.result);
 			} else if (typeof msg.error != 'undefined') {
 				alert("Error: " + msg.error.message);
@@ -433,7 +445,7 @@ function parseSelection() {
 					var description = $("<div class='col-sm-8'></div>");
 					
 					description.append("<p><b><a href='" + record.urlToRecord + "' target='_blank'>" + record.title + "</a></b></p>");
-					description.append("<p>" + record.id + "</p>");
+					description.append("<p>" + record.identifyingNumber + "</p>");
 					description.append("<p>" + record.providerName.replace("NLIB", "Digar") + "</p>");
 					description.append("<p>" + record.description.replace("<", "").replace(">", "") + "</p>");
 					

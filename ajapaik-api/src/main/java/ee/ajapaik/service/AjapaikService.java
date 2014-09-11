@@ -38,4 +38,5 @@ public interface AjapaikService {
 	
 	void removeTask(Long taskId);
 	
+	void postImages(String... ids) throws Exception;
 }

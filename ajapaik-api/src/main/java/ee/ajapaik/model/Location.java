@@ -1,6 +1,5 @@
 package ee.ajapaik.model;
 
-import java.math.BigDecimal;
 
 public class Location {
 
