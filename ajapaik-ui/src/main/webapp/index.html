@@ -17,6 +17,61 @@
 
 </head>
 <body>
+	<!-- Modal -->
+	<div class="modal fade modal" id="modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title pull-left">Saada valim Ajapaika</h3>
+					<div class="btn-group pull-right">
+						<button type="button" class="btn btn-default" data-dismiss="modal">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</div>
+					<div style="clear:both"></div>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12">
+							<form class="form-horizontal" role="form">
+								<div class="form-group">
+									<label for="city" class="col-sm-3 control-label">Linn:</label>
+									<div class="col-sm-5">
+										<div class="input-group">
+									
+											<input id="city-input" class="form-control" type="text" value="">
+												
+											<div class="input-group-btn">
+												<button id="show-cities" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">&nbsp;<span class="caret"></span></button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu">
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="lat" class="col-sm-3 control-label">Latitude:</label>
+									<div class="col-sm-5">
+										<input id="lat" class="form-control" type="text" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="lon" class="col-sm-3 control-label">Longitude:</label>
+									<div class="col-sm-5">
+										<input id="lon" class="form-control" type="text" value="">
+									</div>
+								</div>	
+							</form>
+						</div>
+					</div>		
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Sulge</button>
+					<button type="button" class="btn btn-primary"><img src="ajax-loader.gif" height="16" style="margin-right: 5px; display: none;" id="loader">Saada</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<div class="header">
 
@@ -129,7 +184,8 @@
 				<div id="set-form" style="display: none;">
 					<div class="form-group">
 						<div class="col-sm-10" style="margin-top: 15px">
-							<button type="button" class="btn btn-primary" id="download">Saada ajapaika</button>
+							<button type="button" class="btn btn-primary" id="send">Saada Ajapaika</button>
+							<button type="button" class="btn btn-primary" id="download">Lae alla</button>
 							<button type="button" class="btn btn-danger" id="select-none">Tühista valik</button>
 						</div>
 						<div class="col-sm-2">

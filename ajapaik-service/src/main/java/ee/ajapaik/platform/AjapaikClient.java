@@ -1,8 +1,10 @@
 package ee.ajapaik.platform;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -14,7 +16,10 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.message.BasicHeader;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ee.ajapaik.db.Repository;
+import ee.ajapaik.model.City;
 import ee.ajapaik.model.search.RecordView;
 
 public class AjapaikClient extends BaseHttpClient {
@@ -23,16 +28,48 @@ public class AjapaikClient extends BaseHttpClient {
 		void notify(String name, byte[] data);
 	}
 
+	private ObjectMapper mapper = new ObjectMapper();
 	private Repository repository;
 	
 	public void setRepository(Repository repository) {
 		this.repository = repository;
 	}
+	
+	public City createCity(City city) throws Exception {
+		MultipartEntity entity = new MultipartEntity();
+		entity.addPart("name", getStringBody(city.getName()));
+		entity.addPart("lat", getStringBody(city.getLat()));
+		entity.addPart("lon", getStringBody(city.getLon()));
+		
+		HttpPost request = new HttpPost("/api/cities/");
+		request.setEntity(entity);
+		
+		HttpResponse response = httpClient.execute(request);
+		
+		City result = mapper.readValue(response.getEntity().getContent(), City.class);
+		
+		request.reset();
+		
+		logger.debug("POST returned: " + result);
+		
+		return result;
+	}
+	
+	public List<City> listCities() throws Exception {
+		HttpGet request = new HttpGet("/api/cities/?format=json");
+		HttpResponse response = httpClient.execute(request);
+		
+		List<City> result = mapper.readValue(response.getEntity().getContent(), mapper.getTypeFactory().constructCollectionType(List.class, City.class));
+		
+		request.reset();
+		
+		logger.debug("POST returned: " + result);
+		
+		return result;
+	}
 
-	public void postImages(RecordView... recordViews) throws Exception {
+	public void postImages(Integer city, RecordView... recordViews) throws Exception {
 		for (RecordView recordView : recordViews) {
-			
-			logger.debug("About to execute POST on path '" + baseUrl + "'");
 			
 			final MultipartEntity entity = new MultipartEntity();
 			getImageData(recordView, new DataCallback() {
@@ -44,27 +81,22 @@ public class AjapaikClient extends BaseHttpClient {
 				
 			});
 			
-			String institution = recordView.getInstitution();
-			if(institution.contains(",")) {
-				entity.addPart("institution", getStringBody(institution.split(",")[0]));
-			} else {
-				entity.addPart("institution", getStringBody(institution));
-			}
-			
+			entity.addPart("source", getStringBody("56"));
 			entity.addPart("date", getStringBody(recordView.getDate()));
-			entity.addPart("description", getStringBody(recordView.getDescription()));
-			entity.addPart("title", getStringBody(recordView.getTitle()));
-			entity.addPart("number", getStringBody(recordView.getIdentifyingNumber()));
-			entity.addPart("url", getStringBody(recordView.getUrlToRecord()));
-			entity.addPart("place", getStringBody("Valimimoodul"));
+			entity.addPart("description", getStringBody(recordView.getTitle() + ": " + recordView.getDescription()));
+			entity.addPart("source_key", getStringBody(recordView.getIdentifyingNumber()));
+			entity.addPart("source_url", getStringBody(recordView.getUrlToRecord()));
+			entity.addPart("city", getStringBody(city));
 			
-			HttpPost request = new HttpPost(baseUrl);
+			HttpPost request = new HttpPost("/api/photos/");
 			request.setEntity(entity);
 			
 			try {
 				HttpResponse response = httpClient.execute(request);
 				
 				String result = parseResponse(response);
+				
+				request.reset();
 				
 				logger.debug("POST returned: " + result);
 			} catch (Exception e) {
@@ -73,18 +105,18 @@ public class AjapaikClient extends BaseHttpClient {
 		}
 	}
 
-	private StringBody getStringBody(String data) throws UnsupportedEncodingException {
-		return new StringBody((data != null ? data : ""), Charset.forName("UTF-8"));
+	private StringBody getStringBody(Object data) throws UnsupportedEncodingException {
+		return new StringBody((data != null ? data.toString() : ""), Charset.forName("UTF-8"));
 	}
 
 	private String parseResponse(HttpResponse response) throws Exception {
 		HttpEntity entity = response.getEntity();
 		if(entity != null) {
-			if (response.getStatusLine().getStatusCode() == 200) {
-				byte[] data = IOUtils.toByteArray(entity.getContent());
-				
-				return new String(data, "UTF-8");
-			}
+			InputStream is = entity.getContent();
+			
+			byte[] data = IOUtils.toByteArray(is);
+			
+			return new String(data, "UTF-8");
 		}
 		
 		return null;

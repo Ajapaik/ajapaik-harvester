@@ -5,6 +5,14 @@
   src: url('fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('fonts/glyphicons-halflings-regular.woff') format('woff'), url('fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
+html {
+	overflow-y: scroll;
+}
+
+.glyphicon {
+	top: 0px;
+}
+
 .header {
 	position: fixed;
 	background: #FFFFFF;
@@ -109,6 +117,10 @@
 
 .dropdown-menu {
 	min-width: 190px;
+}
+
+#modal .dropdown-menu {
+    min-width: 220px;
 }
 
 .dropdown-menu li {

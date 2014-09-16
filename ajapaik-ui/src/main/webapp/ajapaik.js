@@ -12,7 +12,7 @@ var scrollTo = 0;
 
 var detailView = true;
 
-var url = ""; //"http://ajapaik.ee:8080/ajapaik-ui/";
+var url = "http://ajapaik.ee:8080/ajapaik-ui/";
 
 $(document).ready(function() {
 
@@ -119,22 +119,86 @@ $(document).ready(function() {
 		selectNone();
 	});
 
-	$("#download").on("click", function(e) {
+	$("#send").on("click", function(e) {
 		e.preventDefault();
 		
-		if(self.selection.length > 0 && confirm("Oled kindel, et soovid valimi saata Ajapaika?")) {
-//			var win = window.open('../ajapaik-service/csv/?ids=' + self.selection, '_blank');
-//			win.focus();
+		if(self.selection.length > 0) {
 			
-			$("#backdrop").fadeIn();
+			$("#city-input").val("");
+			$("#modal .dropdown-menu").html("");
 			
-			self.request("postImages", [self.selection], function(result) {
-				selectNone();
-				
-				$("#backdrop").fadeOut();
+			$("#lat").val("");
+			$("#lon").val("");
+			
+			self.request("listCities", [], function(data) {
+				_.each(data, function(element) {
+					var li = $("<li><a>" + element.name + "</a></li>");
+					li.data(element);
+					
+					li.on("click", function(e) {
+						var target = $(e.currentTarget);
+						var data = target.data();
+						
+						$("#city-input").val(data.name);
+						$("#lat").val(data.lat);
+						$("#lon").val(data.lon);
+					});
+					
+					$("#modal .dropdown-menu").append(li);
+				});
+			
+				showModal(function() {
+					$("#modal #loader").fadeOut();
+					$("#modal .btn-primary").removeAttr('disabled');
+				}, function() {
+					$("#modal .btn-primary").attr('disabled', 'disabled');
+					$("#loader").fadeIn();
+					
+					var name = $("#city-input").val();
+					if(name != "") {
+						var data = null;
+						_.each(data, function(element) {
+							if(element.name == name) {
+								data = element;
+							}
+						});
+						
+						if(data != null) {
+							self.request("postImages", [data.id, self.selection], function(result) {
+								selectNone();
+								
+								$('#modal').modal("hide");
+							});
+						} else {
+							var city = {
+									name: name, 
+									lat: $("#lat").val(), 
+									lon: $("#lon").val(),
+							};
+							
+							self.request("createCity", [city], function(result) {
+								self.request("postImages", [result.id, self.selection], function(result) {
+									selectNone();
+									
+									$('#modal').modal("hide");
+								});
+							});
+						}
+					}
+				});
 			});
 		}
 	});
+	
+	$("#download").on("click", function(e) {
+		e.preventDefault();
+		
+		if(self.selection.length > 0) {
+			var win = window.open('../ajapaik-service/csv/?ids=' + self.selection, '_blank');
+			win.focus();
+		}
+	});
+	
 	
 	$("#task-input").on("keypress", function(e) {
 		console.log("keypress", e);
@@ -406,6 +470,22 @@ function request(method, params, callback) {
 				alert("Error: " + msg.error.message);
 			}
 		}
+	});
+}
+
+function showModal(close, save) {
+	$('#modal').on("hidden.bs.modal", function(event) {
+		$('#modal').unbind("hidden.bs.modal");
+		$('#modal .btn-primary').unbind("click");
+		$('#modal .btn-danger').unbind("click");
+		
+		close(event);
+	}).find(".btn-primary").on("click", function(event) {
+		save(event);
+	});
+	
+	return $('#modal').modal({
+		"backdrop": "static",
 	});
 }
 

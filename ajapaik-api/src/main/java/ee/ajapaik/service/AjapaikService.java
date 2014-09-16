@@ -3,6 +3,7 @@ package ee.ajapaik.service;
 import java.util.Collection;
 import java.util.List;
 
+import ee.ajapaik.model.City;
 import ee.ajapaik.model.InfoSystem;
 import ee.ajapaik.model.MediaView;
 import ee.ajapaik.model.TaskView;
@@ -38,5 +39,9 @@ public interface AjapaikService {
 	
 	void removeTask(Long taskId);
 	
-	void postImages(String... ids) throws Exception;
+	void postImages(Integer cityId, String... ids) throws Exception;
+	
+	List<City> listCities() throws Exception;
+	
+	City createCity(City city) throws Exception;
 }

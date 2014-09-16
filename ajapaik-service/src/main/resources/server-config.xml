@@ -163,7 +163,6 @@
 		<property name="repository" ref="repository" />
 		<property name="host" value="staging.ajapaik.ee" />
 		<property name="protocol" value="http" />
-		<property name="baseUrl" value="/api/post_new_historic_photo" />
 		<property name="useBasicAuth" value="true" />
 		<property name="username" value="kaido" />
 		<property name="password" value="lihtneparool" />

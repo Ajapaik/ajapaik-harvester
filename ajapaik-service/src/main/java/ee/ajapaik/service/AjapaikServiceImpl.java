@@ -14,6 +14,7 @@ import ee.ajapaik.db.Repository;
 import ee.ajapaik.index.IndexedFields;
 import ee.ajapaik.index.Indexer;
 import ee.ajapaik.index.Result;
+import ee.ajapaik.model.City;
 import ee.ajapaik.model.InfoSystem;
 import ee.ajapaik.model.MediaView;
 import ee.ajapaik.model.TaskView;
@@ -197,7 +198,17 @@ public class AjapaikServiceImpl implements AjapaikService {
 	}
 
 	@Override
-	public void postImages(String... ids) throws Exception {
-		ajapaikClient.postImages(getRecords(ids));
+	public void postImages(Integer cityId, String... ids) throws Exception {
+		ajapaikClient.postImages(cityId, getRecords(ids));
+	}
+
+	@Override
+	public List<City> listCities() throws Exception {
+		return ajapaikClient.listCities();
+	}
+
+	@Override
+	public City createCity(City city) throws Exception {
+		return ajapaikClient.createCity(city);
 	}
 }
