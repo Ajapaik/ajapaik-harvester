@@ -151,11 +151,11 @@ $(document).ready(function() {
 					$("#modal #loader").fadeOut();
 					$("#modal .btn-primary").removeAttr('disabled');
 				}, function() {
-					$("#modal .btn-primary").attr('disabled', 'disabled');
-					$("#loader").fadeIn();
-					
 					var name = $("#city-input").val();
 					if(name != "") {
+						$("#modal .btn-primary").attr('disabled', 'disabled');
+						$("#loader").fadeIn();
+						
 						var data = null;
 						_.each(data, function(element) {
 							if(element.name == name) {

@@ -82,7 +82,7 @@ public class AjapaikClient extends BaseHttpClient {
 			});
 			
 			entity.addPart("source", getStringBody("56"));
-			entity.addPart("date", getStringBody(recordView.getDate()));
+			entity.addPart("date_text", getStringBody(recordView.getDate()));
 			entity.addPart("description", getStringBody(recordView.getTitle() + ": " + recordView.getDescription()));
 			entity.addPart("source_key", getStringBody(recordView.getIdentifyingNumber()));
 			entity.addPart("source_url", getStringBody(recordView.getUrlToRecord()));
