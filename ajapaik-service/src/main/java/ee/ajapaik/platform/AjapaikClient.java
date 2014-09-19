@@ -17,9 +17,11 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.message.BasicHeader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 
 import ee.ajapaik.db.Repository;
 import ee.ajapaik.model.City;
+import ee.ajapaik.model.Photo;
 import ee.ajapaik.model.search.RecordView;
 
 public class AjapaikClient extends BaseHttpClient {
@@ -55,15 +57,25 @@ public class AjapaikClient extends BaseHttpClient {
 		return result;
 	}
 	
+
+	public List<Photo> listPhotos() throws Exception {
+		HttpGet request = new HttpGet("/api/photos/?format=json");
+		HttpResponse response = httpClient.execute(request);
+		
+		List<Photo> result = mapper.readValue(response.getEntity().getContent(), collectionType(Photo.class));
+		
+		request.reset();
+		
+		return result;
+	}
+
 	public List<City> listCities() throws Exception {
 		HttpGet request = new HttpGet("/api/cities/?format=json");
 		HttpResponse response = httpClient.execute(request);
 		
-		List<City> result = mapper.readValue(response.getEntity().getContent(), mapper.getTypeFactory().constructCollectionType(List.class, City.class));
+		List<City> result = mapper.readValue(response.getEntity().getContent(), collectionType(City.class));
 		
 		request.reset();
-		
-		logger.debug("POST returned: " + result);
 		
 		return result;
 	}
@@ -105,6 +117,10 @@ public class AjapaikClient extends BaseHttpClient {
 		}
 	}
 
+	private CollectionType collectionType(Class<?> clazz) {
+		return mapper.getTypeFactory().constructCollectionType(List.class, clazz);
+	}
+	
 	private StringBody getStringBody(Object data) throws UnsupportedEncodingException {
 		return new StringBody((data != null ? data.toString() : ""), Charset.forName("UTF-8"));
 	}

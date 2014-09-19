@@ -2,20 +2,15 @@ package ee.ajapaik.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.RowMapper;
 
 import ee.ajapaik.dao.mapper.MediaViewMapper;
-import ee.ajapaik.model.Location;
 import ee.ajapaik.model.MediaView;
 import ee.ajapaik.model.TaskView;
 import ee.ajapaik.xml.model.Meta;
@@ -23,8 +18,6 @@ import ee.ajapaik.xml.model.Task;
 
 public class AjapaikDao {
 
-	public static final NumberFormat FORMAT_2 = new DecimalFormat("0.00");
-	
 	private JdbcTemplate jdbcTemplate;
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
@@ -97,14 +90,6 @@ public class AjapaikDao {
 		jdbcTemplate.update("delete from task where id = ?", taskId);
 	}
 
-	public String getPermalink(String identifier) {
-		try {
-			return jdbcTemplate.queryForObject("select id from project_photo where source_key = ?", String.class, identifier);
-		} catch (EmptyResultDataAccessException e) {
-			return null;
-		}
-	}
-
 	public void updateLinkProposed(Long id) {
 		jdbcTemplate.update("update media set link_proposed = TRUE where id = ?", id);
 	}
@@ -113,23 +98,32 @@ public class AjapaikDao {
 		jdbcTemplate.update("update media set location_proposed = TRUE where id = ?", id);
 	}
 
-	public Location getLocation(String identifier) {
-		try{
-			return jdbcTemplate.queryForObject("select lat, lon, confidence from project_photo where source_key = ? and confidence > 0.6", new RowMapper<Location>() {
 	
-				@Override
-				public Location mapRow(ResultSet rs, int rowNum) throws SQLException {
-					Location location = new Location();
-					location.setLat(rs.getString("lat"));
-					location.setLon(rs.getString("lon"));
-					location.setNotes(FORMAT_2.format(rs.getDouble("confidence") * 100D) + "%");
-					
-					return location;
-				}
-				
-			}, identifier);
-		} catch (EmptyResultDataAccessException e) {
-			return null;
-		}
-	}
+//	public String getPermalink(String identifier) {
+//		try {
+//			return jdbcTemplate.queryForObject("select id from project_photo where source_key = ?", String.class, identifier);
+//		} catch (EmptyResultDataAccessException e) {
+//			return null;
+//		}
+//	}
+//	
+//	public Location getLocation(String identifier) {
+//		try{
+//			return jdbcTemplate.queryForObject("select lat, lon, confidence from project_photo where source_key = ? and confidence > 0.6", new RowMapper<Location>() {
+//	
+//				@Override
+//				public Location mapRow(ResultSet rs, int rowNum) throws SQLException {
+//					Location location = new Location();
+//					location.setLat(rs.getString("lat"));
+//					location.setLon(rs.getString("lon"));
+//					location.setNotes(FORMAT_2.format(rs.getDouble("confidence") * 100D) + "%");
+//					
+//					return location;
+//				}
+//				
+//			}, identifier);
+//		} catch (EmptyResultDataAccessException e) {
+//			return null;
+//		}
+//	}
 }

@@ -90,6 +90,51 @@ public class BaseHttpClient extends BaseClient {
 	public void setUseBasicAuth(boolean useBasicAuth) {
 		this.useBasicAuth = useBasicAuth;
 	}
+	
+	public PoolingClientConnectionManager getConnectionManager() {
+		return connectionManager;
+	}
+
+	public void setConnectionManager(
+			PoolingClientConnectionManager connectionManager) {
+		this.connectionManager = connectionManager;
+	}
+
+	public int getMaxConcurrentConnections() {
+		return maxConcurrentConnections;
+	}
+
+	public String getBaseUrl() {
+		return baseUrl;
+	}
+
+	public int getRetryCount() {
+		return retryCount;
+	}
+
+	public String getProtocol() {
+		return protocol;
+	}
+
+	public String getUserAgent() {
+		return userAgent;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public boolean isUseBasicAuth() {
+		return useBasicAuth;
+	}
+
+	public void setHttpClient(HttpClient httpClient) {
+		this.httpClient = httpClient;
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

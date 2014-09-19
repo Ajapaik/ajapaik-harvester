@@ -27,5 +27,16 @@ public abstract class BaseClient implements InitializingBean {
 	public void setPort(int port) {
 		this.port = port;
 	}
-	
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public int getPort() {
+		return port;
+	}
 }

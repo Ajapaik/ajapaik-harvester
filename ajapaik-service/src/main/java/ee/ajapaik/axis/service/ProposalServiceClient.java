@@ -1,5 +1,8 @@
 package ee.ajapaik.axis.service;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
@@ -9,7 +12,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
 import org.apache.log4j.Logger;
 
-import ee.ajapaik.model.Location;
 import ee.ajapaik.model.MediaView;
 import ee.ra.ais.ProposalServiceStub;
 import ee.ra.ais.ProposalServiceStub.DescriptionUnitMeta_type0;
@@ -26,7 +28,8 @@ import ee.ra.ais.ProposalServiceStub.SetResponse;
 
 public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStub> {
 	
-	protected static final Logger logger = Logger.getLogger(ProposalServiceClient.class);
+	private static final NumberFormat FORMAT_2 = new DecimalFormat("0.00");
+	private static final Logger logger = Logger.getLogger(ProposalServiceClient.class);
 	
 	private ThreadLocal<HttpPost> posts = new ThreadLocal<HttpPost>();
 	
@@ -73,9 +76,9 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		}
 	}
 	
-	public void proposeLocation(MediaView mediaView, Location location) throws Exception {
+	public void proposeLocation(MediaView mediaView, String lat, String lon, String azimuth, Double confidence) throws Exception {
 		Proposal_type0 proposalType = new Proposal_type0();
-		proposalType.setNotes("Usaldusväärsus: " + location.getNotes());
+		proposalType.setNotes("Usaldusväärsus: " + FORMAT_2.format(confidence * 100D) + "%");
 		proposalType.setObjectId(mediaView.getObjectId().intValue());
 		proposalType.setObjectPuri(new URI(mediaView.getPuri()));
 		proposalType.setTaskId(mediaView.getTaskId().byteValue());
@@ -84,11 +87,12 @@ public class ProposalServiceClient extends AbstractSOAPClient<ProposalServiceStu
 		
 		DescriptionUnitMetas_type0 metas = new DescriptionUnitMetas_type0();
 		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "PHOTO_FORMAT", "A4"));
-		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LATITUDE", location.getLat()));
-		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LONGITUDE", location.getLon()));
+		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LATITUDE", lat));
+		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_LONGITUDE", lon));
 		
-//		FIXME: fill azimuth info when available
-//		metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_AZIMUTH", proposal.getAzi().toString()));
+		if(azimuth != null && !azimuth.equals("") && !azimuth.equals("0.0")) {
+			metas.addDescriptionUnitMetasSequence(getSeq("IMAGE", "GEO_AZIMUTH", azimuth));
+		}
 		
 		DescriptionUnit_type0 descriptionUnitType = new DescriptionUnit_type0();
 		descriptionUnitType.setDescriptionUnitMetas(metas);

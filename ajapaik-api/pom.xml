@@ -15,4 +15,10 @@
 
 	<name>ajapaik-api</name>
 
+	<dependencies>
+		<dependency>
+			<artifactId>jackson-annotations</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+		</dependency>
+	</dependencies>
 </project>

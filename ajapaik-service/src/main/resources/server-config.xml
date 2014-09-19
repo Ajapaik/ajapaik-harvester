@@ -62,7 +62,7 @@
 		
 		<property name="indexerCronExpression" value="0 49 5 * * ?" />
 		
-		<property name="proposalCronExpression" value="0 02 19 * * ?" />
+		<property name="proposalCronExpression" value="0 11 12 * * ?" />
 		
 		<property name="schedulerFactory">
 			<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" />		
@@ -117,6 +117,8 @@
 			<map>
 				<entry key="ajapaikDao" value-ref="ajapaikDao" />
 				<entry key="proposalServiceClient" value-ref="proposalServiceClient" />
+				<entry key="photoCache" value-ref="photoCache" />
+				<entry key="ajapaikClient" value-ref="ajapaikClient" />
 			</map>
 		</property>
 		
@@ -192,4 +194,10 @@
 	<bean id="ajapaikDao" class="ee.ajapaik.dao.AjapaikDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
+	
+	<!-- Cache -->
+	<bean id="photoCache" class="ee.ajapaik.cache.PhotoCache">
+		<property name="ajapaikClient" ref="ajapaikClient" />
+	</bean>
+	
 </beans>
