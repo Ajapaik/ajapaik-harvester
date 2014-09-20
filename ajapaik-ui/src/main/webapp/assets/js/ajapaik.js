@@ -16,62 +16,23 @@ var url = "http://ajapaik.ee:8080/ajapaik-ui/";
 
 $(document).ready(function() {
 
-	// Submit
-	$("form").on("submit", function(e) {
-		e.preventDefault();
-	});
+	// Fill search form
+	parseHash(location.hash);
 
 	// Search
 	$("#search-button").on("click", function(e) {
+		search();
+	});
+	
+	$("#search-form input").on("keypress", function(e) {
 		
-		$("#backdrop").fadeIn();
-
-		self.loaded = false;
-		
-		var search = {
-			"fullSearch" : {
-				"value" : $("#fullSearch").val(),
-			},
-			"id" : {
-				"value" : $("#id").val(),
-				"type" : "OR"
-			},
-			"what" : {
-				"value" : $("#what").val(),
-			},
-			"description" : {
-				"value" : $("#description").val(),
-			},
-			"who" : {
-				"value" : $("#who").val(),
-			},
-			"from" : {
-				"value" : $("#from").val(),
-			},
-			"number" : {
-				"value" : $("#number").val(),
-			},
-			
-			"luceneQuery" : $("#luceneQuery").val() == "" ? null : $("#luceneQuery").val(),
-			"institutionTypes" : [getValue("MUSEUM"), getValue("LIBRARY"), getValue("ARCHIVE")],
-			
-			"pageSize" : 200,
-			"digital" : true
+		if(e.keyCode == 13) {
+			if(e.currentTarget.id == "task-input") {
+				scheduleTask();
+			} else {
+				search();		
+			}
 		}
-
-		$("#result-view").fadeOut();
-		
-		self.request("search", [ search ], function(result) {
-			
-			self.result = result;
-			self.offset = result.firstRecordViews != null ? result.firstRecordViews.length : 0;
-			
-			$("#search span").text(result.ids != null ? result.ids.length: "0");
-			
-			$("#result-view").html("");
-			
-			self.parseResult(result.firstRecordViews, true);
-		});
 	});
 
 	// Tab navication
@@ -87,6 +48,8 @@ $(document).ready(function() {
 			
 			$("#set-form").hide();
 			$("#set-view").hide();
+			
+			buildGrid($("#result-view"));
 		} else if(target[0].id == "set") {
 			$("#search-form").hide();
 			$("#result-view").hide();
@@ -130,8 +93,8 @@ $(document).ready(function() {
 			$("#lat").val("");
 			$("#lon").val("");
 			
-			self.request("listCities", [], function(data) {
-				_.each(data, function(element) {
+			self.request("listCities", [], function(result) {
+				_.each(result, function(element) {
 					var li = $("<li><a>" + element.name + "</a></li>");
 					li.data(element);
 					
@@ -157,7 +120,7 @@ $(document).ready(function() {
 						$("#loader").fadeIn();
 						
 						var data = null;
-						_.each(data, function(element) {
+						_.each(result, function(element) {
 							if(element.name == name) {
 								data = element;
 							}
@@ -199,15 +162,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	
-	$("#task-input").on("keypress", function(e) {
-		console.log("keypress", e);
-		
-		if(e.keyCode == 13) {
-			scheduleTask();
-		}
-	});
-	
 	$("#add-task").on("click", function(e) {
 		scheduleTask();
 	});
@@ -239,6 +193,91 @@ $(document).ready(function() {
 		parseSelection();
 	});
 });
+
+function parseHash(hash) {
+	hash = hash.replace("#", "");
+	
+	if(hash != "") {
+		var keyValues = hash.split("&");
+		
+		for (var i = 0; i < keyValues.length; i++) {
+			var keyValue = keyValues[i].split("=");
+			
+			$("#" + keyValue[0]).val(keyValue[1]);
+		}
+		
+		search();
+	}
+}
+
+function search() {
+	
+	$("#backdrop").fadeIn();
+
+	self.loaded = false;
+	
+	var hash = null;
+	_.each($("#search-form input"), function(item) {
+		var value = $(item).val();
+		
+		if(item.type == "text" && item.id != "task-input" && value != "") {
+			if(hash == null) {
+				hash = item.id + "=" + $(item).val();
+			} else {
+				hash += "&" + item.id + "=" + $(item).val();
+			}
+		}
+	});
+
+	if(hash != null) {
+		location.hash = hash;
+	}
+	
+	var search = {
+		"fullSearch" : {
+			"value" : $("#fullSearch").val(),
+		},
+		"id" : {
+			"value" : $("#id").val(),
+			"type" : "OR"
+		},
+		"what" : {
+			"value" : $("#what").val(),
+		},
+		"description" : {
+			"value" : $("#description").val(),
+		},
+		"who" : {
+			"value" : $("#who").val(),
+		},
+		"from" : {
+			"value" : $("#from").val(),
+		},
+		"number" : {
+			"value" : $("#number").val(),
+		},
+		
+		"luceneQuery" : $("#luceneQuery").val() == "" ? null : $("#luceneQuery").val(),
+		"institutionTypes" : [getValue("MUSEUM"), getValue("LIBRARY"), getValue("ARCHIVE")],
+		
+		"pageSize" : 200,
+		"digital" : true
+	}
+
+	$("#result-view").fadeOut();
+	
+	self.request("search", [ search ], function(result) {
+		
+		self.result = result;
+		self.offset = result.firstRecordViews != null ? result.firstRecordViews.length : 0;
+		
+		$("#search span").text(result.ids != null ? result.ids.length: "0");
+		
+		$("#result-view").html("");
+		
+		self.parseResult(result.firstRecordViews, true);
+	});
+}
 
 function selectNone() {
 	_.each($("#result-view").children(), function (task, i) {

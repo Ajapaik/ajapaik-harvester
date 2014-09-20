@@ -42,7 +42,7 @@ public class ProposalTask extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		try {
 			List<MediaView> mediaViews = ajapaikDao.getMediaViewsForProposal();
-			List<Photo> photos = photoCache.getPhotos();
+			List<Photo> photos = photoCache.getData();
 			for (MediaView mediaView : mediaViews) {
 				Photo photo = getPhoto(photos, mediaView.getIdentifier());
 				if(photo != null) {

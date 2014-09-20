@@ -2,7 +2,6 @@ package ee.ajapaik.platform;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -18,23 +17,33 @@ import org.apache.http.entity.mime.content.StringBody;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
-import ee.ajapaik.db.Repository;
 import ee.ajapaik.model.City;
 import ee.ajapaik.model.Photo;
+import ee.ajapaik.model.Source;
 import ee.ajapaik.model.search.RecordView;
-import ee.ajapaik.util.IOHandler;
 
 public class AjapaikClient extends BaseHttpClient {
 	
-	interface DataCallback {
-		void notify(String name, byte[] data);
-	}
-
 	private ObjectMapper mapper = new ObjectMapper();
-	private Repository repository;
 	
-	public void setRepository(Repository repository) {
-		this.repository = repository;
+
+	public Source createSource(String institution) throws Exception {
+		MultipartEntity entity = new MultipartEntity();
+		entity.addPart("name", getStringBody(institution));
+		entity.addPart("description", getStringBody(institution));
+		
+		HttpPost request = new HttpPost("/api/cities/");
+		request.setEntity(entity);
+		
+		HttpResponse response = httpClient.execute(request);
+		
+		Source result = mapper.readValue(response.getEntity().getContent(), Source.class);
+		
+		request.reset();
+		
+		logger.debug("POST returned: " + result);
+		
+		return result;
 	}
 	
 	public City createCity(City city) throws Exception {
@@ -53,6 +62,18 @@ public class AjapaikClient extends BaseHttpClient {
 		request.reset();
 		
 		logger.debug("POST returned: " + result);
+		
+		return result;
+	}
+	
+
+	public List<Source> listSources() throws Exception {
+		HttpGet request = new HttpGet("/api/sources/?format=json");
+		HttpResponse response = httpClient.execute(request);
+		
+		List<Source> result = mapper.readValue(response.getEntity().getContent(), collectionType(Source.class));
+		
+		request.reset();
 		
 		return result;
 	}
@@ -80,43 +101,31 @@ public class AjapaikClient extends BaseHttpClient {
 		return result;
 	}
 
-	public void postImages(Integer city, RecordView... recordViews) throws Exception {
-		for (RecordView recordView : recordViews) {
+	public void postImages(Integer cityId, Integer sourceId, String imageName, byte[] imageData, RecordView recordView) throws Exception {
+		MultipartEntity entity = new MultipartEntity();
+		entity.addPart("image", new ByteArrayBody(imageData, "image/jpeg", imageName));
+		entity.addPart("source", getStringBody(sourceId));
+		entity.addPart("date_text", getStringBody(recordView.getDate()));
+		entity.addPart("description", getStringBody(recordView.getTitle() + ": " + recordView.getDescription()));
+		entity.addPart("source_key", getStringBody(recordView.getIdentifyingNumber()));
+		entity.addPart("source_url", getStringBody(recordView.getUrlToRecord()));
+		entity.addPart("city", getStringBody(cityId));
+		
+		HttpPost request = new HttpPost("/api/photos/");
+		request.setEntity(entity);
+		
+		try {
+			HttpResponse response = httpClient.execute(request);
 			
-			final MultipartEntity entity = new MultipartEntity();
-			getImageData(recordView, new DataCallback() {
-				
-				@Override
-				public void notify(String name, byte[] data) {
-					entity.addPart("image", new ByteArrayBody(data, "image/jpeg", name)); 
-				}
-				
-			});
+			String result = parseResponse(response);
 			
-			// FIXME: parse source from REST
-			entity.addPart("source", getStringBody("56"));
-			entity.addPart("date_text", getStringBody(recordView.getDate()));
-			entity.addPart("description", getStringBody(recordView.getTitle() + ": " + recordView.getDescription()));
-			entity.addPart("source_key", getStringBody(recordView.getIdentifyingNumber()));
-			entity.addPart("source_url", getStringBody(recordView.getUrlToRecord()));
-			entity.addPart("city", getStringBody(city));
+			request.reset();
 			
-			HttpPost request = new HttpPost("/api/photos/");
-			request.setEntity(entity);
-			
-			try {
-				HttpResponse response = httpClient.execute(request);
-				
-				String result = parseResponse(response);
-				
-				request.reset();
-				
-				logger.debug("POST returned: " + result);
-			} catch (Exception e) {
-				logger.error("Error while executing request", e);
-			}
+			logger.debug("POST returned: " + result);
+		} catch (Exception e) {
+			logger.error("Error while executing request", e);
 		}
-	}
+}
 
 	private CollectionType collectionType(Class<?> clazz) {
 		return mapper.getTypeFactory().constructCollectionType(List.class, clazz);
@@ -137,59 +146,5 @@ public class AjapaikClient extends BaseHttpClient {
 		}
 		
 		return null;
-	}
-
-	private void getImageData(RecordView recordView, DataCallback dataCallback) {
-		try {
-			if(recordView.getImageUrl() != null && !recordView.getImageUrl().equals("null")) {
-				grabImage(recordView.getImageUrl(), dataCallback);
-			} else if(recordView.getCachedThumbnailUrl() != null) {
-				byte[] data = repository.queryImage(recordView.getCachedThumbnailUrl());
-				if (data != null) {
-					dataCallback.notify(recordView.getCachedThumbnailUrl() + ".jpg", data);
-				}
-			}
-		} catch (Exception e) {
-			logger.error("Error getting data", e);
-		}
-	}
-
-	private void grabImage(String query, DataCallback c) throws Exception {
-		
-		// XXX: muis hack
-		if(query.contains("portaal/")) {
-			query = query.replace("portaal/", "");
-		}
-		
-		URL url = new URL(query);
-		InputStream is = IOHandler.openStream(url);
-		if(is != null) {
-			c.notify(getFileName(query), IOUtils.toByteArray(is));
-			
-			is.close();
-			
-			return;
-		}
-				
-		c.notify("", null);
-	}
-	
-	private String getFileName(String query) {
-		String[] split = query.split("/");
-		String lastPart = split[split.length - 1];
-		
-		String fileName;
-		if(lastPart.contains("=")) {
-			split = lastPart.split("=");
-			fileName = split[split.length - 1];
-		} else {
-			fileName = lastPart;
-		}
-		
-		if(!fileName.contains(".jpg")) {
-			fileName += ".jpg";
-		}
-		
-		return fileName;
 	}
 }

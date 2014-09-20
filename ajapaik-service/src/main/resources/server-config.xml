@@ -162,7 +162,6 @@
 	</bean>
 	
 	<bean id="ajapaikClient" class="ee.ajapaik.platform.AjapaikClient" parent="baseHttpClient">
-		<property name="repository" ref="repository" />
 		<property name="host" value="staging.ajapaik.ee" />
 		<property name="protocol" value="http" />
 		<property name="useBasicAuth" value="true" />
@@ -177,6 +176,8 @@
 		<property name="repository" ref="repository" />
 		<property name="ajapaikDao" ref="ajapaikDao" />
 		<property name="ajapaikClient" ref="ajapaikClient" />
+		<property name="sourceCache" ref="sourceCache" />
+		<property name="cityCache" ref="cityCache" />
 	</bean>
 	
 	<!-- Database -->
@@ -196,8 +197,14 @@
 	</bean>
 	
 	<!-- Cache -->
-	<bean id="photoCache" class="ee.ajapaik.cache.PhotoCache">
+	<bean id="cache" class="ee.ajapaik.cache.Cache" abstract="true">
 		<property name="ajapaikClient" ref="ajapaikClient" />
+		<property name="period" value="86400000" />
 	</bean>
 	
+	<bean id="photoCache" class="ee.ajapaik.cache.PhotoCache" parent="cache" />
+	
+	<bean id="sourceCache" class="ee.ajapaik.cache.SourceCache" parent="cache" />
+	
+	<bean id="cityCache" class="ee.ajapaik.cache.CityCache" parent="cache" />
 </beans>

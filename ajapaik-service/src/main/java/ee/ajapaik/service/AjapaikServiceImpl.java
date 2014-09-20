@@ -1,14 +1,20 @@
 package ee.ajapaik.service;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.quartz.SimpleTrigger;
 import org.springframework.util.StringUtils;
 
+import ee.ajapaik.cache.CityCache;
+import ee.ajapaik.cache.SourceCache;
 import ee.ajapaik.dao.AjapaikDao;
 import ee.ajapaik.db.Repository;
 import ee.ajapaik.index.IndexedFields;
@@ -17,23 +23,41 @@ import ee.ajapaik.index.Result;
 import ee.ajapaik.model.City;
 import ee.ajapaik.model.InfoSystem;
 import ee.ajapaik.model.MediaView;
+import ee.ajapaik.model.Source;
 import ee.ajapaik.model.TaskView;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.Search;
 import ee.ajapaik.model.search.SearchResults;
 import ee.ajapaik.platform.AjapaikClient;
 import ee.ajapaik.schedule.Scheduler;
+import ee.ajapaik.util.IOHandler;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=AjapaikServiceImpl">Kaido Kalda</a>
  */
 public class AjapaikServiceImpl implements AjapaikService {
+	
+	private static final Logger logger = Logger.getLogger(AjapaikServiceImpl.class);
+	
+	interface DataCallback {
+		void notify(String name, byte[] data);
+	}
 
 	private Scheduler scheduler;
 	private Indexer indexer;
 	private Repository repository;
 	private AjapaikDao ajapaikDao;
 	private AjapaikClient ajapaikClient;
+	private SourceCache sourceCache;
+	private CityCache cityCache;
+	
+	public void setCityCache(CityCache cityCache) {
+		this.cityCache = cityCache;
+	}
+
+	public void setSourceCache(SourceCache sourceCache) {
+		this.sourceCache = sourceCache;
+	}
 
 	public void setAjapaikDao(AjapaikDao ajapaikDao) {
 		this.ajapaikDao = ajapaikDao;
@@ -198,17 +222,111 @@ public class AjapaikServiceImpl implements AjapaikService {
 	}
 
 	@Override
-	public void postImages(Integer cityId, String... ids) throws Exception {
-		ajapaikClient.postImages(cityId, getRecords(ids));
+	public void postImages(final Integer cityId, String... ids) throws Exception {
+		RecordView[] records = getRecords(ids);
+		for (final RecordView recordView : records) {
+			getImageData(recordView, new DataCallback() {
+				
+				@Override
+				public void notify(String name, byte[] data) {
+					try {
+						ajapaikClient.postImages(cityId, getSourceId(recordView), name, data, recordView);
+					} catch (Exception e) {
+						logger.error("Error posting photo", e);
+					}					
+				}
+			});
+		}
 	}
 
 	@Override
 	public List<City> listCities() throws Exception {
-		return ajapaikClient.listCities();
+		return cityCache.getData();
 	}
 
 	@Override
 	public City createCity(City city) throws Exception {
-		return ajapaikClient.createCity(city);
+		City result = ajapaikClient.createCity(city);
+		
+		cityCache.reload();
+		
+		return result;
+	}
+
+	private Integer getSourceId(RecordView recordView) throws Exception {
+		String institution = null;
+		if(recordView.getInstitution().contains(",")) {
+			institution = recordView.getInstitution().split(",")[0];
+		} else {
+			institution = recordView.getInstitution();
+		}
+		
+		List<Source> data = sourceCache.getData();
+		for (Source source : data) {
+			if(source.getDescription().equals(institution)) {
+				return source.getId();
+			}
+		}
+		
+		Source source = ajapaikClient.createSource(institution);
+		
+		sourceCache.reload();
+		
+		return source.getId();
+	}
+
+	
+	private void getImageData(RecordView recordView, DataCallback dataCallback) {
+		try {
+			if(recordView.getImageUrl() != null && !recordView.getImageUrl().equals("null")) {
+				grabImage(recordView.getImageUrl(), dataCallback);
+			} else if(recordView.getCachedThumbnailUrl() != null) {
+				byte[] data = repository.queryImage(recordView.getCachedThumbnailUrl());
+				if (data != null) {
+					dataCallback.notify(recordView.getCachedThumbnailUrl() + ".jpg", data);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Error getting data", e);
+		}
+	}
+
+	private void grabImage(String query, DataCallback c) throws Exception {
+		
+		// XXX: muis hack
+		if(query.contains("portaal/")) {
+			query = query.replace("portaal/", "");
+		}
+		
+		URL url = new URL(query);
+		InputStream is = IOHandler.openStream(url);
+		if(is != null) {
+			c.notify(getFileName(query), IOUtils.toByteArray(is));
+			
+			is.close();
+			
+			return;
+		}
+				
+		c.notify("", null);
+	}
+	
+	private String getFileName(String query) {
+		String[] split = query.split("/");
+		String lastPart = split[split.length - 1];
+		
+		String fileName;
+		if(lastPart.contains("=")) {
+			split = lastPart.split("=");
+			fileName = split[split.length - 1];
+		} else {
+			fileName = lastPart;
+		}
+		
+		if(!fileName.contains(".jpg")) {
+			fileName += ".jpg";
+		}
+		
+		return fileName;
 	}
 }

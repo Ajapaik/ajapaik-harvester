@@ -19,8 +19,6 @@ import org.apache.http.client.AuthCache;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.conn.ClientConnectionRequest;
-import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -156,13 +154,7 @@ public class BaseHttpClient extends BaseClient {
         httpClientParams.setParameter(CoreProtocolPNames.USER_AGENT, userAgent);
         
         // Maximum total connections client can handle
-        connectionManager = new PoolingClientConnectionManager(schemeRegistry) {
-        	@Override
-        	public ClientConnectionRequest requestConnection(HttpRoute route, Object state) {
-        		ClientConnectionRequest connection = super.requestConnection(route, state);
-        		return connection;
-        	}
-        };
+        connectionManager = new PoolingClientConnectionManager(schemeRegistry);
         connectionManager.setMaxTotal(maxConcurrentConnections);
         connectionManager.setDefaultMaxPerRoute(maxConcurrentConnections);
 

@@ -168,7 +168,7 @@
 			var content = '<div class="tooltip-content">'
 					+ '<div class="tooltip-img loading">'
 					+ '<div class="spinner" style="width: ' + self.size.w
-					+ 'px; height:100px;" ><img src="ajax-loader.gif"/></div>'
+					+ 'px; height:100px;" ><img src="assets/img/ajax-loader.gif"/></div>'
 					+ '<img class="image" src="' + data.img
 					+ '" style="display: none;"/>' + '</div>'
 					+ '<div class="tooltip-title">' + data.title + '</div>'
