@@ -60,7 +60,7 @@ public class MuisHarvestTask extends HarvestTask {
 			String description = jaxbUtil.getValue(eseRec, "description");
 			rec.setDescription(description);
 			rec.setProviderName(jaxbUtil.getValue(eseRec, "provider"));
-			rec.setUrlToRecord(fixMuisUrl(jaxbUtil.getValue(eseRec, "isShownAt")));
+			rec.setUrlToRecord(jaxbUtil.getValue(eseRec, "isShownAt"));
 			
 			List<String> dates = jaxbUtil.getValues(eseRec, "date");
 			Pattern pat = Pattern.compile("\\d+");
@@ -84,7 +84,7 @@ public class MuisHarvestTask extends HarvestTask {
 			rec.setProviderHomepageUrl(infoSystem.getHomepageUrl());
 			rec.setProviderName(infoSystem.getName());
 
-			String thumbnailUrl = fixMuisUrl(jaxbUtil.getValue(eseRec, "object"));
+			String thumbnailUrl = jaxbUtil.getValue(eseRec, "object");
 			if(thumbnailUrl != null) {
 				rec.setImageUrl(getImageUrl(thumbnailUrl));
 				rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
@@ -100,14 +100,6 @@ public class MuisHarvestTask extends HarvestTask {
 	private String getImageUrl(String thumbnailUrl) {
 		if(thumbnailUrl != null && thumbnailUrl.length() > 0)
 			return thumbnailUrl.replaceFirst("museaalThumbnail", "museaalImage");
-		
-		return null;
-	}
-	
-	private String fixMuisUrl(String url) {
-		if(url != null && url.length() > 0){
-			return url.replaceFirst("http://muis.ee/", "http://www.muis.ee/portaal/");
-		}
 		
 		return null;
 	}

@@ -3,6 +3,7 @@ package ee.ajapaik.servlet;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,19 +23,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import ee.ajapaik.db.Repository;
 import ee.ajapaik.model.search.RecordView;
-import ee.ajapaik.platform.BaseHttpClient;
-import ee.ajapaik.platform.HttpClientFactory;
 import ee.ajapaik.service.AjapaikService;
+import ee.ajapaik.util.IOHandler;
 
 /**
  * 
@@ -159,44 +155,40 @@ public class CSVServlet extends HttpServlet {
 	}
 
 	private void grabImage(ZipOutputStream zos, String name, String query, Callback c) throws Exception {
+		
+		// XXX: muis hack
+		if(query.contains("portaal/")) {
+			query = query.replace("portaal/", "");
+		}
+		
 		URL url = new URL(query);
-		BaseHttpClient client = HttpClientFactory.getInstance().getClient(url);
-		
-		logger.debug("Getting data from url: " + url);
-		
-		HttpGet get = new HttpGet(url.getFile());
-		get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
-		
-		HttpResponse result = client.getHttpClient().execute(get);
-		HttpEntity entity = result.getEntity();
-		
-		if(entity != null) {
-			if (result.getStatusLine().getStatusCode() == 200) {
+		InputStream is = IOHandler.openStream(url);
+		if (is != null) {
+			String fileName = getFileName(query);
+			
+			ZipEntry ze = new ZipEntry(fileName);
+    		zos.putNextEntry(ze);
+    		
+			int width = 0;
+			int height = 0;
+			
+			try {
+				BufferedImage bimg = ImageIO.read(is);
 				
-				String fileName = getFileName(query);
+				width = bimg.getWidth();
+				height = bimg.getHeight();
 				
-				ZipEntry ze = new ZipEntry(fileName);
-	    		zos.putNextEntry(ze);
-	    		
-				int width = 0;
-				int height = 0;
-				try {
-					BufferedImage bimg = ImageIO.read(entity.getContent());
-					
-					width = bimg.getWidth();
-					height = bimg.getHeight();
-					
-					ImageIO.write( bimg, "jpg", zos );
-				} finally {
-					zos.closeEntry();
-				}
-				
-				logger.debug("Got data: " + fileName);
-				
-				c.notify(fileName, width, height);
-				
-				return;
+				ImageIO.write( bimg, "jpg", zos );
+			} finally {
+				zos.closeEntry();
+				is.close();
 			}
+			
+			logger.debug("Got data: " + fileName);
+			
+			c.notify(fileName, width, height);
+			
+			return;
 		}
 		
 		c.notify("", 0, 0);

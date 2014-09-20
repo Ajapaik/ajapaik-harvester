@@ -14,7 +14,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.message.BasicHeader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -23,6 +22,7 @@ import ee.ajapaik.db.Repository;
 import ee.ajapaik.model.City;
 import ee.ajapaik.model.Photo;
 import ee.ajapaik.model.search.RecordView;
+import ee.ajapaik.util.IOHandler;
 
 public class AjapaikClient extends BaseHttpClient {
 	
@@ -93,6 +93,7 @@ public class AjapaikClient extends BaseHttpClient {
 				
 			});
 			
+			// FIXME: parse source from REST
 			entity.addPart("source", getStringBody("56"));
 			entity.addPart("date_text", getStringBody(recordView.getDate()));
 			entity.addPart("description", getStringBody(recordView.getTitle() + ": " + recordView.getDescription()));
@@ -154,28 +155,22 @@ public class AjapaikClient extends BaseHttpClient {
 	}
 
 	private void grabImage(String query, DataCallback c) throws Exception {
-		URL url = new URL(query);
-		BaseHttpClient client = HttpClientFactory.getInstance().getClient(url);
 		
-		logger.debug("Getting data from url: " + url);
-		
-		HttpGet get = new HttpGet(url.getFile());
-		get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
-		
-		HttpResponse result = client.getHttpClient().execute(get);
-		HttpEntity entity = result.getEntity();
-		
-		if(entity != null) {
-			if (result.getStatusLine().getStatusCode() == 200) {
-				
-				String fileName = getFileName(query);
-				
-				c.notify(fileName, IOUtils.toByteArray(entity.getContent()));
-				
-				return;
-			}
+		// XXX: muis hack
+		if(query.contains("portaal/")) {
+			query = query.replace("portaal/", "");
 		}
 		
+		URL url = new URL(query);
+		InputStream is = IOHandler.openStream(url);
+		if(is != null) {
+			c.notify(getFileName(query), IOUtils.toByteArray(is));
+			
+			is.close();
+			
+			return;
+		}
+				
 		c.notify("", null);
 	}
 	
