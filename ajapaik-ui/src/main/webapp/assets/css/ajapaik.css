@@ -9,6 +9,10 @@ html {
 	overflow-y: scroll;
 }
 
+body {
+	padding-right: 0px !important;
+}
+
 .glyphicon {
 	top: 0px;
 }

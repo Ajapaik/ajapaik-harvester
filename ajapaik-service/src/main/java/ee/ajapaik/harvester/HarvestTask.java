@@ -167,15 +167,21 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		HashMap<String, String> setParams = new HashMap<String, String>();
 		do {
 			ListSetsType listSets = executeOperation(ListSetsType.class, setParams);
+			
+			if(listSets == null) {
+				break;
+			}
+			
 			for (SetType set : listSets.getSet()) {
 				sets.put(set.getSetSpec(), set.getSetName());
 			}
 
 			ResumptionTokenType rt = listSets.getResumptionToken();
-			if (rt != null && rt.getValue() != null)
+			if (rt != null && rt.getValue() != null) {
 				setParams.put("resumptionToken", rt.getValue());
-			else
+			} else {
 				setParams.remove("resumptionToken");
+			}
 
 		} while (setParams.get("resumptionToken") != null);
 
@@ -189,23 +195,36 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			setsToIgnore = Arrays.asList(infoSystem.getIgnoreSet().split(","));
 		}
 		
-		for (String set : this.sets.keySet()) {
-			if(!setsToIgnore.contains(set)) {
-				logger.debug("Opening set: " + set);
-	
-				addParameter(params, "set", set);
-				addParameter(params, "metadataPrefix", format);
-				
-				if (lastHarvest != null)
-					addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
-	
-				iterateRecords(params);
-	
-				logger.debug("Set iterated: " + set);
-			} else {
-				logger.debug("Set ignored: " + set);
+		if(sets.size() > 0) {
+			for (String set : this.sets.keySet()) {
+				if(!setsToIgnore.contains(set)) {
+					iterateSet(params, lastHarvest, set);
+				} else {
+					logger.debug("Set ignored: " + set);
+				}
 			}
+		} else {
+			iterateSet(params, lastHarvest, null);
 		}
+				
+	}
+
+	private void iterateSet(HashMap<String, String> params, Date lastHarvest, String set) throws ClientProtocolException, IOException, JAXBException {
+		logger.debug("Opening set: " + set);
+
+		if(set != null) {
+			addParameter(params, "set", set);
+		}
+		
+		addParameter(params, "metadataPrefix", format);
+		
+		if (lastHarvest != null) {
+			addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
+		}
+
+		iterateRecords(params);
+
+		logger.debug("Set iterated: " + set);
 	}
 	
 	private void addParameter(HashMap<String, String> params, String parameter, String value) {
@@ -315,8 +334,6 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 
 	@SuppressWarnings("unchecked")
 	private JAXBElement<OAIPMHtype> getResponse(String operation, Listener listener) throws ClientProtocolException, IOException, JAXBException {
-		logger.debug("About to make query to: " + operation);
-
 		URL url = new URL(operation);
 		
 		InputStream is = IOHandler.openStream(url);
