@@ -7,7 +7,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import ee.ajapaik.cache.PhotoCache;
 import ee.ajapaik.dao.AjapaikDao;
 import ee.ajapaik.model.MediaView;
 import ee.ajapaik.model.Photo;
@@ -19,15 +18,10 @@ public class ProposalTask extends QuartzJobBean {
 	
 	private ProposalServiceClient proposalServiceClient;
 	private AjapaikDao ajapaikDao;
-	private PhotoCache photoCache;
 	private AjapaikClient ajapaikClient;
 	
 	public void setAjapaikClient(AjapaikClient ajapaikClient) {
 		this.ajapaikClient = ajapaikClient;
-	}
-
-	public void setPhotoCache(PhotoCache photoCache) {
-		this.photoCache = photoCache;
 	}
 
 	public void setProposalServiceClient(ProposalServiceClient proposalServiceClient) {
@@ -42,7 +36,7 @@ public class ProposalTask extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		try {
 			List<MediaView> mediaViews = ajapaikDao.getMediaViewsForProposal();
-			List<Photo> photos = photoCache.getData();
+			List<Photo> photos = ajapaikClient.listPhotos();
 			for (MediaView mediaView : mediaViews) {
 				Photo photo = getPhoto(photos, mediaView.getIdentifier());
 				if(photo != null) {
@@ -52,8 +46,10 @@ public class ProposalTask extends QuartzJobBean {
 							proposalServiceClient.proposePermalink(mediaView, composePermalink(photoId));
 
 							ajapaikDao.updateLinkProposed(mediaView.getId());
+							
+							logger.debug("Permalink proposed for: " + mediaView);
 						} catch (Exception e) {
-							logger.error("Error while proposed permalink for " + mediaView, e);
+							logger.error("Error while proposed permalink for: " + mediaView, e);
 						}
 					}
 					
@@ -63,6 +59,8 @@ public class ProposalTask extends QuartzJobBean {
 								proposalServiceClient.proposeLocation(mediaView, photo.getLat(), photo.getLon(), photo.getAzimuth(), photo.getConfidence());
 								
 								ajapaikDao.updateLocationProposed(mediaView.getId());
+								
+								logger.debug("Location proposed for: " + mediaView);
 							} catch (Exception e) {
 								logger.error("Error while proposed Location for: " + mediaView, e);
 							}
