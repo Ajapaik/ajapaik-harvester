@@ -31,7 +31,8 @@ import ee.ajapaik.persist.SerializingPersister;
 public class Scheduler implements BeanFactoryAware, InitializingBean {
 	private static final String JOB_MAP_INFO_SYSTEM = "infoSystem";
 	private static final String JOB_MAP_HARVEST_JOB_LISTENER = "harvestJobListener";
-	private static final String JOB_PROPOSAL_NAME = "proposal";
+	
+	public static final String JOB_PROPOSAL_NAME = "proposal";
 	public static final String JOB_INDEXER_NAME = "indexer";
 	public static final String JOB_AIS_NAME = "ais";
 	
@@ -198,15 +199,26 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 		CronTrigger cronTrigger = new CronTrigger(JOB_PROPOSAL_NAME, null);
 		try {
 			cronTrigger.setCronExpression(proposalCronExpression);
-			
-			JobDetailBean job = (JobDetailBean) beanFactory.getBean("proposalJob");
-			job.setName(JOB_PROPOSAL_NAME);
-			
-			schedulerFactory.scheduleJob(job, cronTrigger);
+
+			scheduleProposal(cronTrigger);
 		} catch (ParseException e) {
 			logger.error("Failed to parse cron expression: ", e);
-		} catch (SchedulerException e) {
-			logger.error("Scheduler failed to schedule propsal job: ", e);
+		}
+	}
+	
+	public void scheduleProposal(Trigger trigger) {
+		JobDetailBean job = (JobDetailBean) beanFactory.getBean("proposalJob");
+		try {
+			if(schedulerFactory.getJobDetail(JOB_PROPOSAL_NAME, null) != null) {
+				Trigger oldTrigger = schedulerFactory.getTrigger(JOB_PROPOSAL_NAME, null);
+				schedulerFactory.rescheduleJob(JOB_PROPOSAL_NAME, null, trigger);
+				Thread.sleep(1000);		
+				schedulerFactory.rescheduleJob(JOB_PROPOSAL_NAME, null, oldTrigger);
+			} else {
+				schedulerFactory.scheduleJob(job, trigger);
+			}
+		} catch (Exception e) {
+			logger.error("Scheduler failed to schedule proposal job: ", e);
 		}
 	}
 	

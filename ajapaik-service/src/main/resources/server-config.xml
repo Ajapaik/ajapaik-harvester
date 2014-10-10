@@ -56,7 +56,20 @@
 						<prop key="homepageUrl">http://register.muinas.ee</prop>
 						<prop key="schedule">0 0 0 3/17 * ?</prop>
 					</props>
-				</entry>				
+				</entry>
+				
+				<!--
+				<entry key="Kivike">
+					<props>
+						<prop key="address">http://kivike.kirmus.ee/oai.php</prop>
+						<prop key="mapper">ee.ajapaik.harvester.KivikeHarvestTask</prop>
+						<prop key="email">kivike@kirmus.ee</prop>
+						<prop key="homepageUrl">http://kivike.kirmus.ee/</prop>
+						<prop key="schedule">0 6 13 * * ?</prop>
+					</props>
+				</entry>
+				-->
+								
 			</map>
 		</property>
 		
@@ -80,7 +93,7 @@
 			<map>
 				<entry key="repository" value-ref="repository" />
 				<entry key="encodeUrlParameters" value="true" />
-				<entry key="supportedMetadataPrefixes" value="ese" />
+				<entry key="supportedMetadataPrefixes" value="ese,oai_dc" />
 				<entry key="allowInvalidCharacters" value="true" />
 				<entry key="invalidCharacterReplacement" value="¡" />
 				<entry key="fileCache" value-ref="fileCache" />				
@@ -123,6 +136,7 @@
 		</property>
 		
 		<property name="jobClass" value="ee.ajapaik.axis.service.ProposalTask" />
+		<property name="name" value="proposal" />
 	</bean>		
 	
 	<bean id="fileCache" class="ee.ajapaik.image.FileCache" lazy-init="false">

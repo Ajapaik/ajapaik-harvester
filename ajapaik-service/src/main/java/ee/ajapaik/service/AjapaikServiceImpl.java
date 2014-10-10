@@ -237,6 +237,12 @@ public class AjapaikServiceImpl implements AjapaikService {
 				}
 			});
 		}
+		
+		// Make proposal
+		SimpleTrigger trigger = new SimpleTrigger(Scheduler.JOB_PROPOSAL_NAME);
+		trigger.setJobName(Scheduler.JOB_PROPOSAL_NAME);
+		
+		scheduler.scheduleProposal(trigger);
 	}
 
 	@Override
