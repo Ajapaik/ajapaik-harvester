@@ -120,7 +120,7 @@ body {
 }
 
 .dropdown-menu {
-	min-width: 190px;
+	min-width: 230px;
 }
 
 #modal .dropdown-menu {
@@ -132,7 +132,7 @@ body {
 }
 
 #task-select {
-	width: 220px;
+	width: 260px;
 }
 
 #task-select .badge {

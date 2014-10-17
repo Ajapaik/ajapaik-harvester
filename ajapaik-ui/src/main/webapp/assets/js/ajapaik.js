@@ -12,7 +12,7 @@ var scrollTo = 0;
 
 var detailView = true;
 
-var url = "http://ajapaik.ee:8080/ajapaik-ui/";
+var url = ""; //"http://ajapaik.ee:8080/ajapaik-ui/";
 
 $(document).ready(function() {
 
@@ -164,6 +164,10 @@ $(document).ready(function() {
 	
 	$("#add-task").on("click", function(e) {
 		scheduleTask();
+	});
+
+	$("#sync").on("click", function(e) {
+		self.request("scheduleProposal", []);
 	});
 	
 	$("#show-tasks").on("click", function(e) {

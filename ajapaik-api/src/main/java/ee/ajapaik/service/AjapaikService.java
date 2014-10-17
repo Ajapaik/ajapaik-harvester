@@ -44,4 +44,6 @@ public interface AjapaikService {
 	List<City> listCities() throws Exception;
 	
 	City createCity(City city) throws Exception;
+	
+	void scheduleProposal();
 }

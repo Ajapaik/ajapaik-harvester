@@ -238,6 +238,13 @@ public class AjapaikServiceImpl implements AjapaikService {
 			});
 		}
 		
+		scheduleProposal();
+	}
+	
+
+	@Override
+	public void scheduleProposal() {
+		
 		// Make proposal
 		SimpleTrigger trigger = new SimpleTrigger(Scheduler.JOB_PROPOSAL_NAME);
 		trigger.setJobName(Scheduler.JOB_PROPOSAL_NAME);
@@ -335,4 +342,5 @@ public class AjapaikServiceImpl implements AjapaikService {
 		
 		return fileName;
 	}
+
 }
