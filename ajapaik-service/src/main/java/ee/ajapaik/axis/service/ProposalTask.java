@@ -54,7 +54,8 @@ public class ProposalTask extends QuartzJobBean {
 					}
 					
 					if(!mediaView.getLocationProposed()) {
-						if(hasLocation(photo) && photo.getConfidence() >= 0.6) {
+						//if(hasLocation(photo) && photo.getConfidence() >= 0.6) {
+						if(hasLocation(photo)) {
 							try {
 								proposalServiceClient.proposeLocation(mediaView, photo.getLat(), photo.getLon(), photo.getAzimuth(), photo.getConfidence());
 								
