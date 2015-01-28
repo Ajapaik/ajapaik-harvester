@@ -48,7 +48,7 @@
     <service name="TaskService">
         <documentation>Task service</documentation>
         <port name="TaskPort" binding="tns:TaskBinding">
-            <soap:address location="http://rahvusarhiiv.tietotest.ee/service/task/" />
+            <soap:address location="http://anna.ra.ee/service/task/" />
         </port>
     </service>
 </definitions>
