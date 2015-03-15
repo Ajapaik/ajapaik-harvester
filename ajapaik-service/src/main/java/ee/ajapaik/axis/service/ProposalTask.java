@@ -60,7 +60,7 @@ public class ProposalTask extends QuartzJobBean {
 								
 								ajapaikDao.updateLocationProposed(mediaView.getId());
 								
-								logger.debug("Location proposed for: " + mediaView);
+								logger.debug("Location proposed for: " + mediaView + ", " + photo);
 							} catch (Exception e) {
 								logger.error("Error while proposed Location for: " + mediaView, e);
 							}
