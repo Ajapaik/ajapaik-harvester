@@ -47,7 +47,7 @@
     <service name="ProposalService">
         <documentation>Proposal service</documentation>
         <port name="ProposalPort" binding="tns:ProposalBinding">
-            <soap:address location="http://rahvusarhiiv.tietotest.ee/service/proposal/" />
+            <soap:address location="http://anna.ra.ee/service/proposal/" />
         </port>
     </service>
 </definitions>

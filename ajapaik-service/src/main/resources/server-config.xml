@@ -166,11 +166,11 @@
 	</bean>
 	
 	<bean id="taskServiceClient" class="ee.ajapaik.axis.service.TaskServiceClient" parent="abstractSOAPClient">
-		<property name="endpoint" value="http://rahvusarhiiv.tietotest.ee/service/task/" />
+		<property name="endpoint" value="http://anna.ra.ee/service/task/" />
 	</bean>
 	
 	<bean id="proposalServiceClient" class="ee.ajapaik.axis.service.ProposalServiceClient" parent="abstractSOAPClient">
-		<property name="endpoint" value="http://rahvusarhiiv.tietotest.ee/service/proposal/" />
+		<property name="endpoint" value="http://anna.ra.ee/service/proposal/" />
 		<property name="maxConcurrentConnections" value="100" />
 	</bean>
 	
