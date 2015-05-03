@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Record implements Serializable{
+public class Record implements Serializable, Cloneable {
 
 
 	private static final long serialVersionUID = 1L;
@@ -273,5 +273,14 @@ public class Record implements Serializable{
 	}
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+	
+	@Override
+	public Record clone() {
+		try {
+			return (Record) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

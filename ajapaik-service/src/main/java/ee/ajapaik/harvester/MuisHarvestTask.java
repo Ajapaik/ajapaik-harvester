@@ -1,25 +1,35 @@
 package ee.ajapaik.harvester;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.MetadataType;
 import org.openarchives.oai._2.RecordType;
+import org.xml.sax.InputSource;
 
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
 import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.JaxbUtil;
+import ee.ajapaik.xml.MediaHandler;
 
 public class MuisHarvestTask extends HarvestTask {
 
 	@Override
-	protected Record mapRecord(RecordType jaxbRecord) {
+	protected Record mapRecord(RecordType recordType) {
 		Record rec = new Record();
-		HeaderType header = jaxbRecord.getHeader();
+		HeaderType header = recordType.getHeader();
 		rec.setId(header.getIdentifier());
 		
 		List<String> collections = new ArrayList<String>();
@@ -46,12 +56,12 @@ public class MuisHarvestTask extends HarvestTask {
 		}
 		rec.setCollections(collections);
 
-		MetadataType metadata = jaxbRecord.getMetadata();
+		MetadataType metadata = recordType.getMetadata();
 		JaxbUtil jaxbUtil = new JaxbUtil();
 
 		rec.setDeleted(metadata == null);
 		if (!rec.isDeleted()) {
-			eu.europeana.schemas.ese.Record eseRec = (eu.europeana.schemas.ese.Record) jaxbRecord
+			eu.europeana.schemas.ese.Record eseRec = (eu.europeana.schemas.ese.Record) recordType
 					.getMetadata().getAny();
 			
 			rec.setIdentifyingNumber(jaxbUtil.getValue(eseRec, "identifier"));
@@ -83,18 +93,72 @@ public class MuisHarvestTask extends HarvestTask {
 			rec.setTypes(types);
 			rec.setProviderHomepageUrl(infoSystem.getHomepageUrl());
 			rec.setProviderName(infoSystem.getName());
+			rec.setInstitutionType(InstitutionType.MUSEUM);
 
 			String thumbnailUrl = jaxbUtil.getValue(eseRec, "object");
 			if(thumbnailUrl != null) {
-				rec.setImageUrl(getImageUrl(thumbnailUrl));
-				rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
+				String[] split = rec.getId().split(":");
+				List<String> medias = null;
+				try {
+					medias = parseMediaList("http://www.muis.ee/rdf/media-list/" + split[2]);
+				} catch (Exception e) {
+					logger.warn("MediaList returned error", e);
+				}
+
+				if(medias != null && medias.size() > 1) {
+					for (String url : medias) {
+						
+						String[] urlSplit = url.split("\\/"); 
+						
+						Record cloned = rec.clone();
+						
+						cloned.setId(cloned.getId() + "_" + urlSplit[urlSplit.length - 1]);
+						cloned.setImageUrl(url);
+						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode));
+						
+						save(cloned, header.getSetSpec());
+					}
+					return null;
+				} else {
+					rec.setImageUrl(getImageUrl(thumbnailUrl));
+					rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
+				}
 			}
-			rec.setInstitutionType(InstitutionType.MUSEUM);
 		} else {
 			rec.setTitle("Deleted");
 		}
+		
 		return rec;
+	}
 
+	private void save(Record rec, List<String> specs) {
+		if(rec.isDeleted()) {
+			repository.deleteRecord(rec.getId(), taskCode);
+			return;
+		}
+		
+		rec.setSetSpec(specs);
+		rec.setDateCreated(new Date());
+		
+		repository.saveSingleRecord(rec.getId(), rec, taskCode);
+	}
+	
+	private List<String> parseMediaList(String about) throws Exception {
+		MediaHandler mediaHandler = new MediaHandler();
+		SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+		parser.parse(getSource(about), mediaHandler);
+
+		return mediaHandler.getMedias();
+	}
+	
+	private InputSource getSource(String url) throws Exception {
+		InputStream is = IOHandler.openStream(new URL(url));
+		Reader reader = new InputStreamReader(is, "UTF-8");
+		 
+		InputSource isrc = new InputSource(reader);
+		isrc.setEncoding("UTF-8");
+		
+		return isrc;
 	}
 	
 	private String getImageUrl(String thumbnailUrl) {
