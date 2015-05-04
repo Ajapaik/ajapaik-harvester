@@ -38,5 +38,7 @@ public class CachedImageServlet extends HttpServlet {
 				logger.error("Failed to send image data:", e);
 			}
 		}
+		
+		response.getOutputStream().close();
 	}
 }
