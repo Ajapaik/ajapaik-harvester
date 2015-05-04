@@ -32,6 +32,7 @@ public class CachedImageServlet extends HttpServlet {
 		byte[] data = repository.queryImage(requestFile);
 		if (data != null) {
 			try {
+				response.addHeader("Cache-Control", "max-age=31556926");
 				response.getOutputStream().write(data);
 			} catch (IOException e) {
 				logger.error("Failed to send image data:", e);

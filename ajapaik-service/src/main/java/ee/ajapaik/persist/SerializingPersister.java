@@ -150,4 +150,14 @@ public class SerializingPersister implements InitializingBean {
 		}
 	}
 	
+	
+	public static void main(String[] args) throws Exception {
+		SerializingPersister sp = new SerializingPersister();
+		sp.setFileName("data.ser");
+		sp.setLocation("/home/kaido/git/repo/ajapaik/ajapaik-parent/database");
+		
+		sp.afterPropertiesSet();
+		
+		return;
+	}
 }
