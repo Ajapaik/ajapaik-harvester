@@ -3,6 +3,7 @@ package ee.ajapaik.harvester;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +14,8 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.http.ProtocolException;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.MetadataType;
 import org.openarchives.oai._2.RecordType;
@@ -114,7 +117,14 @@ public class MuisHarvestTask extends HarvestTask {
 						
 						cloned.setId(cloned.getId() + "_" + urlSplit[urlSplit.length - 1]);
 						cloned.setImageUrl(url);
-						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode));
+						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode, new DefaultRedirectStrategy() {
+							
+							@Override
+							protected URI createLocationURI(String location) throws ProtocolException {
+								return super.createLocationURI(location.replace("thumb=false", "thumb=true"));
+							}
+							
+						}));
 						
 						save(cloned, header.getSetSpec());
 					}
