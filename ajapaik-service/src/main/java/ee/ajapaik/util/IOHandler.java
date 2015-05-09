@@ -3,25 +3,18 @@ package ee.ajapaik.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolException;
 import org.apache.http.StatusLine;
-import org.apache.http.client.RedirectHandler;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
 import ee.ajapaik.db.Repository;

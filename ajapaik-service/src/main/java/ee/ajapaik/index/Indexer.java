@@ -24,8 +24,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -59,6 +61,7 @@ import ee.ajapaik.db.Repository;
 import ee.ajapaik.model.search.Record;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.SortableField;
+import ee.ajapaik.util.Holder;
 import ee.ajapaik.util.Tracer;
 
 /**
@@ -319,22 +322,33 @@ public class Indexer implements InitializingBean {
 	
 	public void index() {
 		long start = System.currentTimeMillis();
+		
 		logger.info("Initializing database indexing @ " + new Date());
 
+		final Holder<Integer> totalCount = new Holder<Integer>();
+		final Map<String, Integer> digitalCount = new HashMap<String, Integer>();
+		
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
-			int count = 0;
 			
 			@Override
 			public void handleRecord(Record rec, String code) {
 				if(rec != null) {
-					count++;
-					if(count % 1000 == 0) {
-						logger.debug("Commiting index @ record: " + count);
+					
+					totalCount.setValue(totalCount.getValue() + 1);
+					
+					if(totalCount.getValue() % 1000 == 0) {
+						logger.debug("Commiting index @ record: " + totalCount);
 						try {
 							writer.commit();
 						} catch (Exception e) {
 							logger.error("Commiting index failed", e);
 						}
+					}
+					
+					if(rec.getCachedThumbnailUrl() != null) {
+						Integer value = digitalCount.get(code);
+						
+						digitalCount.put(code, (value != null ? value + 1 : 0));
 					}
 					
 					try {
@@ -346,14 +360,15 @@ public class Indexer implements InitializingBean {
 			}
 		});
 		
-		logger.debug("Indexing finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms");
+		logger.debug("Indexing finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms. Metadata count: " + totalCount + ". Media count: " + digitalCount);
+		
 		start = System.currentTimeMillis();
 		
 		try {
 			writer.commit();
-			writer.optimize();
+			writer.forceMerge(1, true);
 		} catch (Exception e) {
-			logger.error("Index optimizing failed", e);
+			logger.error("Index merging failed", e);
 		} finally {
 			try {
 				writer.close();
@@ -362,7 +377,8 @@ public class Indexer implements InitializingBean {
 			}
 		}
 		
-		logger.debug("Index optimizing finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms");
+		logger.debug("Index merging finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms");
+		
 		start = System.currentTimeMillis();
 		
 		try {
@@ -371,8 +387,9 @@ public class Indexer implements InitializingBean {
 				
 				Tracer.trace();
 				
-				while(searchers.size() > 0)
+				while(searchers.size() > 0) {
 					searchers.wait();
+				}
 				
 				rotateIndex();
 			}
