@@ -334,7 +334,7 @@ public class Indexer implements InitializingBean {
 			public void handleRecord(Record rec, String code) {
 				if(rec != null) {
 					
-					totalCount.setValue(totalCount.getValue() + 1);
+					totalCount.setValue(totalCount.getValue() != null ? totalCount.getValue() + 1 : 1);
 					
 					if(totalCount.getValue() % 1000 == 0) {
 						logger.debug("Commiting index @ record: " + totalCount);
