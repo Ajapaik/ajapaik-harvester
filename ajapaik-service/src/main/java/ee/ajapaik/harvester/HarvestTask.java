@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -154,7 +155,19 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		} catch (Exception e) {
 			logger.error("Unknown error", e);
 		}
-		logger.info("Harvester task finished @ " + new Date());
+		
+		long duration = System.currentTimeMillis() - startDate.getTime();
+		
+		logger.info("Harvester task finished @ " + new Date() + ". Took: " + convertMSToDHMS(duration));
+	}
+	
+	private static String convertMSToDHMS(long ms) {
+		long seconds = ms / 1000;
+	    long s = seconds % 60;
+	    long m = (seconds / 60) % 60;
+	    long h = (seconds / (60 * 60));
+	    
+	    return h + "h " + m + "m " + s + "s";
 	}
 
 	private boolean isSupportsDeletedRecords() throws ClientProtocolException, IOException, JAXBException {
