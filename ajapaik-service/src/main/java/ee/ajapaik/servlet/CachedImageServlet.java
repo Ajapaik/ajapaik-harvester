@@ -48,7 +48,7 @@ public class CachedImageServlet extends HttpServlet {
 		byte[] data = repository.queryImage(requestFile);
 		
 		response.addHeader("Cache-Control", "max-age=31556926");
-		response.getOutputStream().write(data != null ? data : noThumbnail);
+		response.getOutputStream().write(data == null || data.length == 0 ? noThumbnail : data);
 		response.getOutputStream().close();
 	}
 }
