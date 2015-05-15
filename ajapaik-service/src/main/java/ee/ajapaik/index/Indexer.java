@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -63,7 +62,6 @@ import ee.ajapaik.model.search.Record;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.SortableField;
 import ee.ajapaik.util.Holder;
-import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.Tracer;
 
 /**
@@ -329,7 +327,7 @@ public class Indexer implements InitializingBean {
 
 		final Holder<Integer> totalCount = new Holder<Integer>();
 		final Map<String, Integer> digitalCount = new HashMap<String, Integer>();
-		final Map<String, List<Record>> noThumbnail = new HashMap<String, List<Record>>();
+//		final Map<String, List<Record>> noThumbnail = new HashMap<String, List<Record>>();
 		
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
 			
@@ -356,11 +354,11 @@ public class Indexer implements InitializingBean {
 						if(rec.getCachedThumbnailUrl().equals("d41d8cd98f00b204e9800998ecf8427e")) {
 							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
 							
-							if(!noThumbnail.containsKey(code)) {
-								noThumbnail.put(code, new ArrayList<Record>());
-							}
-							
-							noThumbnail.get(code).add(rec);
+//							if(!noThumbnail.containsKey(code)) {
+//								noThumbnail.put(code, new ArrayList<Record>());
+//							}
+//							
+//							noThumbnail.get(code).add(rec);
 						}
 					}
 					
