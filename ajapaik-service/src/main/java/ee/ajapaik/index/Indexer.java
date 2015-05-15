@@ -349,6 +349,10 @@ public class Indexer implements InitializingBean {
 						Integer value = digitalCount.get(code);
 						
 						digitalCount.put(code, (value != null ? value + 1 : 0));
+						
+						if(rec.getCachedThumbnailUrl().equals("d41d8cd98f00b204e9800998ecf8427e")) {
+							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
+						}
 					}
 					
 					try {
