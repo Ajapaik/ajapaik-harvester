@@ -348,12 +348,12 @@ public class Indexer implements InitializingBean {
 						}
 					}
 					
-					if(rec.getCachedThumbnailUrl() == null) {
-//						Integer value = digitalCount.get(code);
-//						
-//						digitalCount.put(code, (value != null ? value + 1 : 0));
-//						
-						if(rec.getImageUrl() != null) {
+					if(rec.getCachedThumbnailUrl() != null) {
+						Integer value = digitalCount.get(code);
+						
+						digitalCount.put(code, (value != null ? value + 1 : 0));
+						
+						if(rec.getCachedThumbnailUrl().equals("d41d8cd98f00b204e9800998ecf8427e")) {
 							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
 							
 							if(!noThumbnail.containsKey(code)) {
@@ -414,16 +414,16 @@ public class Indexer implements InitializingBean {
 		
 		logger.debug("Index made available @ " + new Date() + ", took: " + (updateTimestamp - start) + " ms");
 		
-		for (Entry<String, List<Record>> entry : noThumbnail.entrySet()) {
-			String code = entry.getKey();
-			List<Record> list = entry.getValue();
-			for (Record record : list) {
-				record.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(record.getImageUrl()), repository, code));
-				
-				repository.deleteRecord(record.getId(), code);
-				repository.saveSingleRecord(record.getId(), record, code);
-			}
-		}
+//		for (Entry<String, List<Record>> entry : noThumbnail.entrySet()) {
+//			String code = entry.getKey();
+//			List<Record> list = entry.getValue();
+//			for (Record record : list) {
+//				record.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(record.getImageUrl()), repository, code));
+//				
+//				repository.deleteRecord(record.getId(), code);
+//				repository.saveSingleRecord(record.getId(), record, code);
+//			}
+//		}
 	}
 	
 	private String getThumbnailUrl(String image) {
