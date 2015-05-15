@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -62,6 +63,7 @@ import ee.ajapaik.model.search.Record;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.SortableField;
 import ee.ajapaik.util.Holder;
+import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.Tracer;
 
 /**
@@ -327,6 +329,7 @@ public class Indexer implements InitializingBean {
 
 		final Holder<Integer> totalCount = new Holder<Integer>();
 		final Map<String, Integer> digitalCount = new HashMap<String, Integer>();
+		final Map<String, List<Record>> noThumbnail = new HashMap<String, List<Record>>();
 		
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
 			
@@ -352,6 +355,12 @@ public class Indexer implements InitializingBean {
 						
 						if(rec.getCachedThumbnailUrl().equals("d41d8cd98f00b204e9800998ecf8427e")) {
 							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
+							
+							if(!noThumbnail.containsKey(code)) {
+								noThumbnail.put(code, new ArrayList<Record>());
+							}
+							
+							noThumbnail.get(code).add(rec);
 						}
 					}
 					
@@ -404,6 +413,23 @@ public class Indexer implements InitializingBean {
 		this.updateTimestamp = System.currentTimeMillis();
 		
 		logger.debug("Index made available @ " + new Date() + ", took: " + (updateTimestamp - start) + " ms");
+		
+		for (Entry<String, List<Record>> entry : noThumbnail.entrySet()) {
+			String code = entry.getKey();
+			List<Record> list = entry.getValue();
+			for (Record record : list) {
+				record.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(record.getImageUrl()), repository, code));
+				
+				repository.saveSingleRecord(record.getId(), record, code);
+			}
+		}
+	}
+	
+	private String getThumbnailUrl(String image) {
+		if(image != null && image.length() > 0)
+			return image.replaceFirst("museaalImage", "museaalThumbnail");
+		
+		return null;
 	}
 
 	private void rotateIndex() throws CorruptIndexException, IOException {
