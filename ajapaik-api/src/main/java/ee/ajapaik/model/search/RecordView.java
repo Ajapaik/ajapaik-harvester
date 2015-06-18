@@ -2,6 +2,8 @@ package ee.ajapaik.model.search;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 public class RecordView implements Serializable {
 
@@ -28,12 +30,15 @@ public class RecordView implements Serializable {
 	
 	private boolean inBasket;
 	private String cachedThumbnailUrl;
+	private Integer mediaId;
+	private Integer mediaOrder;
 
 	public RecordView(String creators, String identifyingNumber, String title,
 			String description, String types, String materials,
 			String collections, String institution, String urlToRecord,
 			String providerHomepageUrl, String cachedThumbnailUrl,
-			String imageUrl, InstitutionType institutionType, String id, String providerName) {
+			String imageUrl, InstitutionType institutionType, String id, 
+			String providerName, Integer mediaId, Integer mediaOrder) {
 		super();
 		this.creators = notNull(creators);
 		this.identifyingNumber = notNull(identifyingNumber);
@@ -50,6 +55,8 @@ public class RecordView implements Serializable {
 		this.institutionType = institutionType;
 		this.id = notNull(id);
 		this.providerName = notNull(providerName);
+		this.mediaId = mediaId;
+		this.mediaOrder = mediaOrder;
 	}
 
 	public String getProviderName() {
@@ -184,8 +191,17 @@ public class RecordView implements Serializable {
 		
 		if(fields.length > 16 && fields[16] != null && !"null".equals(fields[16]))
 			this.date = fields[16];
+		
+		if(fields.length > 17 && fields[17] != null) {
+			this.mediaId = Integer.valueOf(fields[16]);
+		}
+		
+		if(fields.length > 18 && fields[18] != null) {
+			this.mediaOrder = Integer.valueOf(fields[18]);
+		}
 	}
 
+	@JsonIgnore
 	public String getFullSearchData(){
 		return serialize(" ");
 	}
@@ -211,7 +227,9 @@ public class RecordView implements Serializable {
 		sb.append(id).append(seprator);
 		sb.append(providerName).append(seprator);
 		sb.append(imageUrl).append(seprator);
-		sb.append(date);
+		sb.append(date).append(seprator);
+		sb.append(mediaId).append(seprator);
+		sb.append(mediaOrder);
 
 		return sb.toString();
 	}
@@ -221,6 +239,7 @@ public class RecordView implements Serializable {
 		return imageUrl;
 	}
 
+	@JsonIgnore
 	public boolean isInBasket() {
 		return inBasket;
 	}
@@ -247,5 +266,21 @@ public class RecordView implements Serializable {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	public Integer getMediaId() {
+		return mediaId;
+	}
+
+	public void setMediaId(Integer mediaId) {
+		this.mediaId = mediaId;
+	}
+
+	public Integer getMediaOrder() {
+		return mediaOrder;
+	}
+
+	public void setMediaOrder(Integer mediaOrder) {
+		this.mediaOrder = mediaOrder;
 	}
 }

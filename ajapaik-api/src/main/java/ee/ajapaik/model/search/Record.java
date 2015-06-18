@@ -7,8 +7,8 @@ import java.util.List;
 
 public class Record implements Serializable, Cloneable {
 
-
 	private static final long serialVersionUID = 1L;
+	
 	private List<String> creators; // dc:creator + dc:publisher
 	private String title; // dc:title
 	private String description; // dc:description
@@ -30,6 +30,8 @@ public class Record implements Serializable, Cloneable {
 	private boolean deleted;
 	private List<String> setSpec;
 	private Date dateCreated;
+	private Integer mediaId;
+	private Integer mediaOrder;
 
 	public String getCreatorsAsString() {
 		if (creators == null)
@@ -232,12 +234,24 @@ public class Record implements Serializable, Cloneable {
 	}
 	
 	public RecordView getRecordView(){
-		return new RecordView(getCreatorsAsString(), identifyingNumber, title, description, getTypesAsString(), getMaterialsAsString(), getCollectionsAsString(), getInstitutionsAsString(), urlToRecord, providerHomepageUrl, cachedThumbnailUrl, imageUrl, institutionType, id, getProviderName());
-	}
-	
-	@Override
-	public String toString() {
-		return title+" "+creators+" "+description+" "+identifyingNumber+" "+id+" "+types+" "+materials+" "+collections+" "+institutions+" "+places+" "+dates+" "+urlToRecord+" "+providerHomepageUrl+" "+providerName+" " + cachedThumbnailUrl + " " + institutionType + " " + deleted;
+		return new RecordView(
+				getCreatorsAsString(), 
+				identifyingNumber, 
+				title, 
+				description, 
+				getTypesAsString(), 
+				getMaterialsAsString(), 
+				getCollectionsAsString(), 
+				getInstitutionsAsString(), 
+				urlToRecord, 
+				providerHomepageUrl, 
+				cachedThumbnailUrl, 
+				imageUrl, 
+				institutionType, 
+				id, 
+				getProviderName(),
+				0,
+				0);
 	}
 
 	public void setSetSpec(List<String> setSpec) {
@@ -273,6 +287,22 @@ public class Record implements Serializable, Cloneable {
 	}
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+	
+	public Integer getMediaId() {
+		return mediaId;
+	}
+	
+	public void setMediaId(Integer mediaId) {
+		this.mediaId = mediaId;
+	}
+	
+	public Integer getMediaOrder() {
+		return mediaOrder;
+	}
+	
+	public void setMediaOrder(Integer mediaOrder) {
+		this.mediaOrder = mediaOrder;
 	}
 	
 	@Override

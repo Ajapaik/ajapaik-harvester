@@ -353,13 +353,9 @@ public class Indexer implements InitializingBean {
 						
 						if(rec.getCachedThumbnailUrl().equals("d41d8cd98f00b204e9800998ecf8427e")) {
 							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
-							
-//							if(!noThumbnail.containsKey(code)) {
-//								noThumbnail.put(code, new ArrayList<Record>());
-//							}
-//							
-//							noThumbnail.get(code).add(rec);
 						}
+						
+						MediaUpdater.updateMediaInfo(repository, code, rec);
 					}
 					
 					try {

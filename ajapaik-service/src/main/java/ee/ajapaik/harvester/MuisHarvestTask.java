@@ -108,14 +108,13 @@ public class MuisHarvestTask extends HarvestTask {
 					logger.warn("MediaList returned error", e);
 				}
 
-				if(medias != null && medias.size() > 1) {
-					for (String url : medias) {
-						
-						String[] urlSplit = url.split("\\/"); 
+				if(medias != null && medias.size() > 0) {
+					for (int i = 0; i < medias.size(); i++) {
+						String url = medias.get(i);
 						
 						Record cloned = rec.clone();
-						
-						cloned.setId(cloned.getId() + "_" + urlSplit[urlSplit.length - 1]);
+						cloned.setMediaId(getMediaId(url));
+						cloned.setMediaOrder(i);
 						cloned.setImageUrl(url);
 						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode, new DefaultRedirectStrategy() {
 							
@@ -139,6 +138,20 @@ public class MuisHarvestTask extends HarvestTask {
 		}
 		
 		return rec;
+	}
+
+	private Integer getMediaId(String url) {
+		String[] urlSplit = url.split("\\/");
+		String mediaId = urlSplit[urlSplit.length - 1];
+		
+		if(mediaId != null) {
+			try {
+				return Integer.valueOf(mediaId);
+			} catch(NumberFormatException e) {
+				return null;
+			}
+		}
+		return null;
 	}
 
 	private void save(Record rec, List<String> specs) {
