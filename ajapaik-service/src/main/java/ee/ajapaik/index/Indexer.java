@@ -355,9 +355,7 @@ public class Indexer implements InitializingBean {
 							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
 						}
 						
-						//MediaUpdater.updateMediaInfo(repository, code, rec);
-						
-						logger.debug("id: " + rec.getId() + ", mediaId: " + rec.getMediaId() + ", order: " + rec.getMediaOrder());
+						MediaUpdater.updateMediaInfo(repository, code, rec);
 					}
 					
 					try {

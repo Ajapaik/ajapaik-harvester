@@ -250,8 +250,8 @@ public class Record implements Serializable, Cloneable {
 				institutionType, 
 				id, 
 				getProviderName(),
-				0,
-				0);
+				mediaId,
+				mediaOrder);
 	}
 
 	public void setSetSpec(List<String> setSpec) {

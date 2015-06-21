@@ -22,48 +22,50 @@ public class MediaUpdater {
 	private static final Logger logger = Logger.getLogger(MediaUpdater.class);
 
 	public static void updateMediaInfo(Repository repository, String taskCode, Record rec) {
-		if(rec.getId().contains("_")) {
-			String[] idSplit = rec.getId().split("_");
-			String muisId = idSplit[0].split(":")[2];
-			
-			rec.setMediaId(Integer.valueOf(idSplit[1]));
-			
-			logger.debug("Update record: " + rec.getId() + ". mediaId: " + idSplit[1]);
-		
-			List<String> medias = getMedias(muisId);
-			for (int i = 0; i < medias.size(); i++) {
-				String url = medias.get(i);
-				Integer mediaId = getMediaId(url);
+		if(rec.getMediaId() == null && rec.getMediaOrder() == null) {
+			if(rec.getId().contains("_")) {
+				String[] idSplit = rec.getId().split("_");
+				String muisId = idSplit[0].split(":")[2];
 				
-				if(rec.getMediaId().equals(mediaId)) {
-					rec.setMediaOrder(i);
+				rec.setMediaId(Integer.valueOf(idSplit[1]));
+				
+				logger.debug("Update record: " + rec.getId() + ". mediaId: " + idSplit[1]);
+			
+				List<String> medias = getMedias(muisId);
+				for (int i = 0; i < medias.size(); i++) {
+					String url = medias.get(i);
+					Integer mediaId = getMediaId(url);
 					
-					logger.debug("Update record: " + rec.getId() + ". mediaOrder: " + i);
-					
-					break;
+					if(rec.getMediaId().equals(mediaId)) {
+						rec.setMediaOrder(i);
+						
+						logger.debug("Update record: " + rec.getId() + ". mediaOrder: " + i);
+						
+						break;
+					}
 				}
+				
+				repository.saveSingleRecord(rec.getId(), rec, taskCode);
+			} else {
+				repository.deleteRecord(rec.getId(), taskCode);
+	
+				String muisId = rec.getId().split(":")[2];
+				
+				List<String> medias = getMedias(muisId);
+				if(medias != null && medias.size() > 0) {
+					Integer mediaId = getMediaId(medias.get(0));
+					
+					logger.debug("Update record: " + rec.getId());
+					
+					rec.setId(rec.getId() + "_" + mediaId);
+					rec.setMediaId(mediaId);
+					rec.setMediaOrder(0);
+					
+					logger.debug("Updated - id: " + rec.getId() + ", mediaId: " + mediaId + ", mediaOrder: " + 0);
+				}
+				
+				repository.saveSingleRecord(rec.getId(), rec, taskCode);
 			}
-			
-			repository.saveSingleRecord(rec.getId(), rec, taskCode);
-		} else {
-			repository.deleteRecord(rec.getId(), taskCode);
-
-			String muisId = rec.getId().split(":")[2];
-			
-			List<String> medias = getMedias(muisId);
-			if(medias != null && medias.size() > 0) {
-				Integer mediaId = getMediaId(medias.get(0));
-				
-				logger.debug("Update record: " + rec.getId());
-				
-				rec.setId(rec.getId() + "_" + mediaId);
-				rec.setMediaId(mediaId);
-				rec.setMediaOrder(0);
-				
-				logger.debug("Updated - id: " + rec.getId() + ", mediaId: " + mediaId + ", mediaOrder: " + 0);
-			}
-			
-			repository.saveSingleRecord(rec.getId(), rec, taskCode);
 		}
 	}
 
