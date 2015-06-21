@@ -356,6 +356,8 @@ public class Indexer implements InitializingBean {
 						}
 						
 						//MediaUpdater.updateMediaInfo(repository, code, rec);
+						
+						logger.debug("id: " + rec.getId() + ", mediaId: " + rec.getMediaId() + ", order: " + rec.getMediaOrder());
 					}
 					
 					try {
