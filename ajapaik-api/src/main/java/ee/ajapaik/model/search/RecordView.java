@@ -193,7 +193,7 @@ public class RecordView implements Serializable {
 			this.date = fields[16];
 		
 		if(fields.length > 17 && fields[17] != null) {
-			this.mediaId = Integer.valueOf(fields[16]);
+			this.mediaId = Integer.valueOf(fields[17]);
 		}
 		
 		if(fields.length > 18 && fields[18] != null) {
