@@ -341,7 +341,7 @@ public class Indexer implements InitializingBean {
 					
 					// FIXME: Clean up database of wrong muis id format
 					if(code.equals("fa40b27ef128c8304fc069ed226de8a4")) {
-						if(rec.getId().contains("_")) {
+						if(!rec.getId().contains("_")) {
 							toDelete.add(rec);
 							
 							logger.debug("Marking record for deletion: " + rec.getId());
