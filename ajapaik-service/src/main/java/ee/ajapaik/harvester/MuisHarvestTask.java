@@ -109,35 +109,25 @@ public class MuisHarvestTask extends HarvestTask {
 				}
 
 				if (medias != null && medias.size() > 0) {
-					if (medias.size() == 1) {
-						String url = medias.get(0);
-						rec.setMediaId(getMediaId(url));
-						rec.setMediaOrder(0);
-						rec.setImageUrl(url);
-						rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode, new DefaultRedirectStrategy() {
+					for (int i = 0; i < medias.size(); i++) {
+						String url = medias.get(i);
+						Integer mediaId = getMediaId(medias.get(0));
+
+						Record cloned = rec.clone();
+						cloned.setId(rec.getId() + "_" + mediaId);
+						cloned.setMediaId(mediaId);
+						cloned.setMediaOrder(i);
+						cloned.setImageUrl(url);
+						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode, new DefaultRedirectStrategy() {
 							@Override
 							protected URI createLocationURI(String location) throws ProtocolException {
 								return super.createLocationURI(location.replace("thumb=false", "thumb=true"));
+
 							}
 						}));
-					} else if (medias.size() > 1) {
-						for (int i = 1; i < medias.size(); i++) {
-							String url = medias.get(i);
-
-							Record cloned = rec.clone();
-							cloned.setMediaId(getMediaId(url));
-							cloned.setMediaOrder(i);
-							cloned.setImageUrl(url);
-							cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode, new DefaultRedirectStrategy() {
-								@Override
-								protected URI createLocationURI(String location) throws ProtocolException {
-									return super.createLocationURI(location.replace("thumb=false", "thumb=true"));
-								}
-							}));
-							save(cloned, header.getSetSpec());
-						}
-						return null;
+						save(cloned, header.getSetSpec());
 					}
+					return null;
 				} else {
 					rec.setImageUrl(getImageUrl(thumbnailUrl));
 					rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
