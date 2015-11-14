@@ -111,11 +111,9 @@ public class MuisHarvestTask extends HarvestTask {
 				if(medias != null && medias.size() > 0) {
 					for (int i = 0; i < medias.size(); i++) {
 						String url = medias.get(i);
-						Integer mediaId = getMediaId(url);
 						
 						Record cloned = rec.clone();
-						cloned.setId(rec.getId() + "_" + mediaId);
-						cloned.setMediaId(mediaId);
+						cloned.setMediaId(getMediaId(url));
 						cloned.setMediaOrder(i);
 						cloned.setImageUrl(url);
 						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode, new DefaultRedirectStrategy() {
