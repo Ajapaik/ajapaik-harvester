@@ -429,7 +429,7 @@ public class Indexer implements InitializingBean {
 			
 			logger.debug("Deleting record: " + record.getId());
 			
-			repository.deleteRecord(record.getId(), "fa40b27ef128c8304fc069ed226de8a4");
+			//repository.deleteRecord(record.getId(), "fa40b27ef128c8304fc069ed226de8a4");
 		}
 		
 //		for (Entry<String, List<Record>> entry : noThumbnail.entrySet()) {
