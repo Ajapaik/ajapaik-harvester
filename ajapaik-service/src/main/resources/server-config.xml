@@ -28,6 +28,7 @@
 	<bean id="scheduler" class="ee.ajapaik.schedule.Scheduler">
 		<property name="configuredInfoSystems">
 			<map>
+				<!-- -->
 				<entry key="MuIS">
 					<props>
 						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
@@ -57,6 +58,18 @@
 						<prop key="schedule">0 0 0 3/17 * ?</prop>
 					</props>
 				</entry>
+				 
+				<entry key="ETERA">
+					<props>
+						<prop key="address">http://www.etera.ee/api/oai2</prop>
+						<prop key="mapper">ee.ajapaik.harvester.ETERAHarvestTask</prop>
+						<prop key="email">info@test.ee</prop>
+						<prop key="homepageUrl">http://www.etera.ee</prop>
+						<prop key="schedule">0 0 0 18 * ?</prop>
+						<prop key="useSets">false</prop>
+						<prop key="useSet">none</prop>
+					</props>
+				</entry>				
 				
 				<!--
 				<entry key="Kivike">
@@ -96,7 +109,7 @@
 				<entry key="supportedMetadataPrefixes" value="ese,oai_dc" />
 				<entry key="allowInvalidCharacters" value="true" />
 				<entry key="invalidCharacterReplacement" value="¡" />
-				<entry key="fileCache" value-ref="fileCache" />				
+				<entry key="fileCache" value-ref="fileCache" />
 			</map>
 		</property>
 	</bean>
