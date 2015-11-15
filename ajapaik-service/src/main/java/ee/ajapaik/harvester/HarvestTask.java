@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -121,7 +120,10 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			Date lastHarvest = supportsDeleted ? infoSystem.getLastHarvestTime() : null;
 			
 			this.format = getSupportedMetadataFormat();
-			this.sets = loadSets();
+			
+			if(infoSystem.getUseSets() != null && infoSystem.getUseSets()) {
+				this.sets = loadSets();
+			}
 			
 			if (format != null) {
 				HashMap<String, String> params = new HashMap<String, String>();
@@ -132,13 +134,19 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 				
 				// XXX: set list may change, should clear
 				// old list before update.
-				repository.saveSets(sets, taskCode);
+				if(infoSystem.getUseSets() != null && infoSystem.getUseSets()) {
+					repository.saveSets(sets, taskCode);
+				}
 				
 				String set = infoSystem.getUseSet();
 				if (set != null) {
-					addParameter(params, "set", set);
-					if (lastHarvest != null)
+					if(infoSystem.getUseSets() != null && infoSystem.getUseSets()) {
+						addParameter(params, "set", set);
+					}
+					
+					if (lastHarvest != null) {
 						addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
+					}
 
 					iterateRecords(params);
 				} else {
@@ -158,7 +166,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		
 		long duration = System.currentTimeMillis() - startDate.getTime();
 		
-		logger.info("Harvester task finished @ " + new Date() + ". Took: " + convertMSToDHMS(duration));
+		logger.info("Harvester task finished @ " + new Date() + ". Tooks: " + convertMSToDHMS(duration));
 	}
 	
 	private static String convertMSToDHMS(long ms) {
@@ -252,16 +260,20 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	public void handleRecord(ListRecordsType listRecordsType, RecordType recordType) {
 		Record rec = mapRecord(recordType);
 		if (rec != null) {
-			if(rec.isDeleted()) {
-				repository.deleteRecord(rec.getId(), taskCode);
-				return;
-			}
-			
-			rec.setSetSpec(recordType.getHeader().getSetSpec());
-			rec.setDateCreated(new Date());
-			
-			repository.saveSingleRecord(rec.getId(), rec, taskCode);
+			save(rec, recordType.getHeader().getSetSpec());
 		}
+	}
+	
+	protected void save(Record rec, List<String> specs) {
+		if(rec.isDeleted()) {
+			repository.deleteRecord(rec.getId(), taskCode);
+			return;
+		}
+		
+		rec.setSetSpec(specs);
+		rec.setDateCreated(new Date());
+		
+		repository.saveSingleRecord(rec.getId(), rec, taskCode);
 	}
 
 	protected abstract Record mapRecord(RecordType recordType);
@@ -395,7 +407,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 							return invalidCharacterReplacement.toCharArray()[0];
 						}
 					};
-
+					
 					return (JAXBElement<OAIPMHtype>) u.unmarshal(fisr);
 				} else {
 					return (JAXBElement<OAIPMHtype>) u.unmarshal(bis);

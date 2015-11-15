@@ -7,12 +7,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
+
+import ee.ajapaik.model.InfoSystem;
 
 public class SerializingPersister implements InitializingBean {
 	
@@ -153,10 +159,20 @@ public class SerializingPersister implements InitializingBean {
 	
 	public static void main(String[] args) throws Exception {
 		SerializingPersister sp = new SerializingPersister();
-		sp.setFileName("data.ser");
-		sp.setLocation("/home/kaido/git/repo/ajapaik/ajapaik-parent/database");
+		sp.setFileName("data.ser.ajapaik");
+		sp.setLocation("/home/kaido/git/repo/ajapaik/ajapaik-parent");
 		
 		sp.afterPropertiesSet();
+		
+		List<Object> x = sp.map.get("ee.ajapaik.model.InfoSystem");
+		for (Object object : x) {
+			InfoSystem is = (InfoSystem) object;
+			if(is.getName().equals("MuIS")) {
+				is.setLastHarvestTime(new Date(1431079740019L));
+			}
+		}
+		
+		sp.persist();
 		
 		return;
 	}

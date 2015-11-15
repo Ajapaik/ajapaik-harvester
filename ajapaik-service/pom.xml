@@ -182,9 +182,85 @@
 		</dependency>				
 	</dependencies>
 	
+	<profiles>
+		<profile>
+			<id>generate</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.axis2</groupId>
+						<artifactId>axis2-wsdl2code-maven-plugin</artifactId>
+						<version>${axis2.version}</version>
+						<executions>
+							<execution>
+								<id>Tasks</id>
+								<goals>
+									<goal>wsdl2code</goal>
+								</goals>
+								<configuration>
+									<flattenFiles>true</flattenFiles>
+									<outputDirectory>src/main/java</outputDirectory>
+									<generateAllClasses>true</generateAllClasses>
+									<generateServerSide>false</generateServerSide>
+									<unwrap>true</unwrap>
+									<wsdlFile>src/test/resources/task.wsdl</wsdlFile>
+									<syncMode>sync</syncMode>
+									<packageName>ee.ra.ais</packageName>
+									<databindingName>adb</databindingName>
+								</configuration>
+							</execution>
+							<execution>
+								<id>Proposal</id>
+								<goals>
+									<goal>wsdl2code</goal>
+								</goals>
+								<configuration>
+									<flattenFiles>true</flattenFiles>
+									<outputDirectory>src/main/java</outputDirectory>
+									<generateAllClasses>true</generateAllClasses>
+									<generateServerSide>false</generateServerSide>
+									<unwrap>false</unwrap>
+									<wsdlFile>src/test/resources/proposal.wsdl</wsdlFile>
+									<syncMode>sync</syncMode>
+									<packageName>ee.ra.ais</packageName>
+									<databindingName>adb</databindingName>
+								</configuration>
+							</execution>					
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.jvnet.jaxb2.maven2</groupId>
+						<artifactId>maven-jaxb2-plugin</artifactId>
+						<version>0.8.1</version>
+						<executions>
+							<execution>
+								<id>Rdfs</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<configuration>
+									<generateDirectory>src/main/java</generateDirectory>
+									<schemaIncludes>
+										<schemaInclude>rdfs.xsd</schemaInclude>
+									</schemaIncludes>
+									<generatePackage>org.w3.rdf</generatePackage>
+								</configuration>
+							</execution>
+						</executions>				
+						<dependencies>
+							<dependency>
+							  <groupId>com.sun.xml.bind</groupId>
+							  <artifactId>jaxb-xjc</artifactId>
+							  <version>2.2.5-2</version>
+							</dependency>
+						</dependencies>
+					</plugin>						
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	
 	<build>
-
 		<finalName>ajapaik-service</finalName>
 		<resources>
 			<resource>
@@ -203,69 +279,6 @@
 					</suiteXmlFiles>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.axis2</groupId>
-				<artifactId>axis2-wsdl2code-maven-plugin</artifactId>
-				<version>${axis2.version}</version>
-				<executions>
-					<execution>
-						<id>Tasks</id>
-						<goals>
-							<goal>wsdl2code</goal>
-						</goals>
-						<configuration>
-							<generateAllClasses>true</generateAllClasses>
-							<generateServerSide>false</generateServerSide>
-							<unwrap>true</unwrap>
-							<wsdlFile>src/test/resources/task.wsdl</wsdlFile>
-							<syncMode>sync</syncMode>
-							<packageName>ee.ra.ais</packageName>
-							<databindingName>adb</databindingName>
-						</configuration>
-					</execution>
-					<execution>
-						<id>Proposal</id>
-						<goals>
-							<goal>wsdl2code</goal>
-						</goals>
-						<configuration>
-							<generateAllClasses>true</generateAllClasses>
-							<generateServerSide>false</generateServerSide>
-							<unwrap>false</unwrap>
-							<wsdlFile>src/test/resources/proposal.wsdl</wsdlFile>
-							<syncMode>sync</syncMode>
-							<packageName>ee.ra.ais</packageName>
-							<databindingName>adb</databindingName>
-						</configuration>
-					</execution>					
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.8.1</version>
-				<executions>
-					<execution>
-						<id>Rdfs</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaIncludes>
-								<schemaInclude>rdfs.xsd</schemaInclude>
-							</schemaIncludes>
-							<generatePackage>org.w3.rdf</generatePackage>
-						</configuration>
-					</execution>
-				</executions>				
-				<dependencies>
-					<dependency>
-					  <groupId>com.sun.xml.bind</groupId>
-					  <artifactId>jaxb-xjc</artifactId>
-					  <version>2.2.5-2</version>
-					</dependency>
-				</dependencies>
-			</plugin>						
 		</plugins>
 	</build>
 

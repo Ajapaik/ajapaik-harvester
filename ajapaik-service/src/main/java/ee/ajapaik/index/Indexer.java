@@ -331,21 +331,17 @@ public class Indexer implements InitializingBean {
 		final Map<String, Integer> digitalCount = new HashMap<String, Integer>();
 //		final Map<String, List<Record>> noThumbnail = new HashMap<String, List<Record>>();
 		
-		final List<Record> toDelete = new ArrayList<Record>();
-		
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
 			
 			@Override
 			public void handleRecord(Record rec, String code) {
 				if(rec != null) {
 					
-					// FIXME: Clean up database of wrong muis id format
+					// FIXME: HACK. Clean up database of wrong muis id format
 					if(code.equals("fa40b27ef128c8304fc069ed226de8a4")) {
 						if(!rec.getId().contains("_")) {
-							toDelete.add(rec);
-							
-							logger.debug("Marking record for deletion: " + rec.getId());
-							
+							logger.debug("Wrong MUIS ID format: " + rec.getId() + ". Not indexing.");
+
 							return;
 						}
 					}
@@ -422,15 +418,6 @@ public class Indexer implements InitializingBean {
 		this.updateTimestamp = System.currentTimeMillis();
 		
 		logger.debug("Index made available @ " + new Date() + ", took: " + (updateTimestamp - start) + " ms");
-		
-		
-		// FIXME: remove code!
-		for(Record record : toDelete) {
-			
-			logger.debug("Deleting record: " + record.getId());
-			
-			//repository.deleteRecord(record.getId(), "fa40b27ef128c8304fc069ed226de8a4");
-		}
 		
 //		for (Entry<String, List<Record>> entry : noThumbnail.entrySet()) {
 //			String code = entry.getKey();

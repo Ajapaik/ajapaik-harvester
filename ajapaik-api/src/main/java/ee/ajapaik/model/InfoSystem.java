@@ -15,7 +15,16 @@ public class InfoSystem implements Serializable {
 	private String schedule;
 	private String email;
 	private String homepageUrl;
-	private String ignoreSet; 
+	private String ignoreSet;
+	private Boolean useSets;
+	
+	public Boolean getUseSets() {
+		return useSets;
+	}
+
+	public void setUseSets(Boolean useSets) {
+		this.useSets = useSets;
+	}
 
 	public InfoSystem() {
 	}

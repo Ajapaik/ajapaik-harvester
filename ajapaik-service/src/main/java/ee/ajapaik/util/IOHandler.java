@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -43,11 +45,12 @@ public class IOHandler {
 		 return response.getEntity().getContent();
 	}
 	
-	public static String saveThumbnail(String thumbnailUrl, Repository repository, String taskCode, RedirectStrategy strategy) {
+
+	public static String saveThumbnail(String thumbnailUrl, Map<String, String> headers, Repository repository, String taskCode, RedirectStrategy strategy) {
 		try {
 			URL url = new URL(thumbnailUrl);
 			
-			InputStream is = openStream(url, strategy);
+			InputStream is = openStream(url, strategy, headers);
 			
 			if(is != null) {
 				byte[] data = IOUtils.toByteArray(is);
@@ -65,7 +68,11 @@ public class IOHandler {
 			logger.error("Error reading stream", e);
 		}
 		
-		return null;		
+		return null;	
+	}
+	
+	public static String saveThumbnail(String thumbnailUrl, Repository repository, String taskCode, RedirectStrategy strategy) {
+		return saveThumbnail(thumbnailUrl, null, repository, taskCode, strategy);
 	}
 	
 	public static String saveThumbnail(String thumbnailUrl, Repository repository, String taskCode) {
@@ -73,6 +80,14 @@ public class IOHandler {
 	}
 	
 	public static InputStream openStream(URL url, RedirectStrategy strategy) {
+		return openStream(url, strategy, null);
+	}
+	
+	public static InputStream openStream(URL url) {
+		return openStream(url, null, null);
+	}
+
+	public static InputStream openStream(URL url, RedirectStrategy strategy, Map<String, String> headers) {
 		try {
 			if(url != null) {
 				logger.debug("About to make query for url: " + url);
@@ -85,6 +100,13 @@ public class IOHandler {
 				
 				HttpGet get = new HttpGet(url.getFile());
 				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
+				get.addHeader(new BasicHeader("Host", url.getHost()));
+				
+				if(headers != null) {
+					for(Entry<String, String> entry : headers.entrySet()) {
+						get.addHeader(new BasicHeader(entry.getKey(), entry.getValue()));		
+					}
+				}
 				
 				HttpResponse result = bc.getHttpClient().execute(get);
 				
@@ -98,9 +120,5 @@ public class IOHandler {
 			logger.error("Error opening stream data", e);
 		}
 		return null;
-	}
-	
-	public static InputStream openStream(URL url) {
-		return openStream(url, null);
 	}
 }

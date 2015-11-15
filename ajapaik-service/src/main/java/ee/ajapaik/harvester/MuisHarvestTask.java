@@ -6,7 +6,6 @@ import java.io.Reader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -152,18 +151,6 @@ public class MuisHarvestTask extends HarvestTask {
 			}
 		}
 		return null;
-	}
-
-	private void save(Record rec, List<String> specs) {
-		if(rec.isDeleted()) {
-			repository.deleteRecord(rec.getId(), taskCode);
-			return;
-		}
-		
-		rec.setSetSpec(specs);
-		rec.setDateCreated(new Date());
-		
-		repository.saveSingleRecord(rec.getId(), rec, taskCode);
 	}
 	
 	private List<String> parseMediaList(String about) throws Exception {

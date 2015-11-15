@@ -335,7 +335,9 @@ public class Repository implements InitializingBean {
 		synchronized (environment) {
 			Database db = openDatabase(environment, RECORD);
 			try {
-				db.delete(null, serializer.serializeKey(key));
+				OperationStatus os = db.delete(null, serializer.serializeKey(key));
+				
+				logger.debug("Deleted: code: " + code + ", key: " + key + ", status: " + os.toString());
 			} catch (Exception e) {
 				logger.error("Error while deleting record", e);
 				throw new RuntimeException(e);
