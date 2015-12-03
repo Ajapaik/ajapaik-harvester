@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.ajapaik.model.Page;
 import ee.ajapaik.model.Pages;
 import ee.ajapaik.model.search.Record;
+import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.util.IOHandler;
 
 public class ETERAHarvestTask extends HarvestTask {
@@ -40,6 +41,8 @@ public class ETERAHarvestTask extends HarvestTask {
 		rec.setInstitutions(institutions);
 
 		rec.setDeleted(metadata == null);
+
+		rec.setInstitutionType(InstitutionType.LIBRARY);)
 		
 		if (!rec.isDeleted()) {
 			OaiDcType any = ((JAXBElement<OaiDcType>) metadata.getAny()).getValue();
