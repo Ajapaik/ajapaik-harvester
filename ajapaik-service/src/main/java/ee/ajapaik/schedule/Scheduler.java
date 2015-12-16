@@ -99,6 +99,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			is.setEmail(value.getProperty("email"));
 			is.setSchedule(value.getProperty("schedule"));
 			is.setIgnoreSet(value.getProperty("ignoreSet"));
+			is.setDisableSets(Boolean.valueOf(value.getProperty("disableSets")));
 			
 			if(savedConf != null && savedConf.contains(is)) {
 				InfoSystem infoSystem = savedConf.get(savedConf.indexOf(is));

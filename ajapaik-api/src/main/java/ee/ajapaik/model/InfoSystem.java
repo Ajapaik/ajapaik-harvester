@@ -16,14 +16,14 @@ public class InfoSystem implements Serializable {
 	private String email;
 	private String homepageUrl;
 	private String ignoreSet;
-	private Boolean useSets = Boolean.TRUE;
-	
-	public Boolean getUseSets() {
-		return useSets;
+	private Boolean disableSets;
+
+	public Boolean getDisableSets() {
+		return disableSets;
 	}
 
-	public void setUseSets(Boolean useSets) {
-		this.useSets = useSets;
+	public void setDisableSets(Boolean disableSets) {
+		this.disableSets = disableSets;
 	}
 
 	public InfoSystem() {

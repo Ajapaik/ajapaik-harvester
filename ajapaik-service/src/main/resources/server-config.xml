@@ -35,7 +35,7 @@
 						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
 						<prop key="email">muis@muis.ee</prop>
 						<prop key="homepageUrl">http://www.muis.ee</prop>
-						<prop key="schedule">0 10 18 1/16 * ?</prop>
+						<prop key="schedule">0 0 18 1/16 * ?</prop>
 					</props>
 				</entry>
 				<entry key="NLIB">
@@ -65,8 +65,8 @@
 						<prop key="mapper">ee.ajapaik.harvester.ETERAHarvestTask</prop>
 						<prop key="email">info@test.ee</prop>
 						<prop key="homepageUrl">http://www.etera.ee</prop>
-						<prop key="schedule">0 0 0 18 * ?</prop>
-						<prop key="useSets">false</prop>
+						<prop key="schedule">0 25 19 16 * ?</prop>
+						<prop key="disableSets">true</prop>
 						<prop key="useSet">none</prop>
 					</props>
 				</entry>				

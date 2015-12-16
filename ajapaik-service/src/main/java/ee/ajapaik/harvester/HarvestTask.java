@@ -121,7 +121,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			
 			this.format = getSupportedMetadataFormat();
 			
-			if(infoSystem.getUseSets() != null && infoSystem.getUseSets()) {
+			if(!infoSystem.getDisableSets()) {
 				this.sets = loadSets();
 			}
 			
@@ -134,13 +134,13 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 				
 				// XXX: set list may change, should clear
 				// old list before update.
-				if(infoSystem.getUseSets() != null && infoSystem.getUseSets()) {
+				if(!infoSystem.getDisableSets()) {
 					repository.saveSets(sets, taskCode);
 				}
 				
 				String set = infoSystem.getUseSet();
 				if (set != null) {
-					if(infoSystem.getUseSets() != null && infoSystem.getUseSets()) {
+					if(!infoSystem.getDisableSets()) {
 						addParameter(params, "set", set);
 					}
 					
