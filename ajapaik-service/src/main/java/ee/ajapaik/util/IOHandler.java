@@ -100,7 +100,7 @@ public class IOHandler {
 				
 				HttpGet get = new HttpGet(url.getFile());
 				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
-				get.addHeader(new BasicHeader("Host", url.getHost()));
+//				get.addHeader(new BasicHeader("Host", url.getHost()));
 				
 				if(headers != null) {
 					for(Entry<String, String> entry : headers.entrySet()) {
