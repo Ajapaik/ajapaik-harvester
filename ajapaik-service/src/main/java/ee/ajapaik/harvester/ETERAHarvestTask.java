@@ -42,7 +42,7 @@ public class ETERAHarvestTask extends HarvestTask {
 
 		rec.setDeleted(metadata == null);
 
-		rec.setInstitutionType(InstitutionType.LIBRARY);)
+		rec.setInstitutionType(InstitutionType.LIBRARY);
 		
 		if (!rec.isDeleted()) {
 			OaiDcType any = ((JAXBElement<OaiDcType>) metadata.getAny()).getValue();
