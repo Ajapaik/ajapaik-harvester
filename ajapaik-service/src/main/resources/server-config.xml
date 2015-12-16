@@ -35,7 +35,7 @@
 						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
 						<prop key="email">muis@muis.ee</prop>
 						<prop key="homepageUrl">http://www.muis.ee</prop>
-						<prop key="schedule">0 0 0 1/15 * ?</prop>
+						<prop key="schedule">0 10 18 1/16 * ?</prop>
 					</props>
 				</entry>
 				<entry key="NLIB">
