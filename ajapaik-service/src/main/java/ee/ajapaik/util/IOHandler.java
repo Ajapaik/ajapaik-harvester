@@ -105,6 +105,8 @@ public class IOHandler {
 					defaultHttpClient.setRedirectStrategy(strategy);
 				}
 
+				logger.debug("Interceptor count: " + defaultHttpClient.getRequestInterceptorCount());
+				
 				if(defaultHttpClient.getRequestInterceptorCount() == 0) {
 					defaultHttpClient.addRequestInterceptor(new HttpRequestInterceptor() {
 						
@@ -120,7 +122,6 @@ public class IOHandler {
 				
 				HttpGet get = new HttpGet(url.getFile());
 				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
-//				get.addHeader(new BasicHeader("Host", url.getHost()));
 				
 				if(headers != null) {
 					for(Entry<String, String> entry : headers.entrySet()) {
