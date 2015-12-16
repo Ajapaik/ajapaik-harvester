@@ -11,12 +11,17 @@ import java.util.zip.GZIPInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
 import ee.ajapaik.db.Repository;
@@ -94,8 +99,27 @@ public class IOHandler {
 				
 				BaseHttpClient bc = HttpClientFactory.getInstance().getClient(url);
 				
+				HttpClient httpClient = bc.getHttpClient();
 				if(strategy != null) {
-					((DefaultHttpClient) bc.getHttpClient()).setRedirectStrategy(strategy);
+					DefaultHttpClient defaultHttpClient = (DefaultHttpClient) httpClient;
+					defaultHttpClient.setRedirectStrategy(strategy);
+					defaultHttpClient.addRequestInterceptor(new HttpRequestInterceptor() {
+						
+						@Override
+						public void process(HttpRequest req, HttpContext arg1) throws HttpException, IOException {
+							logger.debug("Process request: " + req);
+							
+							String host = req.getHeaders("Host")[0].getValue();
+							
+							logger.debug("Host headr: " + host);
+							
+							if(host.contains(":")) {
+								logger.debug("Header has port! Splitting: " + host.split(":")[0]);
+								
+								req.setHeader("Host", host.split(":")[0]);
+							}
+						}
+					});
 				}
 				
 				HttpGet get = new HttpGet(url.getFile());
@@ -108,7 +132,7 @@ public class IOHandler {
 					}
 				}
 				
-				HttpResponse result = bc.getHttpClient().execute(get);
+				HttpResponse result = httpClient.execute(get);
 				
 				HttpEntity entity = result.getEntity();
 				
