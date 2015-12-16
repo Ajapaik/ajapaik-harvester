@@ -105,20 +105,8 @@ public class IOHandler {
 					defaultHttpClient.setRedirectStrategy(strategy);
 				}
 
-				logger.debug("Interceptor count: " + defaultHttpClient.getRequestInterceptorCount());
-				
-				if(defaultHttpClient.getRequestInterceptorCount() == 0) {
-					defaultHttpClient.addRequestInterceptor(new HttpRequestInterceptor() {
-						
-						@Override
-						public void process(HttpRequest req, HttpContext arg1) throws HttpException, IOException {
-							String host = req.getHeaders("Host")[0].getValue();
-							if(host.contains(":")) {
-								req.setHeader("Host", host.split(":")[0]);
-							}
-						}
-					});
-				}
+				// Add host header check interceptor
+				defaultHttpClient.addRequestInterceptor(new HostReplacerInterceptor());
 				
 				HttpGet get = new HttpGet(url.getFile());
 				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
@@ -130,6 +118,9 @@ public class IOHandler {
 				}
 				
 				HttpResponse result = httpClient.execute(get);
+				
+				// Remove host header check interceptor
+				defaultHttpClient.removeRequestInterceptorByClass(HostReplacerInterceptor.class);
 				
 				HttpEntity entity = result.getEntity();
 				
