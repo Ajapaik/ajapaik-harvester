@@ -52,6 +52,7 @@ public class ETERAHarvestTask extends HarvestTask {
 			if("Foto".equals(type)) {
 				rec.setDates(getValue(data, "date"));
 				rec.setTitle(getSingleValue(data, "title"));
+				rec.setCreators(getValue(data, "creator"));
 				rec.setUrlToRecord(getSingleValue(data, "relation"));
 				
 				String id = rec.getId().split(":")[2];

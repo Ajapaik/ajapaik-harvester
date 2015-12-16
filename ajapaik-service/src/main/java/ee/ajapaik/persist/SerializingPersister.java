@@ -167,8 +167,8 @@ public class SerializingPersister implements InitializingBean {
 		List<Object> x = sp.map.get("ee.ajapaik.model.InfoSystem");
 		for (Object object : x) {
 			InfoSystem is = (InfoSystem) object;
-			if(is.getName().equals("MuIS")) {
-				is.setLastHarvestTime(new Date(1431079740019L));
+			if(is.getName().equals("ETERA")) {
+				is.setLastHarvestTime(null);
 			}
 		}
 		
