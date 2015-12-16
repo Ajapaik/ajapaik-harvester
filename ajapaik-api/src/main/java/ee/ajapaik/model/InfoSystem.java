@@ -16,7 +16,7 @@ public class InfoSystem implements Serializable {
 	private String email;
 	private String homepageUrl;
 	private String ignoreSet;
-	private Boolean useSets;
+	private Boolean useSets = Boolean.TRUE;
 	
 	public Boolean getUseSets() {
 		return useSets;
