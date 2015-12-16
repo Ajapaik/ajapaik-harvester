@@ -102,27 +102,21 @@ public class IOHandler {
 				HttpClient httpClient = bc.getHttpClient();
 				DefaultHttpClient defaultHttpClient = (DefaultHttpClient) httpClient;
 				if(strategy != null) {
-					
 					defaultHttpClient.setRedirectStrategy(strategy);
 				}
 
-				defaultHttpClient.addRequestInterceptor(new HttpRequestInterceptor() {
-					
-					@Override
-					public void process(HttpRequest req, HttpContext arg1) throws HttpException, IOException {
-						logger.debug("Process request: " + req);
+				if(defaultHttpClient.getRequestInterceptorCount() == 0) {
+					defaultHttpClient.addRequestInterceptor(new HttpRequestInterceptor() {
 						
-						String host = req.getHeaders("Host")[0].getValue();
-						
-						logger.debug("Host headr: " + host);
-						
-						if(host.contains(":")) {
-							logger.debug("Header has port! Splitting: " + host.split(":")[0]);
-							
-							req.setHeader("Host", host.split(":")[0]);
+						@Override
+						public void process(HttpRequest req, HttpContext arg1) throws HttpException, IOException {
+							String host = req.getHeaders("Host")[0].getValue();
+							if(host.contains(":")) {
+								req.setHeader("Host", host.split(":")[0]);
+							}
 						}
-					}
-				});
+					});
+				}
 				
 				HttpGet get = new HttpGet(url.getFile());
 				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
