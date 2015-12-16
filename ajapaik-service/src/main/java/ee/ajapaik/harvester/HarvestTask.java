@@ -216,7 +216,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			setsToIgnore = Arrays.asList(infoSystem.getIgnoreSet().split(","));
 		}
 		
-		if(sets.size() > 0) {
+		if(sets != null && sets.size() > 0) {
 			for (String set : this.sets.keySet()) {
 				if(!setsToIgnore.contains(set)) {
 					iterateSet(params, lastHarvest, set);
