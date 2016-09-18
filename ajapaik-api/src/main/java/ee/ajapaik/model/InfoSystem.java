@@ -65,7 +65,7 @@ public class InfoSystem implements Serializable {
 		this.running = running;
 	}
 
-	public String getUseSet() {
+	public String getSetToUse() {
 		return useSet;
 	}
 

@@ -160,7 +160,12 @@
 			<version>8.1.4.v20120524</version>
 			<scope>test</scope>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-kernel</artifactId>
@@ -170,7 +175,7 @@
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-adb</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
 			<artifactId>axis2-transport-http</artifactId>

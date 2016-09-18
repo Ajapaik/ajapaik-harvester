@@ -1,5 +1,24 @@
 package ee.ajapaik.harvester;
 
+import ee.ajapaik.db.Repository;
+import ee.ajapaik.model.InfoSystem;
+import ee.ajapaik.model.search.Record;
+import ee.ajapaik.util.Digester;
+import ee.ajapaik.util.FilteredInputStreamReader;
+import ee.ajapaik.util.IOHandler;
+import ee.ajapaik.util.MonitorableBufferedInputStream;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.log4j.Logger;
+import org.openarchives.oai._2.*;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.scheduling.quartz.QuartzJobBean;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Unmarshaller.Listener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -8,51 +27,15 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.Unmarshaller.Listener;
-
-import org.apache.http.client.ClientProtocolException;
-import org.apache.log4j.Logger;
-import org.openarchives.oai._2.DeletedRecordType;
-import org.openarchives.oai._2.IdentifyType;
-import org.openarchives.oai._2.ListMetadataFormatsType;
-import org.openarchives.oai._2.ListRecordsType;
-import org.openarchives.oai._2.ListSetsType;
-import org.openarchives.oai._2.MetadataFormatType;
-import org.openarchives.oai._2.OAIPMHtype;
-import org.openarchives.oai._2.RecordType;
-import org.openarchives.oai._2.ResumptionTokenType;
-import org.openarchives.oai._2.SetType;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.springframework.scheduling.quartz.QuartzJobBean;
-
-import ee.ajapaik.db.Repository;
-import ee.ajapaik.model.InfoSystem;
-import ee.ajapaik.model.search.Record;
-import ee.ajapaik.util.Digester;
-import ee.ajapaik.util.FilteredInputStreamReader;
-import ee.ajapaik.util.IOHandler;
-import ee.ajapaik.util.MonitorableBufferedInputStream;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=HarvestTask">Kaido Kalda</a>
  */
 public abstract class HarvestTask extends QuartzJobBean implements ListRecordsType.Listener {
 
-	protected static final Logger logger = Logger.getLogger(HarvestTask.class);
+	protected Logger logger = Logger.getLogger(HarvestTask.class);
 	
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -63,7 +46,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	protected boolean allowInvalidCharacters;
 	protected String invalidCharacterReplacement;
 	protected String supportedMetadataPrefixes;
-	protected Map<String, String> sets;
+	protected Map<String, String> sets = new LinkedHashMap<String, String>();
 	protected String format;
 
 	public void setInfoSystem(InfoSystem infoSystem) {
@@ -118,32 +101,32 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		try {
 			boolean supportsDeleted = isSupportsDeletedRecords();
 			Date lastHarvest = supportsDeleted ? infoSystem.getLastHarvestTime() : null;
-			
+
 			this.format = getSupportedMetadataFormat();
-			
+
 			if(!infoSystem.getDisableSets()) {
 				this.sets = loadSets();
 			}
-			
+
 			if (format != null) {
 				HashMap<String, String> params = new HashMap<String, String>();
 				addParameter(params, "metadataPrefix", format);
 
 				// XXX: why to clear?
 				// repository.clearDatabase(taskCode);
-				
+
 				// XXX: set list may change, should clear
 				// old list before update.
 				if(!infoSystem.getDisableSets()) {
 					repository.saveSets(sets, taskCode);
 				}
-				
-				String set = infoSystem.getUseSet();
+
+				String set = infoSystem.getSetToUse();
 				if (set != null) {
 					if(!infoSystem.getDisableSets()) {
 						addParameter(params, "set", set);
 					}
-					
+
 					if (lastHarvest != null) {
 						addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
 					}
@@ -153,22 +136,20 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 					iterateSets(params, lastHarvest);
 				}
 			}
-			
+
 			// Mark last harvest date
 			infoSystem.setLastHarvestTime(startDate);
 		} catch (IOException e) {
 			logger.error("Error in IO", e);
-		} catch (JAXBException e) {
-			logger.error("Error parsing stream", e);
 		} catch (Exception e) {
 			logger.error("Unknown error", e);
 		}
-		
+
 		long duration = System.currentTimeMillis() - startDate.getTime();
-		
+
 		logger.info("Harvester task finished @ " + new Date() + ". Tooks: " + convertMSToDHMS(duration));
 	}
-	
+
 	private static String convertMSToDHMS(long ms) {
 		long seconds = ms / 1000;
 	    long s = seconds % 60;
@@ -209,16 +190,12 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		return sets;
 	}
 
-	private void iterateSets(HashMap<String, String> params, Date lastHarvest) throws ClientProtocolException, IOException, JAXBException {
-		
-		List<String> setsToIgnore = new ArrayList<String>();
-		if(infoSystem.getIgnoreSet() != null) {
-			setsToIgnore = Arrays.asList(infoSystem.getIgnoreSet().split(","));
-		}
-		
-		if(sets != null && sets.size() > 0) {
-			for (String set : this.sets.keySet()) {
-				if(!setsToIgnore.contains(set)) {
+	void iterateSets(Map<String, String> params, Date lastHarvest) throws ClientProtocolException, IOException {
+		List<String> setsToIgnore = getSetsToIgnore();
+
+		if (!getSets().isEmpty()) {
+			for (String set : getSets().keySet()) {
+				if (!setsToIgnore.contains(set)) {
 					iterateSet(params, lastHarvest, set);
 				} else {
 					logger.debug("Set ignored: " + set);
@@ -227,32 +204,44 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		} else {
 			iterateSet(params, lastHarvest, null);
 		}
-				
 	}
 
-	private void iterateSet(HashMap<String, String> params, Date lastHarvest, String set) throws ClientProtocolException, IOException, JAXBException {
-		logger.debug("Opening set: " + set);
-
-		if(set != null) {
-			addParameter(params, "set", set);
+	private List<String> getSetsToIgnore() {
+		List<String> setsToIgnore = new ArrayList<String>();
+		if(infoSystem.getIgnoreSet() != null) {
+			setsToIgnore = Arrays.asList(infoSystem.getIgnoreSet().split(","));
 		}
-		
-		addParameter(params, "metadataPrefix", format);
-		
-		if (lastHarvest != null) {
-			addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
+		return setsToIgnore;
+	}
+
+	void iterateSet(Map<String, String> params, Date lastHarvest, String set) throws ClientProtocolException, IOException {
+		try {
+			logger.debug("Opening set: " + set);
+
+			if (set != null) {
+				addParameter(params, "set", set);
+			}
+
+			addParameter(params, "metadataPrefix", format);
+
+			if (lastHarvest != null) {
+				addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
+			}
+
+			iterateRecords(params);
+
+			logger.debug("Set iterated: " + set);
+		} catch (JAXBException e) {
+			logger.error("Error parsing stream", e);
+			logger.error("Failed to import set! Set = " + set);
 		}
-
-		iterateRecords(params);
-
-		logger.debug("Set iterated: " + set);
 	}
 	
-	private void addParameter(HashMap<String, String> params, String parameter, String value) {
+	private void addParameter(Map<String, String> params, String parameter, String value) {
 		params.put(parameter, value);
 	}
 	
-	private void removeParameter(HashMap<String, String> params, String parameter) {
+	private void removeParameter(Map<String, String> params, String parameter) {
 		params.remove(parameter);
 	}
 
@@ -278,7 +267,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 
 	protected abstract Record mapRecord(RecordType recordType);
 
-	private void iterateRecords(HashMap<String, String> params)
+	void iterateRecords(Map<String, String> params)
 			throws ClientProtocolException, IOException, JAXBException {
 		Listener listener = new Listener() {
 			@Override
@@ -340,7 +329,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 
 	@SuppressWarnings("unchecked")
 	private <T> T executeOperation(Class<T> clazz, Map<String, String> additionalParams, Listener listener) throws ClientProtocolException, IOException, JAXBException {
-		JAXBElement<OAIPMHtype> response = null;
+		JAXBElement<OAIPMHtype> response;
 		if (clazz.equals(IdentifyType.class)) {
 			response = getResponse(getOperationAddress("Identify", additionalParams), listener);
 			return (T) response.getValue().getIdentify();
@@ -383,9 +372,9 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 						@Override
 						public char filter(char b) {
 							if (b == 0 || b == 0x9 || b == 0xA || b == 0xD
-									|| (b >= 0x20 && b <= 0xD7FF)
-									|| (b >= 0xE000 && b <= 0xFFFD)
-									|| (b >= 0x10000 && b <= 0x10FFFF)) {
+								|| (b >= 0x20 && b <= 0xD7FF)
+								|| (b >= 0xE000 && b <= 0xFFFD)
+								|| b >= 0x10000) {
 								return b;
 							}
 
