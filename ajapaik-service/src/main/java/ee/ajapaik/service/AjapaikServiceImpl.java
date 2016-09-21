@@ -1,18 +1,5 @@
 package ee.ajapaik.service;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.IndexSearcher;
-import org.quartz.SimpleTrigger;
-import org.springframework.util.StringUtils;
-
 import ee.ajapaik.cache.CityCache;
 import ee.ajapaik.cache.SourceCache;
 import ee.ajapaik.dao.AjapaikDao;
@@ -20,17 +7,25 @@ import ee.ajapaik.db.Repository;
 import ee.ajapaik.index.IndexedFields;
 import ee.ajapaik.index.Indexer;
 import ee.ajapaik.index.Result;
-import ee.ajapaik.model.City;
-import ee.ajapaik.model.InfoSystem;
-import ee.ajapaik.model.MediaView;
-import ee.ajapaik.model.Source;
-import ee.ajapaik.model.TaskView;
+import ee.ajapaik.model.*;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.Search;
 import ee.ajapaik.model.search.SearchResults;
 import ee.ajapaik.platform.AjapaikClient;
 import ee.ajapaik.schedule.Scheduler;
 import ee.ajapaik.util.IOHandler;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.search.IndexSearcher;
+import org.quartz.SimpleTrigger;
+import org.springframework.util.StringUtils;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=AjapaikServiceImpl">Kaido Kalda</a>
@@ -180,6 +175,7 @@ public class AjapaikServiceImpl implements AjapaikService {
 
 	@Override
 	public void index() {
+		logger.info("Indexing triggered");
 		SimpleTrigger trigger = new SimpleTrigger(Scheduler.JOB_INDEXER_NAME);
 		trigger.setJobName(Scheduler.JOB_INDEXER_NAME);
 		
