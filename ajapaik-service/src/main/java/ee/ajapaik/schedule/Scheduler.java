@@ -1,20 +1,9 @@
 package ee.ajapaik.schedule;
 
-import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-
+import ee.ajapaik.model.InfoSystem;
+import ee.ajapaik.persist.SerializingPersister;
 import org.apache.log4j.Logger;
-import org.quartz.CronTrigger;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.JobListener;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
+import org.quartz.*;
 import org.quartz.impl.StdScheduler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -22,8 +11,11 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
-import ee.ajapaik.model.InfoSystem;
-import ee.ajapaik.persist.SerializingPersister;
+import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=Scheduler">Kaido Kalda</a>
@@ -224,6 +216,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 	}
 	
 	public void scheduleIndexing(Trigger trigger) {
+		logger.debug("Started scheduling indexing");
 		JobDetailBean job = (JobDetailBean) beanFactory.getBean("indexerJob");
 		job.getJobDataMap().put(JOB_MAP_HARVEST_JOB_LISTENER, harvestJobListener);
 		try {
@@ -238,6 +231,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 		} catch (Exception e) {
 			logger.error("Scheduler failed to schedule indexer job: ", e);
 		}
+		logger.debug("Finished scheduling indexing");
 	}
 	
 	public class HarvestJobListener implements JobListener {
