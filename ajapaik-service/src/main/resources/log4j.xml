@@ -37,6 +37,11 @@
 		<level value="DEBUG" />
 	</logger>
 
+	<logger name="org.quartz">
+		<level value="DEBUG" />
+		<appender-ref ref="file" />
+	</logger>
+
 	<root>
 		<priority value="INFO" />
 		<appender-ref ref="file" />
