@@ -280,11 +280,15 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 		
 		@Override
 		public void jobToBeExecuted(JobExecutionContext context) {
+			logger.debug("Job to be executed!");
 			Thread currentThread = Thread.currentThread();
 			name.set(currentThread.getName());
+			logger.debug("name set");
 			
 			synchronized (harvestJobListener) {
+				logger.debug("Syncronized");
 				while(harvestJobListener.hasActiveIndexerJobs()) {
+					logger.debug("Active indexer jobs");
 					try {
 						harvestJobListener.wait();
 					} catch (InterruptedException e) {
@@ -292,12 +296,18 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 					}
 				}
 			}
+			logger.debug("No more active indexer jobs");
 			
 			JobDetail jobDetail = context.getJobDetail();
+			logger.debug("Jobdetail = " + jobDetail.getName());
 			if(jobDetail.getJobDataMap().containsKey(JOB_MAP_INFO_SYSTEM)) {
+				logger.debug("JobDetail contains key");
 				InfoSystem is = (InfoSystem) jobDetail.getJobDataMap().get(JOB_MAP_INFO_SYSTEM);
+				logger.debug("Infosystem found! is = " + is.getName());
 				is.setRunning(Boolean.TRUE);
+				logger.debug("Is is set running");
 				persister.save(is);
+				logger.debug("IS Saved");
 			}
 			
 			logger.info("Setting job '" + jobDetail.getName() + "' state to STARTED!");
