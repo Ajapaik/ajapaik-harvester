@@ -5,7 +5,7 @@ Endpoint: http://ajapaik.ee:8080/ajapaik-service/AjapaikService.json
 API content type is ```application/json```
 
 
-**Request body: **
+**Request body:**
 ```
 {
     "method": "search",
