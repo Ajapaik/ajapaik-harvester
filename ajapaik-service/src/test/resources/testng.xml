@@ -1,0 +1,17 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Ajapaik tests">
+  	<test name="Ajapaik tests" annotations="JDK" verbose="2" preserve-order="true">
+  		<parameter name="resource-file" value="inits.properties" />
+  		<groups>
+	    	<run>
+				<include name="unitTest" />
+				<!-- <include name="loadTest" />  -->
+      		</run>
+    	</groups>
+    	<classes>
+    		<!-- TestSuite with spring initialization -->
+    		<class name="ee.ajapaik.SpringContextAwareTestSuite" />
+
+    	</classes>
+  	</test>
+</suite>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions name="Task"
+             targetNamespace="http://ais.ra.ee/services"
+             xmlns:dira="http://ais.ra.ee/schemas/dira"
+             xmlns:tns="http://ais.ra.ee/services"
+             xmlns:xsd="http://ais.ra.ee/schemas/task"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <import namespace="http://ais.ra.ee/schemas/dira" schemaLocation="dira.xsd" />
+            <import namespace="http://ais.ra.ee/schemas/task" schemaLocation="task.xsd" />
+        </schema>
+    </types>
+
+
+    <message name="taskObjectListRequest">
+        <part name="body" element="xsd:taskObjectListRequest"/>
+    </message>
+
+    <message name="taskObjectListResponse">
+        <part name="body" element="xsd:taskObjectListResponse"/>
+    </message>
+
+
+    <portType name="TaskPortType">
+        <operation name="taskObjectList">
+            <input message="tns:taskObjectListRequest" />
+            <output message="tns:taskObjectListResponse" />
+        </operation>
+    </portType>
+
+
+    <binding name="TaskBinding" type="tns:TaskPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="taskObjectList">
+            <soap:operation soapAction="/service/task"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+
+    <service name="TaskService">
+        <documentation>Task service</documentation>
+        <port name="TaskPort" binding="tns:TaskBinding">
+            <soap:address location="http://anna.ra.ee/service/task/" />
+        </port>
+    </service>
+</definitions>

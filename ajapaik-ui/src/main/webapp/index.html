@@ -1,0 +1,216 @@
+<html>
+<head>
+
+	<title>Ajapaiga valimimoodul</title>
+	
+	<meta charset="UTF-8">
+	
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/ajapaik.css">
+	
+	<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+	<script type="text/javascript" src="assets/js/jquery.row-grid.js"></script>
+	<script type="text/javascript" src="assets/js/jquery.tooltip.js"></script>
+	<script type="text/javascript" src="assets/js/underscore.min.js"></script>
+	<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="assets/js/ajapaik.js"></script>
+
+</head>
+<body>
+	<!-- Modal -->
+	<div class="modal fade modal" id="modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title pull-left">Saada valim Ajapaika</h3>
+					<div class="btn-group pull-right">
+						<button type="button" class="btn btn-default" data-dismiss="modal">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</div>
+					<div style="clear:both"></div>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12">
+							<form class="form-horizontal" role="form">
+								<div class="form-group">
+									<label for="city" class="col-sm-3 control-label">Linn:</label>
+									<div class="col-sm-5">
+										<div class="input-group">
+									
+											<input id="city-input" class="form-control" type="text" value="">
+												
+											<div class="input-group-btn">
+												<button id="show-cities" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">&nbsp;<span class="caret"></span></button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu">
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="lat" class="col-sm-3 control-label">Latitude:</label>
+									<div class="col-sm-5">
+										<input id="lat" class="form-control" type="text" value="">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="lon" class="col-sm-3 control-label">Longitude:</label>
+									<div class="col-sm-5">
+										<input id="lon" class="form-control" type="text" value="">
+									</div>
+								</div>	
+							</form>
+						</div>
+					</div>		
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Sulge</button>
+					<button type="button" class="btn btn-primary"><img src="assets/img/ajax-loader.gif" height="16" style="margin-right: 5px; display: none;" id="loader">Saada</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="header">
+
+		<ul class="nav nav-tabs">
+			<li class="active" id="search"><a href="#">Otsing <span class="badge">0</span></a></li>
+			<li id="set"><a href="#">Valim <span class="badge">0</span></a></li>
+		</ul>
+
+		<div id="panel">
+			<form class="form-horizontal">
+				<div id="search-form">
+				
+				<div class="panel panel-default">
+  					<div class="panel-body">
+						<div class="form-group">
+	
+							<div class="col-sm-1 w-13">
+								<input value="" id="fullSearch" placeholder="Full Search" class="form-control">
+							</div>
+	
+							<div class="col-sm-1 w-13">
+									<input value="" id="id" placeholder="ID" class="form-control">
+							</div>
+	
+							<div class="col-sm-1 w-13">
+									<input value="" id="what" placeholder="Title" class="form-control">
+							</div>
+	
+							<div class="col-sm-1 w-13">
+									<input value="" id="description" placeholder="Description" class="form-control">
+							</div>
+	
+							<div class="col-sm-1 w-13">
+									<input value="" id="who" placeholder="Author" class="form-control">
+							</div>
+	
+							<div class="col-sm-1 w-13">
+									<input value="" id="from" placeholder="Institution" class="form-control">
+							</div>
+	
+							<div class="col-sm-1 w-13">
+									<input value="" id="number" placeholder="Number" class="form-control">
+							</div>
+							
+							<div class="col-sm-1">
+								<button id="search-button" type="button" class="btn btn-primary" style="float: right;">Otsi</button>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="col-sm-11"  style="width: 91%">
+									<input value="" id="luceneQuery" placeholder="Lucene Query" class="form-control">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-1">
+								<div class="input-group">
+									<div class="checkbox">
+										<label><input type="checkbox" id="MUSEUM">MuIs</label>
+									</div>
+								</div>
+							</div>
+	
+							<div class="col-sm-1">
+								<div class="input-group">
+									<div class="checkbox">
+										<label><input type="checkbox" id="ARCHIVE">MKA</label>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-1">
+								<div class="input-group">
+									<div class="checkbox">
+										<label><input type="checkbox" id="LIBRARY">Digar</label>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-1">
+								<div class="input-group">
+									<div class="checkbox">
+										<label><input type="checkbox" id="ETERA">ETERA</label>
+									</div>
+								</div>
+							</div>
+							<div id="task-select" class="col-sm-2">
+								<div class="input-group">
+								
+									<span id="sync" class="input-group-addon"><span class="glyphicon glyphicon-upload"></span></span>
+									<span id="add-task" class="input-group-addon"><span class="glyphicon glyphicon-ok"></span></span>
+									<input id="task-input" class="form-control" type="text" placeholder="Ülesande ID">
+										
+									<div class="input-group-btn">
+										<button id="show-tasks" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">&nbsp;<span class="caret"></span></button>
+										<ul class="dropdown-menu dropdown-menu-right" role="menu">
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+					<div class="form-group">
+						<div class="col-sm-10">
+							<button type="button" class="btn btn-primary" id="select-all">Vali kõik</button>
+						</div>
+						<div class="col-sm-2">
+							<div style="float: right; margin-right: 5px;">
+								<div class="thumb-size" id="sm" style="padding: 10px;"></div>
+								<div class="thumb-size" id="md" style="padding: 15px;"></div>
+								<div class="thumb-size" id="lg" style="padding: 20px;"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="set-form" style="display: none;">
+					<div class="form-group">
+						<div class="col-sm-10" style="margin-top: 15px">
+							<button type="button" class="btn btn-primary" id="send">Saada Ajapaika</button>
+							<button type="button" class="btn btn-primary" id="download">Lae alla</button>
+							<button type="button" class="btn btn-danger" id="select-none">Tühista valik</button>
+						</div>
+						<div class="col-sm-2">
+							<div style="float: right; margin-right: 5px;">
+								<img id="thumbnails" src="assets/img/large-thumbnails-48.png" style="border: 1px solid; padding: 2px;">
+								<img id="list" src="assets/img/list-with-thumbnails-48.png" style="border: 1px solid; padding: 2px;">
+							</div>
+						</div>
+					</div>				
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	<div id="result-view" style="display: none;"></div>
+	
+	<div id="set-view" style="display: none;"></div>
+	
+	<div id="backdrop" style="display: none;"><img class="loader" src="assets/img/ajax_loader_blue_64.gif"></div>
+</body>
+</html>

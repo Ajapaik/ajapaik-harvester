@@ -1,0 +1,197 @@
+@font-face {
+  font-family: 'Glyphicons Halflings';
+
+  src: url('../fonts/glyphicons-halflings-regular.eot');
+  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../assets/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+html {
+	overflow-y: scroll;
+}
+
+body {
+	padding-right: 0px !important;
+}
+
+.glyphicon {
+	top: 0px;
+}
+
+.header {
+	position: fixed;
+	background: #FFFFFF;
+	width: 100%;
+	z-index: 1;
+	padding-top: 10px;
+}
+
+#panel {
+	border-bottom: 1px solid #DDDDDD;
+	padding: 10px;
+}
+
+.w-13 {
+	width: 13%;
+}
+
+.input-group-addon {
+	cursor: pointer;
+}
+
+.thumb-size {
+	background: gray;
+	float: left;
+	margin: 1px;
+	cursor: pointer;
+}
+
+#result-view, #set-view, #task-view {
+	background: #F1F1F1;
+}
+
+#result-view {
+	padding: 335px 10px 10px;
+}
+
+#set-view, #task-view {
+	padding: 150px 10px 10px;
+}
+
+#result-view:before, #result-view:after,#set-view:before, #set-view:after,#task-view:before, #task-view:after {
+	content: "";
+	display: table;
+}
+
+#result-view:after, #set-view:after, #task-view:after {
+	clear: both;
+}
+
+.item {
+	float: left;
+	margin-bottom: 15px;
+}
+
+.item img {
+	max-width: 100%;
+	max-height: 100%;
+	vertical-align: bottom;
+	border: 1px solid;
+}
+
+.first-item {
+	clear: both;
+}
+/* remove margin bottom on last row */
+.last-row,.last-row ~ .item {
+	margin-bottom: 0;
+}
+
+.selected {
+	opacity: 0.3;
+}
+
+#backdrop {
+    background-color: #FF;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1;
+}
+
+.loader {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 55px;
+}
+
+.record-container {
+	padding: 10px;
+}
+
+.record-container:hover {
+	background: #FCFCFC;
+}
+
+.record-container img {
+	border: 1px solid;
+}
+
+.dropdown-menu {
+	min-width: 230px;
+}
+
+#modal .dropdown-menu {
+    min-width: 220px;
+}
+
+.dropdown-menu li {
+	cursor: pointer;
+}
+
+#task-select {
+	width: 260px;
+}
+
+#task-select .badge {
+	width: 35px;
+	margin-top: -20px;
+}
+
+/*** TOOLTIP ***/
+
+
+#tooltip
+{
+    background: #FFF;
+    border: 5px solid #ccc;
+    box-shadow: 0px 0px 20px #555;
+    
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+#tooltip .tooltip-desc
+{
+    padding: 10px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+#tooltip .tooltip-title
+{
+    padding-left: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+}
+
+#tooltip .tooltip-number
+{
+    padding-left: 10px;
+    font-size: 12px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+}
+
+#tooltip .tooltip-img
+{
+    position: relative;
+}
+#tooltip .spinner
+{
+    position: relative;
+    background: #fff;
+    
+}
+#tooltip .spinner>img
+{
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    left: 50%;
+    top: 50%;  
+}
