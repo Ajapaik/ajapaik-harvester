@@ -30,6 +30,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static java.util.Arrays.asList;
+
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=HarvestTask">Kaido Kalda</a>
  */
@@ -102,7 +104,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			boolean supportsDeleted = isSupportsDeletedRecords();
 			Date lastHarvest = supportsDeleted ? infoSystem.getLastHarvestTime() : null;
 
-			this.format = getSupportedMetadataFormat();
+			this.format = getSupportedMetadataFormat(infoSystem);
 
 			if(!infoSystem.getDisableSets()) {
 				this.sets = loadSets();
@@ -209,7 +211,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	private List<String> getSetsToIgnore() {
 		List<String> setsToIgnore = new ArrayList<String>();
 		if(infoSystem.getIgnoreSet() != null) {
-			setsToIgnore = Arrays.asList(infoSystem.getIgnoreSet().split(","));
+			setsToIgnore = asList(infoSystem.getIgnoreSet().split(","));
 		}
 		return setsToIgnore;
 	}
@@ -307,11 +309,16 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		}
 	}
 
-	private String getSupportedMetadataFormat() throws ClientProtocolException,
+	private String getSupportedMetadataFormat(InfoSystem infoSystem) throws ClientProtocolException,
 			IOException, JAXBException {
 		ListMetadataFormatsType meta = executeOperation(
 				ListMetadataFormatsType.class, null);
 		String[] supportedFormats = supportedMetadataPrefixes.split(",");
+		for (MetadataFormatType type : meta.getMetadataFormat()) {
+			if (type.getMetadataPrefix().equalsIgnoreCase(infoSystem.getMetadataPrefix())) {
+				return infoSystem.getMetadataPrefix();
+			}
+		}
 		for (MetadataFormatType type : meta.getMetadataFormat()) {
 			for (String format : supportedFormats) {
 				if (type.getMetadataPrefix().equalsIgnoreCase(format))

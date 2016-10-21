@@ -17,6 +17,7 @@ public class InfoSystem implements Serializable {
 	private String homepageUrl;
 	private String ignoreSet;
 	private Boolean disableSets;
+	private String metadataPrefix;
 
 	public Boolean getDisableSets() {
 		return disableSets;
@@ -116,5 +117,13 @@ public class InfoSystem implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		return obj != null && name.equals(((InfoSystem) obj).getName());
+	}
+
+	public String getMetadataPrefix() {
+		return metadataPrefix;
+	}
+
+	public void setMetadataPrefix(String metadataPrefix) {
+		this.metadataPrefix = metadataPrefix;
 	}
 }
