@@ -70,7 +70,19 @@
 						<prop key="useSet">none</prop>
 					</props>
 				</entry>				
-				
+
+				<entry key="DSpace">
+					<props>
+						<prop key="address">http://dspace.ut.ee/oai/request</prop>
+						<prop key="mapper">ee.ajapaik.harvester.DSpaceHarvestTask</prop>
+						<prop key="email">info@test.ee</prop>
+						<prop key="homepageUrl">http://dspace.ut.ee/</prop>
+						<prop key="schedule">0 11 20 28 * ?</prop>
+						<prop key="useSet">col_10062_34121</prop>
+						<prop key="metadataPrefix">est_dc</prop>
+					</props>
+				</entry>
+
 				<!--
 				<entry key="Kivike">
 					<props>
