@@ -12,10 +12,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+
+import static java.util.Arrays.asList;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=Scheduler">Kaido Kalda</a>
@@ -85,7 +88,8 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			
 			InfoSystem is = new InfoSystem(entry.getKey());
 			is.setAddress(value.getProperty("address"));
-			is.setUseSet(value.getProperty("useSet"));
+            String setsToUse = value.getProperty("setsToUse");
+            is.setSetsToUse(setsToUse == null ? new ArrayList<String>() : asList(setsToUse.split(",")));
 			is.setMapper(value.getProperty("mapper"));
 			is.setHomepageUrl(value.getProperty("homepageUrl"));
 			is.setEmail(value.getProperty("email"));

@@ -2,13 +2,14 @@ package ee.ajapaik.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class InfoSystem implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String name;
 	private String address;
-	private String useSet;
+	private List<String> setsToUse;
 	private String mapper;
 	private Date lastHarvestTime;
 	private Boolean running;
@@ -66,12 +67,12 @@ public class InfoSystem implements Serializable {
 		this.running = running;
 	}
 
-	public String getSetToUse() {
-		return useSet;
+	public List<String> getSetsToUse() {
+		return setsToUse;
 	}
 
-	public void setUseSet(String useSet) {
-		this.useSet = useSet;
+	public void setSetsToUse(List<String> setsToUse) {
+		this.setsToUse = setsToUse;
 	}
 
 	public String getName() {

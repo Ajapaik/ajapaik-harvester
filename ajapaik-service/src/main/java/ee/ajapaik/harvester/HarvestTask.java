@@ -123,17 +123,17 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 					repository.saveSets(sets, taskCode);
 				}
 
-				String set = infoSystem.getSetToUse();
-				if (set != null) {
-					if(!infoSystem.getDisableSets()) {
-						addParameter(params, "set", set);
-					}
-
-					if (lastHarvest != null) {
-						addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
-					}
-
-					iterateRecords(params);
+                List<String> setsToUse = infoSystem.getSetsToUse();
+				if (!setsToUse.isEmpty()) {
+                    for (String set : setsToUse) {
+                        if (!infoSystem.getDisableSets()) {
+                            addParameter(params, "set", set);
+                        }
+                        if (lastHarvest != null) {
+                            addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
+                        }
+                        iterateRecords(params);
+                    }
 				} else {
 					iterateSets(params, lastHarvest);
 				}

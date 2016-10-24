@@ -42,7 +42,7 @@
 					<props>
 						<prop key="address">http://repox.nlib.ee:8080/repox/OAIHandler</prop>
 						<prop key="mapper">ee.ajapaik.harvester.DigarHarvestTask</prop>
-						<prop key="useSet">postcard</prop>
+						<prop key="setsToUse">postcard</prop>
 						<prop key="email">nlib@nlib.ee</prop>
 						<prop key="homepageUrl">http://www.nlib.ee</prop>
 						<prop key="schedule">0 0 0 2/16 * ?</prop>
@@ -67,7 +67,7 @@
 						<prop key="homepageUrl">http://www.etera.ee</prop>
 						<prop key="schedule">0 25 19 16 * ?</prop>
 						<prop key="disableSets">true</prop>
-						<prop key="useSet">none</prop>
+						<prop key="setsToUse">none</prop>
 					</props>
 				</entry>				
 
@@ -78,7 +78,7 @@
 						<prop key="email">info@test.ee</prop>
 						<prop key="homepageUrl">http://dspace.ut.ee/</prop>
 						<prop key="schedule">0 11 20 28 * ?</prop>
-						<prop key="useSet">col_10062_34121</prop>
+						<prop key="setsToUse">col_10062_34121,col_10062_223</prop>
 						<prop key="metadataPrefix">est_dc</prop>
 					</props>
 				</entry>
