@@ -12,10 +12,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+
+import static java.util.Arrays.asList;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=Scheduler">Kaido Kalda</a>
@@ -71,7 +74,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 	public void updateInfoSystem(InfoSystem infoSystem) {
 		updateConfiguration(infoSystem);
 	}
-	
+
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
@@ -85,13 +88,15 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			
 			InfoSystem is = new InfoSystem(entry.getKey());
 			is.setAddress(value.getProperty("address"));
-			is.setUseSet(value.getProperty("useSet"));
+            String setsToUse = value.getProperty("setsToUse");
+            is.setSetsToUse(setsToUse == null ? new ArrayList<String>() : asList(setsToUse.split(",")));
 			is.setMapper(value.getProperty("mapper"));
 			is.setHomepageUrl(value.getProperty("homepageUrl"));
 			is.setEmail(value.getProperty("email"));
 			is.setSchedule(value.getProperty("schedule"));
 			is.setIgnoreSet(value.getProperty("ignoreSet"));
 			is.setDisableSets(Boolean.valueOf(value.getProperty("disableSets")));
+			is.setMetadataPrefix(String.valueOf(value.getProperty("metadataPrefix")));
 			
 			if(savedConf != null && savedConf.contains(is)) {
 				InfoSystem infoSystem = savedConf.get(savedConf.indexOf(is));
@@ -287,14 +292,14 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			
 			synchronized (harvestJobListener) {
 				logger.debug("Syncronized");
-				while(harvestJobListener.hasActiveIndexerJobs()) {
+/*				while(harvestJobListener.hasActiveIndexerJobs()) {
 					logger.debug("Active indexer jobs");
 					try {
 						harvestJobListener.wait();
 					} catch (InterruptedException e) {
 						logger.error("HarvestTask was interrupted: ", e);
 					}
-				}
+				}*/
 			}
 			logger.debug("No more active indexer jobs");
 			
