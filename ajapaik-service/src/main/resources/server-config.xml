@@ -77,8 +77,8 @@
 						<prop key="mapper">ee.ajapaik.harvester.DSpaceHarvestTask</prop>
 						<prop key="email">info@test.ee</prop>
 						<prop key="homepageUrl">http://dspace.ut.ee/</prop>
-						<prop key="schedule">0 11 20 28 * ?</prop>
-						<prop key="setsToUse">col_10062_34121,col_10062_223</prop>
+						<prop key="schedule">38 03 * * * ?</prop>
+						<prop key="setsToUse">col_10062_223</prop>
 						<prop key="metadataPrefix">est_dc</prop>
 					</props>
 				</entry>

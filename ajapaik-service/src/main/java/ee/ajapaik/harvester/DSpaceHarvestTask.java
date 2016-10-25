@@ -41,7 +41,7 @@ public class DSpaceHarvestTask extends HarvestTask {
 			List<JAXBElement<ElementType>> data = any.getTitleOrCreatorOrSubject();
 			
 			String type = getSingleValue(data, "type");
-			if("image".equals(type)) {
+			if("image".equalsIgnoreCase(type)) {
 				rec.setTitle(getSingleValue(data, "title"));
 				rec.setCreators(getValue(data, "creator"));
 				rec.setUrlToRecord(getSingleValue(data, "relation"));
@@ -54,27 +54,35 @@ public class DSpaceHarvestTask extends HarvestTask {
 				rec.setInstitutionType(DSPACE);
 
 				List<String> identifiers = getValues(data, "identifier");
-				String imageUrl = null;
-				String thumbnailUrl = null;
+				int mediaOrder = 0;
 				for (String identifier : identifiers) {
-					if (identifier.contains(".tif.")) {
-						continue;
-					}
-					if (imageUrl == null && identifier.contains("http") && identifier.contains(".jpg") && !identifier.contains(".jpg.jpg")) {
-						imageUrl = identifier;
-						continue;
-					}
-					if (thumbnailUrl == null && identifier.contains("http") && identifier.contains(".jpg.jpg")) {
-						thumbnailUrl = identifier;
+					if (!identifier.contains(".tif.") && identifier.contains("http") && identifier.contains(".jpg") && !identifier.contains(".jpg.jpg")) {
+						Record clone = rec.clone();
+						Integer mediaId = Integer.valueOf(rec.getId().split(":")[2].split("/")[1]);
+						clone.setId(rec.getId() + "_" + mediaId);
+						clone.setImageUrl(identifier);
+						clone.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(identifiers, identifier), repository, taskCode));
+						clone.setMediaId(mediaId);
+						clone.setMediaOrder(mediaOrder++);
+						save(clone, recordType.getHeader().getSetSpec());
 					}
 				}
-				rec.setImageUrl(imageUrl);
-				rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
-				rec.setMediaId(Integer.valueOf(rec.getId().split(":")[2].split("/")[1]));
-				rec.setMediaOrder(0);
 			}
 		}
-		return rec;
+		return null;
+	}
+
+	private String getThumbnailUrl(List<String> identifiers, String identifier) {
+		String thumbnailUrl = null;
+		String[] split = identifier.split("/");
+		String fileName = split[split.length - 1];
+		for (String identifierForThumbnail : identifiers) {
+            if (identifierForThumbnail.contains("/" + fileName + ".jpg")) {
+                thumbnailUrl = identifierForThumbnail;
+                break;
+            }
+        }
+		return thumbnailUrl;
 	}
 
 	private String getSingleValue(List<JAXBElement<ElementType>> data, String key) {
