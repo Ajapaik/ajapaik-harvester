@@ -74,7 +74,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 	public void updateInfoSystem(InfoSystem infoSystem) {
 		updateConfiguration(infoSystem);
 	}
-	
+
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
@@ -292,14 +292,14 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			
 			synchronized (harvestJobListener) {
 				logger.debug("Syncronized");
-				while(harvestJobListener.hasActiveIndexerJobs()) {
+/*				while(harvestJobListener.hasActiveIndexerJobs()) {
 					logger.debug("Active indexer jobs");
 					try {
 						harvestJobListener.wait();
 					} catch (InterruptedException e) {
 						logger.error("HarvestTask was interrupted: ", e);
 					}
-				}
+				}*/
 			}
 			logger.debug("No more active indexer jobs");
 			
