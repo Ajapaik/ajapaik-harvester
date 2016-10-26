@@ -1,8 +1,8 @@
 package ee.ajapaik.model.search;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serializable;
 
 
 public class RecordView implements Serializable {
@@ -192,11 +192,11 @@ public class RecordView implements Serializable {
 		if(fields.length > 16 && fields[16] != null && !"null".equals(fields[16]))
 			this.date = fields[16];
 		
-		if(fields.length > 17 && fields[17] != null) {
+		if(fields.length > 17 && fields[17] != null && !"null".equals(fields[17])) {
 			this.mediaId = Integer.valueOf(fields[17]);
 		}
 		
-		if(fields.length > 18 && fields[18] != null) {
+		if(fields.length > 18 && fields[18] != null && !"null".equals(fields[18])) {
 			this.mediaOrder = Integer.valueOf(fields[18]);
 		}
 	}
