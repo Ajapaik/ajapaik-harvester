@@ -262,7 +262,7 @@ function search() {
 		},
 		
 		"luceneQuery" : $("#luceneQuery").val() == "" ? null : $("#luceneQuery").val(),
-		"institutionTypes" : [getValue("MUSEUM"), getValue("LIBRARY"), getValue("ARCHIVE"), getValue("ETERA")],
+		"institutionTypes" : [getValue("MUSEUM"), getValue("LIBRARY"), getValue("ARCHIVE"), getValue("ETERA"), getValue("DSPACE")],
 		
 		"pageSize" : 200,
 		"digital" : true
