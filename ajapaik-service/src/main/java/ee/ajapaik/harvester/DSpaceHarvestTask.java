@@ -44,7 +44,7 @@ public class DSpaceHarvestTask extends HarvestTask {
 			if("image".equalsIgnoreCase(type)) {
 				rec.setTitle(getSingleValue(data, "title"));
 				rec.setCreators(getValue(data, "creator"));
-				rec.setUrlToRecord(getSingleValue(data, "relation"));
+				rec.setUrlToRecord(getValues(data, "identifier").get(1));
 				rec.setDates(singletonList(getValues(data, "date").get(2)));
 				rec.setTypes(singletonList(type));
 				rec.setDescription(getSingleValue(data, "description"));
