@@ -112,7 +112,8 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 	private void updateConfiguration(InfoSystem infoSystem) {
 		for (InfoSystem is : getInfoSystems()) {
 			if(is.equals(infoSystem)) {
-				is.setSchedule(infoSystem.getSchedule());				
+				is.setSchedule(infoSystem.getSchedule());
+                is.setLastHarvestTime(infoSystem.getLastHarvestTime());
 				persister.save(is);
 			}
 		}
