@@ -58,7 +58,7 @@ public class DSpaceHarvestTask extends HarvestTask {
 				for (String identifier : identifiers) {
 					if (!identifier.contains(".tif.") && identifier.contains("http") && identifier.contains(".jpg") && !identifier.contains(".jpg.jpg")) {
 						Record clone = rec.clone();
-						Integer mediaId = Integer.valueOf(rec.getId().split(":")[2].split("/")[1]);
+						Integer mediaId = Integer.valueOf(identifier.split("/")[6]);
 						clone.setId(rec.getId() + "_" + mediaId);
 						clone.setImageUrl(identifier);
 						clone.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(identifiers, identifier), repository, taskCode));
