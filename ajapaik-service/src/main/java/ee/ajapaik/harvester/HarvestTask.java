@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=HarvestTask">Kaido Kalda</a>
@@ -260,10 +261,11 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 			repository.deleteRecord(rec.getId(), taskCode);
 			return;
 		}
+		if (isBlank(rec.getImageUrl())) return;
 		
 		rec.setSetSpec(specs);
 		rec.setDateCreated(new Date());
-		
+
 		repository.saveSingleRecord(rec.getId(), rec, taskCode);
 	}
 
