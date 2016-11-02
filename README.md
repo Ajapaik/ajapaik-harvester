@@ -56,7 +56,7 @@ API content type is ```application/json```
 - from – Institution, where record is from. Optional
 - number – Number of Record, ID of institution record
 - luceneQuery - ?
-- institutionTypes – Array. Possible values are: null, "MUSEUM", "LIBRARY"
+- institutionTypes – Array. Possible values are: null, "MUSEUM", "LIBRARY", "DPSACE"
 - pageSize – limits number of record data. Record Ids list length is always up to 10 000 rows and cannot be limited. If not specified, no record views are returned
 - digital - ?
 
