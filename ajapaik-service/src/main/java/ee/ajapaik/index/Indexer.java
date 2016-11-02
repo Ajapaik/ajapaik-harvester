@@ -1,36 +1,12 @@
 package ee.ajapaik.index;
 
-import static ee.ajapaik.index.IndexedFields.CODE;
-import static ee.ajapaik.index.IndexedFields.COLLECTION;
-import static ee.ajapaik.index.IndexedFields.DATE_CREATED;
-import static ee.ajapaik.index.IndexedFields.DESCRIPTION;
-import static ee.ajapaik.index.IndexedFields.DIGITAL;
-import static ee.ajapaik.index.IndexedFields.FROM;
-import static ee.ajapaik.index.IndexedFields.FULL_SEARCH;
-import static ee.ajapaik.index.IndexedFields.ID;
-import static ee.ajapaik.index.IndexedFields.ID_NUMBER;
-import static ee.ajapaik.index.IndexedFields.INSTITUTION_TYPE;
-import static ee.ajapaik.index.IndexedFields.NUMBER;
-import static ee.ajapaik.index.IndexedFields.RECORD_VIEW;
-import static ee.ajapaik.index.IndexedFields.SET_SPEC;
-import static ee.ajapaik.index.IndexedFields.WHAT;
-import static ee.ajapaik.index.IndexedFields.WHERE;
-import static ee.ajapaik.index.IndexedFields.WHO;
-import static ee.ajapaik.index.IndexedFields.YEAR;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import ee.ajapaik.db.RecordHandler;
+import ee.ajapaik.db.Repository;
+import ee.ajapaik.model.search.Record;
+import ee.ajapaik.model.search.RecordView;
+import ee.ajapaik.model.search.SortableField;
+import ee.ajapaik.util.Holder;
+import ee.ajapaik.util.Tracer;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -42,29 +18,20 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.*;
 import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeQuery;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.InitializingBean;
 
-import ee.ajapaik.db.RecordHandler;
-import ee.ajapaik.db.Repository;
-import ee.ajapaik.model.search.Record;
-import ee.ajapaik.model.search.RecordView;
-import ee.ajapaik.model.search.SortableField;
-import ee.ajapaik.util.Digester;
-import ee.ajapaik.util.Holder;
-import ee.ajapaik.util.Tracer;
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static ee.ajapaik.index.IndexedFields.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=Indexer">Kaido Kalda</a>
@@ -85,7 +52,8 @@ public class Indexer implements InitializingBean {
 	private StandardAnalyzer analyzer;
 	private List<IndexSearcher> searchers = new ArrayList<IndexSearcher>();
 	private long updateTimestamp = System.currentTimeMillis();
-	
+	private String muisRepoHash = "fa40b27ef128c8304fc069ed226de8a4";
+
 	public long getUpdateTimestamp() {
 		return updateTimestamp;
 	}
@@ -329,8 +297,8 @@ public class Indexer implements InitializingBean {
 
 		final Holder<Integer> totalCount = new Holder<Integer>();
 		final Map<String, Integer> digitalCount = new HashMap<String, Integer>();
-//		final Map<String, List<Record>> noThumbnail = new HashMap<String, List<Record>>();
-		
+		final List<Record> recordsWithoutImageUrl = new ArrayList<Record>();
+
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
 			
 			@Override
@@ -338,10 +306,9 @@ public class Indexer implements InitializingBean {
 				if(rec != null) {
 					
 					// FIXME: HACK. Clean up database of wrong muis id format
-					if(code.equals("fa40b27ef128c8304fc069ed226de8a4")) {
-						if(!rec.getId().contains("_")) {
-							logger.debug("Wrong MUIS ID format: " + rec.getId() + ". Not indexing.");
-
+					if(code.equals(muisRepoHash)) {
+						if(isBlank(rec.getImageUrl())) {
+							recordsWithoutImageUrl.add(rec);
 							return;
 						}
 					}
@@ -365,8 +332,6 @@ public class Indexer implements InitializingBean {
 						if(rec.getCachedThumbnailUrl().equals("d41d8cd98f00b204e9800998ecf8427e")) {
 							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
 						}
-						
-						//MediaUpdater.updateMediaInfo(repository, code, rec);
 					}
 					
 					try {
@@ -377,6 +342,11 @@ public class Indexer implements InitializingBean {
 				}
 			}
 		});
+
+		for (Record record : recordsWithoutImageUrl) {
+			logger.debug("Deleting record without image from Muis Repo. Record id = " + record.getId() + ", urlToRecord = " + record.getUrlToRecord());
+			repository.deleteRecord(record.getId(), muisRepoHash);
+		}
 		
 		logger.debug("Indexing finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms. Metadata count: " + totalCount + ". Media count: " + digitalCount);
 		
@@ -418,27 +388,6 @@ public class Indexer implements InitializingBean {
 		this.updateTimestamp = System.currentTimeMillis();
 		
 		logger.debug("Index made available @ " + new Date() + ", took: " + (updateTimestamp - start) + " ms");
-		
-//		for (Entry<String, List<Record>> entry : noThumbnail.entrySet()) {
-//			String code = entry.getKey();
-//			List<Record> list = entry.getValue();
-//			for (Record record : list) {
-//				record.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(record.getImageUrl()), repository, code));
-//				
-//				repository.deleteRecord(record.getId(), code);
-//				repository.saveSingleRecord(record.getId(), record, code);
-//			}
-//		}
-	}
-	public static void main(String[] args) {
-		System.out.println(Digester.digestToString("MuIS"));
-	}
-	
-	private String getThumbnailUrl(String image) {
-		if(image != null && image.length() > 0)
-			return image.replaceFirst("museaalImage", "museaalThumbnail");
-		
-		return null;
 	}
 
 	private void rotateIndex() throws CorruptIndexException, IOException {
