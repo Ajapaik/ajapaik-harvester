@@ -20,7 +20,7 @@ public class InfoSystem implements Serializable {
 	private Boolean disableSets;
 	private String metadataPrefix;
 
-	public Boolean getDisableSets() {
+	public Boolean isSetsDisabled() {
 		return disableSets;
 	}
 

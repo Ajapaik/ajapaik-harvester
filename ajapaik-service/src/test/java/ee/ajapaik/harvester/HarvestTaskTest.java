@@ -35,7 +35,7 @@ public class HarvestTaskTest {
     harvestTask.format = "format";
     doNothing().when(harvestTask).iterateRecords(params);
 
-    harvestTask.iterateSet(params, lastHarvest, "setSpecValue");
+    harvestTask.iterateSet("setSpecValue");
 
     verify(harvestTask.logger).debug("Set iterated: setSpecValue");
     assertEquals("setSpecValue", params.get("set"));
@@ -48,7 +48,7 @@ public class HarvestTaskTest {
     Map<String, String> params = new HashMap<String, String>();
     doNothing().when(harvestTask).iterateRecords(params);
 
-    harvestTask.iterateSet(params, null, null);
+    harvestTask.iterateSet(null);
 
     assertFalse(params.containsKey("from"));
   }
@@ -58,7 +58,7 @@ public class HarvestTaskTest {
     Map<String, String> params = new HashMap<String, String>();
     doNothing().when(harvestTask).iterateRecords(params);
 
-    harvestTask.iterateSet(params, null, null);
+    harvestTask.iterateSet(null);
 
     assertFalse(params.containsKey("set"));
   }
@@ -73,13 +73,13 @@ public class HarvestTaskTest {
     }};
     harvestTask.setSets(sets);
     harvestTask.infoSystem = new InfoSystem();
-    doNothing().when(harvestTask).iterateSet(anyMap(), any(Date.class), anyString());
+    doNothing().when(harvestTask).iterateSet(anyString());
 
-    harvestTask.iterateSets(params, lastHarvest);
+    harvestTask.iterateSets();
 
-    verify(harvestTask).iterateSet(params, lastHarvest, "S1");
-    verify(harvestTask).iterateSet(params, lastHarvest, "S2");
-    verify(harvestTask).iterateSet(params, lastHarvest, "S3");
+    verify(harvestTask).iterateSet("S1");
+    verify(harvestTask).iterateSet("S2");
+    verify(harvestTask).iterateSet("S3");
   }
 
   @Test
@@ -95,11 +95,11 @@ public class HarvestTaskTest {
     doThrow(JAXBException.class).when(params).put("set", "S2");
     doNothing().when(harvestTask).iterateRecords(anyMap());
 
-    harvestTask.iterateSets(params, lastHarvest);
+    harvestTask.iterateSets();
 
-    verify(harvestTask).iterateSet(params, lastHarvest, "S1");
-    verify(harvestTask).iterateSet(params, lastHarvest, "S2");
-    verify(harvestTask).iterateSet(params, lastHarvest, "S3");
+    verify(harvestTask).iterateSet("S1");
+    verify(harvestTask).iterateSet("S2");
+    verify(harvestTask).iterateSet("S3");
     verify(harvestTask.logger).error(eq("Error parsing stream"), any(JAXBException.class));
     verify(harvestTask.logger).error("Failed to import set! Set = S2");
     verify(harvestTask.logger).debug("Set iterated: S1");
@@ -119,15 +119,15 @@ public class HarvestTaskTest {
       put("S4", "set4");
     }};
     harvestTask.setSets(sets);
-    doNothing().when(harvestTask).iterateSet(anyMap(), any(Date.class), anyString());
+    doNothing().when(harvestTask).iterateSet(anyString());
 
-    harvestTask.iterateSets(params, lastHarvest);
+    harvestTask.iterateSets();
 
-    verify(harvestTask).iterateSet(params, lastHarvest, "S1");
-    verify(harvestTask).iterateSet(params, lastHarvest, "S3");
-    verify(harvestTask, never()).iterateSet(anyMap(), any(Date.class), eq("S2"));
+    verify(harvestTask).iterateSet("S1");
+    verify(harvestTask).iterateSet("S3");
+    verify(harvestTask, never()).iterateSet(eq("S2"));
     verify(harvestTask.logger).debug("Set ignored: S2");
-    verify(harvestTask, never()).iterateSet(anyMap(), any(Date.class), eq("S4"));
+    verify(harvestTask, never()).iterateSet(eq("S4"));
     verify(harvestTask.logger).debug("Set ignored: S4");
   }
 
@@ -135,10 +135,10 @@ public class HarvestTaskTest {
   public void iterateSets_noSetsDefinedRunsIterateSetOnce() throws IOException, JAXBException {
     harvestTask.infoSystem = new InfoSystem();
     Map<String, String> params = new HashMap<String, String>();
-    doNothing().when(harvestTask).iterateSet(anyMap(), any(Date.class), anyString());
+    doNothing().when(harvestTask).iterateSet(anyString());
 
-    harvestTask.iterateSets(params, lastHarvest);
+    harvestTask.iterateSets();
 
-    verify(harvestTask).iterateSet(params, lastHarvest, null);
+    verify(harvestTask).iterateSet(null);
   }
 }

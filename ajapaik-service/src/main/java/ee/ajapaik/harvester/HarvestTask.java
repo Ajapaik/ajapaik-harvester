@@ -91,7 +91,6 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 
 	@Override
 	protected void executeInternal(JobExecutionContext jobexecutioncontext) throws JobExecutionException {
-		// Register UncaughtExceptionHandler
 		Thread.currentThread().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
@@ -102,41 +101,30 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		Date startDate = new Date();
 		logger.info("Harvester task started @ " + startDate);
 		try {
-			boolean supportsDeleted = isSupportsDeletedRecords();
-			Date lastHarvest = supportsDeleted ? infoSystem.getLastHarvestTime() : null;
-
 			this.format = getSupportedMetadataFormat(infoSystem);
 
-			if(!infoSystem.getDisableSets()) {
+			if(!infoSystem.isSetsDisabled()) {
 				this.sets = loadSets();
 			}
 
 			if (format != null) {
-				HashMap<String, String> params = new HashMap<String, String>();
-				addParameter(params, "metadataPrefix", format);
 
 				// XXX: why to clear?
 				// repository.clearDatabase(taskCode);
 
 				// XXX: set list may change, should clear
 				// old list before update.
-				if(!infoSystem.getDisableSets()) {
+				if(!infoSystem.isSetsDisabled()) {
 					repository.saveSets(sets, taskCode);
 				}
 
                 List<String> setsToUse = infoSystem.getSetsToUse();
 				if (!setsToUse.isEmpty()) {
                     for (String set : setsToUse) {
-                        if (!infoSystem.getDisableSets()) {
-                            addParameter(params, "set", set);
-                        }
-                        if (lastHarvest != null) {
-                            addParameter(params, "from", DATE_FORMAT.format(lastHarvest));
-                        }
-                        iterateRecords(params);
+                       iterateSet(infoSystem.isSetsDisabled() ? null : set);
                     }
 				} else {
-					iterateSets(params, lastHarvest);
+					iterateSets();
 				}
 			}
 
@@ -162,7 +150,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	    return h + "h " + m + "m " + s + "s";
 	}
 
-	private boolean isSupportsDeletedRecords() throws ClientProtocolException, IOException, JAXBException {
+	private boolean supportsDeletedRecords() throws ClientProtocolException, IOException, JAXBException {
 		DeletedRecordType type = executeOperation(IdentifyType.class, null).getDeletedRecord();
 		return !DeletedRecordType.NO.equals(type);
 	}
@@ -193,19 +181,19 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		return sets;
 	}
 
-	void iterateSets(Map<String, String> params, Date lastHarvest) throws ClientProtocolException, IOException {
+	void iterateSets() throws ClientProtocolException, IOException {
 		List<String> setsToIgnore = getSetsToIgnore();
 
 		if (!getSets().isEmpty()) {
 			for (String set : getSets().keySet()) {
 				if (!setsToIgnore.contains(set)) {
-					iterateSet(params, lastHarvest, set);
+					iterateSet(set);
 				} else {
 					logger.debug("Set ignored: " + set);
 				}
 			}
 		} else {
-			iterateSet(params, lastHarvest, null);
+			iterateSet(null);
 		}
 	}
 
@@ -217,8 +205,13 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		return setsToIgnore;
 	}
 
-	void iterateSet(Map<String, String> params, Date lastHarvest, String set) throws ClientProtocolException, IOException {
+	void iterateSet(String set) throws ClientProtocolException, IOException {
 		try {
+            Map<String, String> params = new HashMap<String, String>();
+
+			boolean supportsDeleted = supportsDeletedRecords();
+			Date lastHarvest = supportsDeleted ? infoSystem.getLastHarvestTime() : null;
+
 			logger.debug("Opening set: " + set);
 
 			if (set != null) {
