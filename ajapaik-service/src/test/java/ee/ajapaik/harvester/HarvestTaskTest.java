@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.xml.bind.JAXBException;
@@ -31,41 +32,52 @@ public class HarvestTaskTest {
 
   @Test
   public void iterateSet() throws IOException, JAXBException {
-    Map<String, String> params = new HashMap<String, String>();
     harvestTask.format = "format";
-    doNothing().when(harvestTask).iterateRecords(params);
+    InfoSystem infoSystem = new InfoSystem();
+    infoSystem.setLastHarvestTime(new Date(1479720967));
+    harvestTask.infoSystem = infoSystem;
+    doNothing().when(harvestTask).iterateRecords(anyMap());
+    doReturn(true).when(harvestTask).supportsDeletedRecords();
 
     harvestTask.iterateSet("setSpecValue");
 
     verify(harvestTask.logger).debug("Set iterated: setSpecValue");
+    ArgumentCaptor<Map> captor = ArgumentCaptor.forClass(Map.class);
+    verify(harvestTask).iterateRecords(captor.capture());
+    Map params = captor.getValue();
     assertEquals("setSpecValue", params.get("set"));
     assertEquals("format", params.get("metadataPrefix"));
-    assertEquals("2016-09-18", params.get("from"));
+    assertEquals("1970-01-18", params.get("from"));
   }
 
   @Test
   public void iterateSet_noLastHarvestTime() throws IOException, JAXBException {
-    Map<String, String> params = new HashMap<String, String>();
-    doNothing().when(harvestTask).iterateRecords(params);
+    doNothing().when(harvestTask).iterateRecords(anyMap());
+    doReturn(false).when(harvestTask).supportsDeletedRecords();
 
     harvestTask.iterateSet(null);
 
+    ArgumentCaptor<Map> captor = ArgumentCaptor.forClass(Map.class);
+    verify(harvestTask).iterateRecords(captor.capture());
+    Map params = captor.getValue();
     assertFalse(params.containsKey("from"));
   }
 
   @Test
   public void iterateSet_noSet() throws IOException, JAXBException {
-    Map<String, String> params = new HashMap<String, String>();
-    doNothing().when(harvestTask).iterateRecords(params);
+    doNothing().when(harvestTask).iterateRecords(anyMap());
+    doReturn(false).when(harvestTask).supportsDeletedRecords();
 
     harvestTask.iterateSet(null);
 
+    ArgumentCaptor<Map> captor = ArgumentCaptor.forClass(Map.class);
+    verify(harvestTask).iterateRecords(captor.capture());
+    Map params = captor.getValue();
     assertFalse(params.containsKey("set"));
   }
 
   @Test
   public void iterateSets_multipleSets() throws IOException, JAXBException {
-    Map<String, String> params = new HashMap<String, String>();
     Map<String, String> sets = new HashMap<String, String>() {{
       put("S1", "set1");
       put("S2", "set2");
@@ -84,7 +96,6 @@ public class HarvestTaskTest {
 
   @Test
   public void iterateSets_continuesToNextSetIfIterateSetMethodThrewJAXBExceptionForPreviousSet() throws IOException, JAXBException {
-    Map<String, String> params = spy(new HashMap<String, String>());
     Map<String, String> sets = new HashMap<String, String>() {{
       put("S1", "set1");
       put("S2", "set2");
@@ -92,8 +103,9 @@ public class HarvestTaskTest {
     }};
     harvestTask.setSets(sets);
     harvestTask.infoSystem = new InfoSystem();
-    doThrow(JAXBException.class).when(params).put("set", "S2");
+    doThrow(JAXBException.class).when(harvestTask).addParameter(anyMap(), eq("set"), eq("S2"));
     doNothing().when(harvestTask).iterateRecords(anyMap());
+    doReturn(false).when(harvestTask).supportsDeletedRecords();
 
     harvestTask.iterateSets();
 

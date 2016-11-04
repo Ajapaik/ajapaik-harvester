@@ -150,7 +150,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	    return h + "h " + m + "m " + s + "s";
 	}
 
-	private boolean supportsDeletedRecords() throws ClientProtocolException, IOException, JAXBException {
+	boolean supportsDeletedRecords() throws ClientProtocolException, IOException, JAXBException {
 		DeletedRecordType type = executeOperation(IdentifyType.class, null).getDeletedRecord();
 		return !DeletedRecordType.NO.equals(type);
 	}
@@ -233,7 +233,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		}
 	}
 	
-	private void addParameter(Map<String, String> params, String parameter, String value) {
+	void addParameter(Map<String, String> params, String parameter, String value) {
 		params.put(parameter, value);
 	}
 	
