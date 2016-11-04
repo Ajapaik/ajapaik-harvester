@@ -31,7 +31,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ee.ajapaik.index.IndexedFields.*;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=Indexer">Kaido Kalda</a>
@@ -297,22 +296,12 @@ public class Indexer implements InitializingBean {
 
 		final Holder<Integer> totalCount = new Holder<Integer>();
 		final Map<String, Integer> digitalCount = new HashMap<String, Integer>();
-		final List<Record> recordsWithoutImageUrl = new ArrayList<Record>();
 
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
 			
 			@Override
 			public void handleRecord(Record rec, String code) {
 				if(rec != null) {
-					
-					// FIXME: HACK. Clean up database of wrong muis id format
-					if(code.equals(muisRepoHash)) {
-						if(isBlank(rec.getImageUrl())) {
-							recordsWithoutImageUrl.add(rec);
-							return;
-						}
-					}
-					
 					totalCount.setValue(totalCount.getValue() != null ? totalCount.getValue() + 1 : 1);
 					
 					if(totalCount.getValue() % 1000 == 0) {
@@ -343,11 +332,6 @@ public class Indexer implements InitializingBean {
 			}
 		});
 
-		for (Record record : recordsWithoutImageUrl) {
-			logger.debug("Deleting record without image from Muis Repo. Record id = " + record.getId() + ", urlToRecord = " + record.getUrlToRecord());
-			repository.deleteRecord(record.getId(), muisRepoHash);
-		}
-		
 		logger.debug("Indexing finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms. Metadata count: " + totalCount + ". Media count: " + digitalCount);
 		
 		start = System.currentTimeMillis();
