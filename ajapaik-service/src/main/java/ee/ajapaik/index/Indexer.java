@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ee.ajapaik.index.IndexedFields.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=Indexer">Kaido Kalda</a>
@@ -302,6 +303,14 @@ public class Indexer implements InitializingBean {
 			@Override
 			public void handleRecord(Record rec, String code) {
 				if(rec != null) {
+					
+					// FIXME: HACK. Clean up database of wrong muis id format
+					if(code.equals(muisRepoHash) && isBlank(rec.getImageUrl())) {
+						logger.debug("Deleting record without image from Muis Repo. Record id = " + rec.getId() + ", urlToRecord = " + rec.getUrlToRecord());
+						repository.deleteRecord(rec.getId(), muisRepoHash);
+						return;
+					}
+					
 					totalCount.setValue(totalCount.getValue() != null ? totalCount.getValue() + 1 : 1);
 					
 					if(totalCount.getValue() % 1000 == 0) {
