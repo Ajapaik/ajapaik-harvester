@@ -1,24 +1,14 @@
 package ee.ajapaik.db;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.sleepycat.je.*;
+import ee.ajapaik.model.search.Record;
+import ee.ajapaik.serialize.Serializer;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.sleepycat.je.Cursor;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
-
-import ee.ajapaik.model.search.Record;
-import ee.ajapaik.serialize.Serializer;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=Repository">Kaido Kalda</a>
@@ -280,7 +270,7 @@ public class Repository implements InitializingBean {
 			}
 		}
 		if(logger.isDebugEnabled())
-			logger.debug("Record saved in " + (System.nanoTime() - start) / 1000000D + " ms");
+			logger.debug("Record(" + data.getId() + ") saved in " + (System.nanoTime() - start) / 1000000D + " ms");
 	}
 	
 	public void saveSets(Map<String, String> sets, String code) {
