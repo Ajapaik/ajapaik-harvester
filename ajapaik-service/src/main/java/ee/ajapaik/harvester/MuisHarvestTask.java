@@ -1,5 +1,19 @@
 package ee.ajapaik.harvester;
 
+import ee.ajapaik.model.search.InstitutionType;
+import ee.ajapaik.model.search.Record;
+import ee.ajapaik.util.IOHandler;
+import ee.ajapaik.util.JaxbUtil;
+import ee.ajapaik.xml.MediaHandler;
+import org.apache.http.ProtocolException;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
+import org.openarchives.oai._2.HeaderType;
+import org.openarchives.oai._2.MetadataType;
+import org.openarchives.oai._2.RecordType;
+import org.xml.sax.InputSource;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -10,22 +24,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.http.ProtocolException;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.openarchives.oai._2.HeaderType;
-import org.openarchives.oai._2.MetadataType;
-import org.openarchives.oai._2.RecordType;
-import org.xml.sax.InputSource;
-
-import ee.ajapaik.model.search.InstitutionType;
-import ee.ajapaik.model.search.Record;
-import ee.ajapaik.util.IOHandler;
-import ee.ajapaik.util.JaxbUtil;
-import ee.ajapaik.xml.MediaHandler;
-
 public class MuisHarvestTask extends HarvestTask {
 
 	@Override
@@ -33,7 +31,7 @@ public class MuisHarvestTask extends HarvestTask {
 		Record rec = new Record();
 		HeaderType header = recordType.getHeader();
 		rec.setId(header.getIdentifier());
-		
+
 		List<String> collections = new ArrayList<String>();
 		List<String> setSpec = header.getSetSpec();
 		for (String collection : setSpec) {
@@ -110,7 +108,7 @@ public class MuisHarvestTask extends HarvestTask {
 				if (medias != null && medias.size() > 0) {
 					for (int i = 0; i < medias.size(); i++) {
 						String url = medias.get(i);
-						Integer mediaId = getMediaId(medias.get(0));
+						Integer mediaId = getMediaId(medias.get(i));
 
 						Record cloned = rec.clone();
 						cloned.setId(rec.getId() + "_" + mediaId);
