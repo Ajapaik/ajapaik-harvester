@@ -53,15 +53,15 @@ public class DSpaceHarvestTask extends HarvestTask {
 				rec.setProviderName(infoSystem.getName());
 				rec.setInstitutionType(DSPACE);
 
-				List<String> identifiers = getValues(data, "identifier");
+				List<String> images = getImages(data);
 				int mediaOrder = 0;
-				for (String identifier : identifiers) {
-					if (!identifier.contains(".tif.") && identifier.contains("http") && identifier.contains(".jpg") && !identifier.contains(".jpg.jpg")) {
+				for (String image : images) {
+					if (!isThumbnail(image)) {
 						Record clone = rec.clone();
-						Integer mediaId = Integer.valueOf(identifier.split("/")[6]);
+						Integer mediaId = Integer.valueOf(image.split("/")[6]);
 						clone.setId(rec.getId() + "_" + mediaId);
-						clone.setImageUrl(identifier);
-						clone.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(identifiers, identifier), repository, taskCode));
+						clone.setImageUrl(image);
+						clone.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(images, image), repository, taskCode));
 						clone.setMediaId(mediaId);
 						clone.setMediaOrder(mediaOrder++);
 						save(clone, recordType.getHeader().getSetSpec());
@@ -72,17 +72,19 @@ public class DSpaceHarvestTask extends HarvestTask {
 		return null;
 	}
 
+	private boolean isThumbnail(String image) {
+		return image.endsWith(".jpg.jpg");
+	}
+
 	private String getThumbnailUrl(List<String> identifiers, String identifier) {
-		String thumbnailUrl = null;
 		String[] split = identifier.split("/");
-		String fileName = split[split.length - 1];
+		String thumbnailUrlEnding = "/" + split[split.length - 1] + ".jpg";
 		for (String identifierForThumbnail : identifiers) {
-            if (identifierForThumbnail.contains("/" + fileName + ".jpg")) {
-                thumbnailUrl = identifierForThumbnail;
-                break;
+            if (identifierForThumbnail.endsWith(thumbnailUrlEnding)) {
+                return identifierForThumbnail;
             }
         }
-		return thumbnailUrl;
+		return null;
 	}
 
 	private String getSingleValue(List<JAXBElement<ElementType>> data, String key) {
@@ -116,6 +118,24 @@ public class DSpaceHarvestTask extends HarvestTask {
 			}
 		}
 		return result;
+	}
+
+	private List<String> getImages(List<JAXBElement<ElementType>> data) {
+		List<String> result = new ArrayList<String>();
+		for (JAXBElement<ElementType> jaxbElement : data) {
+			List<String> contents = getContent(jaxbElement);
+			if (contents.size() < 1) continue;
+			String content = contents.get(0);
+
+			if("identifier".equals(jaxbElement.getName().getLocalPart()) && isImage(content)) {
+				result.add(content);
+			}
+		}
+		return result;
+	}
+
+	private boolean isImage(String content) {
+		return !content.contains(".tif") && content.startsWith("http") && content.endsWith(".jpg");
 	}
 
 	private List<String> getContent(JAXBElement<ElementType> jaxbElement) {
