@@ -204,8 +204,12 @@ public class RecordView implements Serializable {
 		if(fields.length > 18 && fields[18] != null && !"null".equals(fields[18])) {
 			this.mediaOrder = Integer.valueOf(fields[18]);
 		}
-		this.latitude = fields[19];
-		this.longitude = fields[20];
+		if (fields.length > 19) {
+			this.latitude = fields[19];
+		}
+		if (fields.length > 20) {
+			this.longitude = fields[20];
+		}
 	}
 
 	@JsonIgnore

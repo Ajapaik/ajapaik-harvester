@@ -23,7 +23,6 @@ public class DSpaceHarvestTask extends HarvestTask {
 	@SuppressWarnings("unchecked")
 	protected Record mapRecord(RecordType recordType) {
 		HeaderType header = recordType.getHeader();
-        if(!header.getIdentifier().contains("oai:dspace.ut.ee:10062/41102")) return null;
 		MetadataType metadata = recordType.getMetadata();
 		
 		List<String> institutions = new ArrayList<String>();
