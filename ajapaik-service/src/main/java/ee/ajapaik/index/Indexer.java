@@ -42,7 +42,7 @@ public class Indexer implements InitializingBean {
 
 	private static final String ACTIVE = "active";
 	private static final String AVAILABLE = "available";
-	
+
 	private String indexDirectory;
 	private Repository repository;
 
@@ -142,7 +142,9 @@ public class Indexer implements InitializingBean {
 		addField(doc, WHO, rec.getCreators());
 		addField(doc, INSTITUTION_TYPE, rec.getInstitutionType());
 		addField(doc, COLLECTION, rec.getCollections());
-		
+		addField(doc, LATITUDE, rec.getLatitude());
+		addField(doc, LONGITUDE, rec.getLongitude());
+
 		RecordView recordView = rec.getRecordView();
 		if(rec.getDates() != null) {
 			recordView.setDate(rec.getDates().toString());

@@ -33,12 +33,15 @@ public class RecordView implements Serializable {
 	private Integer mediaId;
 	private Integer mediaOrder;
 
+	private String latitude;
+	private String longitude;
+
 	public RecordView(String creators, String identifyingNumber, String title,
-			String description, String types, String materials,
-			String collections, String institution, String urlToRecord,
-			String providerHomepageUrl, String cachedThumbnailUrl,
-			String imageUrl, InstitutionType institutionType, String id, 
-			String providerName, Integer mediaId, Integer mediaOrder) {
+					  String description, String types, String materials,
+					  String collections, String institution, String urlToRecord,
+					  String providerHomepageUrl, String cachedThumbnailUrl,
+					  String imageUrl, InstitutionType institutionType, String id,
+					  String providerName, Integer mediaId, Integer mediaOrder, String latitude, String longitude) {
 		super();
 		this.creators = notNull(creators);
 		this.identifyingNumber = notNull(identifyingNumber);
@@ -57,6 +60,8 @@ public class RecordView implements Serializable {
 		this.providerName = notNull(providerName);
 		this.mediaId = mediaId;
 		this.mediaOrder = mediaOrder;
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
 	public String getProviderName() {
@@ -199,6 +204,8 @@ public class RecordView implements Serializable {
 		if(fields.length > 18 && fields[18] != null && !"null".equals(fields[18])) {
 			this.mediaOrder = Integer.valueOf(fields[18]);
 		}
+		this.latitude = fields[19];
+		this.longitude = fields[20];
 	}
 
 	@JsonIgnore
@@ -229,7 +236,9 @@ public class RecordView implements Serializable {
 		sb.append(imageUrl).append(seprator);
 		sb.append(date).append(seprator);
 		sb.append(mediaId).append(seprator);
-		sb.append(mediaOrder);
+		sb.append(mediaOrder).append(seprator);
+		sb.append(latitude).append(seprator);
+		sb.append(longitude);
 
 		return sb.toString();
 	}
@@ -282,5 +291,21 @@ public class RecordView implements Serializable {
 
 	public void setMediaOrder(Integer mediaOrder) {
 		this.mediaOrder = mediaOrder;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
 	}
 }

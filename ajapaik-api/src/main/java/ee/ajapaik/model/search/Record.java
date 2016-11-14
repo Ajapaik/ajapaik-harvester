@@ -32,6 +32,8 @@ public class Record implements Serializable, Cloneable {
 	private Date dateCreated;
 	private Integer mediaId;
 	private Integer mediaOrder;
+	private String latitude;
+	private String longitude;
 
 	public String getCreatorsAsString() {
 		if (creators == null)
@@ -142,7 +144,7 @@ public class Record implements Serializable, Cloneable {
 	public List<String> getPlaces() {
 		return places;
 	}
-	
+
 	public void setPlaces(List<String> places) {
 		this.places = places;
 	}
@@ -155,7 +157,7 @@ public class Record implements Serializable, Cloneable {
 		this.dates = dates;
 	}
 
-	
+
 
 	public List<String> getCollections() {
 		return collections;
@@ -227,44 +229,46 @@ public class Record implements Serializable, Cloneable {
 		}
 		if(description.startsWith(", "))
 			description = description.substring(1);
-		
+
 	}
 	private String notNull(String s){
 		return s==null?"":s;
 	}
-	
+
 	public RecordView getRecordView(){
 		return new RecordView(
-				getCreatorsAsString(), 
-				identifyingNumber, 
-				title, 
-				description, 
-				getTypesAsString(), 
-				getMaterialsAsString(), 
-				getCollectionsAsString(), 
-				getInstitutionsAsString(), 
-				urlToRecord, 
-				providerHomepageUrl, 
-				cachedThumbnailUrl, 
-				imageUrl, 
-				institutionType, 
-				id, 
+				getCreatorsAsString(),
+				identifyingNumber,
+				title,
+				description,
+				getTypesAsString(),
+				getMaterialsAsString(),
+				getCollectionsAsString(),
+				getInstitutionsAsString(),
+				urlToRecord,
+				providerHomepageUrl,
+				cachedThumbnailUrl,
+				imageUrl,
+				institutionType,
+				id,
 				getProviderName(),
 				mediaId,
-				mediaOrder);
+				mediaOrder,
+				latitude,
+				longitude);
 	}
 
 	public void setSetSpec(List<String> setSpec) {
 		this.setSpec = setSpec;
 	}
-	
+
 	public List<String> getSetSpec() {
 		return setSpec;
 	}
 	public void setDateCreated(Date date) {
 		this.dateCreated = date;
 	}
-	
+
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -272,39 +276,55 @@ public class Record implements Serializable, Cloneable {
 	public void addInstitution(String institution) {
 		if(institutions == null)
 			institutions = new ArrayList<String>();
-		institutions.add(institution);		
+		institutions.add(institution);
 	}
-	
+
 	public String getCachedThumbnailUrl() {
 		return cachedThumbnailUrl;
 	}
 	public void setCachedThumbnailUrl(String cachedThumbnailUrl) {
 		this.cachedThumbnailUrl = cachedThumbnailUrl;
 	}
-	
+
 	public String getImageUrl() {
 		return imageUrl;
 	}
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
-	
+
 	public Integer getMediaId() {
 		return mediaId;
 	}
-	
+
 	public void setMediaId(Integer mediaId) {
 		this.mediaId = mediaId;
 	}
-	
+
 	public Integer getMediaOrder() {
 		return mediaOrder;
 	}
-	
+
 	public void setMediaOrder(Integer mediaOrder) {
 		this.mediaOrder = mediaOrder;
 	}
-	
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+
 	@Override
 	public Record clone() {
 		try {

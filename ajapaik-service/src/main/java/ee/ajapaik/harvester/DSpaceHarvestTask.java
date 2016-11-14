@@ -23,6 +23,7 @@ public class DSpaceHarvestTask extends HarvestTask {
 	@SuppressWarnings("unchecked")
 	protected Record mapRecord(RecordType recordType) {
 		HeaderType header = recordType.getHeader();
+        if(!header.getIdentifier().contains("oai:dspace.ut.ee:10062/41102")) return null;
 		MetadataType metadata = recordType.getMetadata();
 		
 		List<String> institutions = new ArrayList<String>();
@@ -52,6 +53,7 @@ public class DSpaceHarvestTask extends HarvestTask {
 				rec.setProviderHomepageUrl(infoSystem.getHomepageUrl());
 				rec.setProviderName(infoSystem.getName());
 				rec.setInstitutionType(DSPACE);
+				setCoordinates(rec, data);
 
 				List<String> images = getImages(data);
 				int mediaOrder = 0;
@@ -70,6 +72,16 @@ public class DSpaceHarvestTask extends HarvestTask {
 			}
 		}
 		return null;
+	}
+
+	private void setCoordinates(Record rec, List<JAXBElement<ElementType>> data) {
+        String coordinates = getSingleValue(data, "coverage");
+        if (coordinates == null) return;
+        String[] latAndLong = coordinates.split(",");
+        if (latAndLong.length == 2) {
+			rec.setLatitude(latAndLong[0]);
+			rec.setLongitude(latAndLong[1]);
+		}
 	}
 
 	private boolean isThumbnail(String image) {
