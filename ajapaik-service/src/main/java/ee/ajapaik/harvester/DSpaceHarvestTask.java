@@ -45,16 +45,15 @@ public class DSpaceHarvestTask extends HarvestTask {
 				rec.setTitle(getSingleValue(data, "title"));
 				rec.setCreators(getValue(data, "creator"));
 				rec.setUrlToRecord(getValues(data, "identifier").get(1));
-				rec.setDates(singletonList(getValues(data, "date").get(2)));
 				rec.setTypes(singletonList(type));
 				rec.setDescription(getSingleValue(data, "description"));
 				rec.setIdentifyingNumber(getSingleValue(data, "identifier"));
 				rec.setProviderHomepageUrl(infoSystem.getHomepageUrl());
 				rec.setProviderName(infoSystem.getName());
 				rec.setInstitutionType(DSPACE);
-				setCoordinates(rec, data);
+                addDatesAndCoordinates(rec, data);
 
-				List<String> images = getImages(data);
+                List<String> images = getImages(data);
 				int mediaOrder = 0;
 				for (String image : images) {
 					if (!isThumbnail(image)) {
@@ -73,15 +72,28 @@ public class DSpaceHarvestTask extends HarvestTask {
 		return null;
 	}
 
-	private void setCoordinates(Record rec, List<JAXBElement<ElementType>> data) {
-        String coordinates = getSingleValue(data, "coverage");
-        if (coordinates == null) return;
-        String[] latAndLong = coordinates.split(",");
-        if (latAndLong.length == 2) {
-			rec.setLatitude(latAndLong[0]);
-			rec.setLongitude(latAndLong[1]);
-		}
-	}
+    private void addDatesAndCoordinates(Record rec, List<JAXBElement<ElementType>> data) {
+        List<String> dates = new ArrayList<String>();
+        dates.add(getValues(data, "date").get(2));
+        List<String> coverage = getValues(data, "coverage");
+        for (String param : coverage) {
+            String[] latAndLong = param.split(",");
+            if (isCoordinate(latAndLong)) {
+                rec.setLatitude(latAndLong[0]);
+                rec.setLongitude(latAndLong[1]);
+                continue;
+            }
+            if (param.startsWith("[") && param.endsWith("]")) {
+                param = param.substring(1, param.length()-1);
+            }
+            dates.add(param);
+        }
+        rec.setDates(dates);
+    }
+
+    private boolean isCoordinate(String[] latAndLong) {
+        return latAndLong.length == 2 && latAndLong[0].contains(".") && latAndLong[1].contains(".");
+    }
 
 	private boolean isThumbnail(String image) {
 		return image.endsWith(".jpg.jpg");
