@@ -5,7 +5,6 @@ import ee.ajapaik.model.InfoSystem;
 import ee.ajapaik.model.search.Record;
 import ee.ajapaik.util.Digester;
 import ee.ajapaik.util.FilteredInputStreamReader;
-import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.MonitorableBufferedInputStream;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -32,6 +30,7 @@ import java.util.Map.Entry;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.http.client.fluent.Request.Get;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=HarvestTask">Kaido Kalda</a>
@@ -349,10 +348,8 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 	}
 
 	@SuppressWarnings("unchecked")
-	private JAXBElement<OAIPMHtype> getResponse(String operation, Listener listener) throws ClientProtocolException, IOException, JAXBException {
-		URL url = new URL(operation);
-		
-		InputStream is = IOHandler.openStream(url);
+	private JAXBElement<OAIPMHtype> getResponse(String operationUrl, Listener listener) throws ClientProtocolException, IOException, JAXBException {
+		InputStream is = Get(operationUrl).connectTimeout(5000).execute().returnContent().asStream();
 
 		if (is != null) {
 			MonitorableBufferedInputStream bis = null;
