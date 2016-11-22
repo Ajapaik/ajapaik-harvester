@@ -1,21 +1,13 @@
 package ee.ajapaik.persist;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
-
-import ee.ajapaik.model.InfoSystem;
-import ee.ajapaik.util.Digester;
 
 public class SerializingPersister implements InitializingBean {
 	
@@ -151,29 +143,5 @@ public class SerializingPersister implements InitializingBean {
 				logger.error("Error while closing stream: " + e); 
 			}
 		}
-	}
-	
-	
-	public static void main(String[] args) throws Exception {
-		
-		System.out.println(Digester.digestToString("ETERA"));
-		
-		SerializingPersister sp = new SerializingPersister();
-		sp.setFileName("data.ser.ajapaik");
-		sp.setLocation("/home/kaido/git/repo/ajapaik/ajapaik-parent");
-		
-		sp.afterPropertiesSet();
-		
-		List<Object> x = sp.map.get("ee.ajapaik.model.InfoSystem");
-		for (Object object : x) {
-			InfoSystem is = (InfoSystem) object;
-			if(is.getName().equals("ETERA")) {
-				is.setLastHarvestTime(null);
-			}
-		}
-		
-		sp.persist();
-		
-		return;
 	}
 }
