@@ -19,5 +19,6 @@ public enum IndexedFields {
 	SET_SPEC,
 	DATE_CREATED,
 	LATITUDE,
-	LONGITUDE
+	LONGITUDE,
+	COLLECTION_TYPE
 }

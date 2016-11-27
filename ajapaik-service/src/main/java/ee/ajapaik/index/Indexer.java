@@ -144,6 +144,7 @@ public class Indexer implements InitializingBean {
 		addField(doc, COLLECTION, rec.getCollections());
 		addField(doc, LATITUDE, rec.getLatitude());
 		addField(doc, LONGITUDE, rec.getLongitude());
+		addField(doc, COLLECTION_TYPE, rec.getCollectionType());
 
 		RecordView recordView = rec.getRecordView();
 		if(rec.getDates() != null) {

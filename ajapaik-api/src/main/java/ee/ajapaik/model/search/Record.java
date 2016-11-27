@@ -34,6 +34,7 @@ public class Record implements Serializable, Cloneable {
 	private Integer mediaOrder;
 	private String latitude;
 	private String longitude;
+	private CollectionType collectionType;
 
 	public String getCreatorsAsString() {
 		if (creators == null)
@@ -323,6 +324,14 @@ public class Record implements Serializable, Cloneable {
 
 	public void setLongitude(String longitude) {
 		this.longitude = longitude;
+	}
+
+	public CollectionType getCollectionType() {
+		return collectionType;
+	}
+
+	public void setCollectionType(CollectionType collectionType) {
+		this.collectionType = collectionType;
 	}
 
 	@Override
