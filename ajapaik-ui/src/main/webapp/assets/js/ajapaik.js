@@ -262,7 +262,7 @@ function search() {
 		},
 		
 		"luceneQuery" : $("#luceneQuery").val() == "" ? null : $("#luceneQuery").val(),
-		"collectionTypes" :  [getValue("PHOTOS"), getValue("PAINTINGS"), getValue("GRAPHIC_ART")],
+		"collectionTypes" :  [getValue("PHOTOS"), getValue("PAINTINGS"), getValue("GRAPHIC_ART"), getValue("PERSONA")],
 		"institutionTypes" : [getValue("MUSEUM"), getValue("LIBRARY"), getValue("ARCHIVE"), getValue("ETERA"), getValue("DSPACE")],
 		
 		"pageSize" : 200,

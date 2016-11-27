@@ -62,6 +62,17 @@
 						<prop key="collectionType">GRAPHIC_ART</prop>
 					</props>
 				</entry>
+				<entry key="MuIS_persona">
+					<props>
+						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
+						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
+						<prop key="email">muis@muis.ee</prop>
+						<prop key="homepageUrl">http://www.muis.ee</prop>
+						<prop key="setsToUse">EKM:AE,EKM:KR,EKM:Mi</prop>
+						<prop key="schedule">0 0 18 6/20 * ?</prop>
+						<prop key="collectionType">PERSONA</prop>
+					</props>
+				</entry>
 				<entry key="NLIB">
 					<props>
 						<prop key="address">http://repox.nlib.ee:8080/repox/OAIHandler</prop>
