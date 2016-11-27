@@ -136,7 +136,11 @@ public class Search implements Serializable {
 
 	public String getSearchPhrase() {
 		if(luceneQuery != null) {
-			return (luceneQuery + getInstitutions() + getCollectionTypesForQuery()).trim();
+			String phrase = luceneQuery + getInstitutions();
+			if (collectionTypes != null && !collectionTypes.isEmpty()) {
+				(phrase += getCollectionTypesForQuery()).trim();
+			}
+			return phrase;
 		} else {
 			String phrase = "";
 			if (fullSearch != null && fullSearch.getValue() != null
@@ -167,7 +171,11 @@ public class Search implements Serializable {
 			if (phrase.startsWith(" "))
 				phrase = phrase.substring(1);
 
-			return (phrase + getInstitutions() + getCollectionTypesForQuery()).trim();
+			phrase += getInstitutions();
+			if (collectionTypes != null && !collectionTypes.isEmpty()) {
+				(phrase += getCollectionTypesForQuery()).trim();
+			}
+			return phrase;
 		}
 	}
 
