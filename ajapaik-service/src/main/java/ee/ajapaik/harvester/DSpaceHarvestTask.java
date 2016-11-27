@@ -51,6 +51,7 @@ public class DSpaceHarvestTask extends HarvestTask {
 				rec.setProviderHomepageUrl(infoSystem.getHomepageUrl());
 				rec.setProviderName(infoSystem.getName());
 				rec.setInstitutionType(DSPACE);
+				rec.setCollectionType(infoSystem.getCollectionType());
                 addDatesAndCoordinates(rec, data);
 
                 List<String> images = getImages(data);

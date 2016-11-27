@@ -1,13 +1,11 @@
 package ee.ajapaik.harvester;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.JAXBElement;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ee.ajapaik.model.Page;
+import ee.ajapaik.model.Pages;
+import ee.ajapaik.model.search.InstitutionType;
+import ee.ajapaik.model.search.Record;
+import ee.ajapaik.util.IOHandler;
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.MetadataType;
 import org.openarchives.oai._2.RecordType;
@@ -15,13 +13,12 @@ import org.openarchives.oai._2_0.oai_dc.OaiDcType;
 import org.purl.dc.elements._1.ElementType;
 import org.purl.dc.elements._1.SimpleLiteral;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ee.ajapaik.model.Page;
-import ee.ajapaik.model.Pages;
-import ee.ajapaik.model.search.Record;
-import ee.ajapaik.model.search.InstitutionType;
-import ee.ajapaik.util.IOHandler;
+import javax.xml.bind.JAXBElement;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ETERAHarvestTask extends HarvestTask {
 	
@@ -43,6 +40,7 @@ public class ETERAHarvestTask extends HarvestTask {
 		rec.setDeleted(metadata == null);
 
 		rec.setInstitutionType(InstitutionType.LIBRARY);
+		rec.setCollectionType(infoSystem.getCollectionType());
 		
 		if (!rec.isDeleted()) {
 			OaiDcType any = ((JAXBElement<OaiDcType>) metadata.getAny()).getValue();

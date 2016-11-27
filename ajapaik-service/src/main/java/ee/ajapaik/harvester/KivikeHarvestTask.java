@@ -1,12 +1,6 @@
 package ee.ajapaik.harvester;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.JAXBElement;
-
+import ee.ajapaik.model.search.Record;
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.MetadataType;
 import org.openarchives.oai._2.RecordType;
@@ -14,7 +8,11 @@ import org.openarchives.oai._2_0.oai_dc.OaiDcType;
 import org.purl.dc.elements._1.ElementType;
 import org.purl.dc.elements._1.SimpleLiteral;
 
-import ee.ajapaik.model.search.Record;
+import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class KivikeHarvestTask extends HarvestTask {
 
@@ -34,6 +32,7 @@ public class KivikeHarvestTask extends HarvestTask {
 		institutions.add(infoSystem.getName());
 		
 		rec.setInstitutions(institutions);
+		rec.setCollectionType(infoSystem.getCollectionType());
 		
 		MetadataType metadata = recordType.getMetadata();
 		rec.setDeleted(metadata == null);

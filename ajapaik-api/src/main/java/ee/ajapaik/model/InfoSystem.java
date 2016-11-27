@@ -1,5 +1,7 @@
 package ee.ajapaik.model;
 
+import ee.ajapaik.model.search.CollectionType;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +21,7 @@ public class InfoSystem implements Serializable {
 	private String ignoreSet;
 	private Boolean disableSets;
 	private String metadataPrefix;
+	private CollectionType collectionType;
 
 	public Boolean isSetsDisabled() {
 		return disableSets;
@@ -126,5 +129,13 @@ public class InfoSystem implements Serializable {
 
 	public void setMetadataPrefix(String metadataPrefix) {
 		this.metadataPrefix = metadataPrefix;
+	}
+
+	public CollectionType getCollectionType() {
+		return collectionType;
+	}
+
+	public void setCollectionType(CollectionType collectionType) {
+		this.collectionType = collectionType;
 	}
 }

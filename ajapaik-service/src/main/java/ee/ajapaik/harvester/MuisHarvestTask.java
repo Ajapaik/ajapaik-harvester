@@ -1,6 +1,5 @@
 package ee.ajapaik.harvester;
 
-import ee.ajapaik.model.search.CollectionType;
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
 import ee.ajapaik.util.IOHandler;
@@ -95,7 +94,7 @@ public class MuisHarvestTask extends HarvestTask {
 			rec.setProviderHomepageUrl(infoSystem.getHomepageUrl());
 			rec.setProviderName(infoSystem.getName());
 			rec.setInstitutionType(InstitutionType.MUSEUM);
-			rec.setCollectionType(CollectionType.PHOTOS);
+			rec.setCollectionType(infoSystem.getCollectionType());
 
 			String thumbnailUrl = jaxbUtil.getValue(eseRec, "object");
 			if(thumbnailUrl != null) {

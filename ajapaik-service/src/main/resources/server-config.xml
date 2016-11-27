@@ -37,6 +37,29 @@
 						<prop key="homepageUrl">http://www.muis.ee</prop>
 						<prop key="setsToUse">AM:FT,AM:FT:Dg,AM:FT:F,AM:FT:N,AT:F,CRJM:F,DrKM:F,EAM:Fk,EKM:FK,EMM:F,EMM:F:D,EPM:FP,EPiM:FK,ERM:Fk,ERM:HM:Fk,ERM:PM:Fk,ERM:TM:Fk,ESM:F,ETDM:F,ETMM:Df,ETMM:F,ETMM:T 429::T 429:2/,EVM:F,EpM:F,HKM:F,HMK:F,HM:F,HM:F:Ff,HM:F:Fn,HM:F:Fn:Fn-k,HM:F:Fn:Fn-p,HM:S:S3,HM:S:SF,IM:F,JKM:F,JSM:F,JÖM:F,KLM:F,KLM:F:FA,KLM:F:FAA,KLM:F:FD,KLM:F:FN,KLM:F:FNK,KLM:F:FP,KLM:F:FR,KLM:F:FS,KMM:F,LM:Fo,MF:F,MM:F,MM:F:DiF,MTM:F,MT:F,NLM:F,NLM:KMM:KMM F,OSM:F,PAL:F,PM:F,PTM:F,PäMu:F,RM:F,RM:F:Fn,RdtM:F,RdtM:F:Fd,RdtM:F:Ff,RdtM:F:Fn,RrM:F,SM:Fo,SM:Fo:F,SM:Fo:Fd,SM:Fo:Fkl,SM:Fo:Fn,STM :SSM:F_SSM,STM:F,THM:F,TKM:F,TLM:ATM:ATMF,TLM:Df,TLM:EVM:EVMF,TLM:FG,TLM:FG:F,TLM:FG:Fd,TLM:FG:Fn,TLM:KF,TLM:VM:VM F,TLM:VM:VM Fd,TLÜM:F,TM LM :F,TM:F,TPM:F,TTM:F,TTM:F:Fd,TTÜM:F,TaM:F,TaM:F:Fa,TaM:F:Fs,UKM:F,UTKK:F,VK:F,VMM:F,VM:F,VaM:F.,ÜAM:F,RM:F:Fn,RdtM:F:Fn,SM:Fo:Fkl,SM:Fo:Fn,TKM:N,TLM:FG:Fn,TLM:VM:VM Fn,TTÜM:N</prop>
 						<prop key="schedule">0 0 18 1/16 * ?</prop>
+                        <prop key="collectionType">PHOTOS</prop>
+					</props>
+				</entry>
+				<entry key="MuIS_paintings">
+					<props>
+						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
+						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
+						<prop key="email">muis@muis.ee</prop>
+						<prop key="homepageUrl">http://www.muis.ee</prop>
+						<prop key="setsToUse">EKM:M,EKM:VM,KMM:MA,TKM:A,TKM:M</prop>
+						<prop key="schedule">0 0 18 4/18 * ?</prop>
+						<prop key="collectionType">PAINTINGS</prop>
+					</props>
+				</entry>
+				<entry key="MuIS_graphics">
+					<props>
+						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
+						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
+						<prop key="email">muis@muis.ee</prop>
+						<prop key="homepageUrl">http://www.muis.ee</prop>
+						<prop key="setsToUse">EKM:G,EKM:VG,KMM:GR,KMM:JO,TKM:ASM:ASM B,TKM:B,TKM:C,TKM:E,TKM:G,TKM:H</prop>
+						<prop key="schedule">0 0 18 5/19 * ?</prop>
+						<prop key="collectionType">GRAPHIC_ART</prop>
 					</props>
 				</entry>
 				<entry key="NLIB">
@@ -47,6 +70,7 @@
 						<prop key="email">nlib@nlib.ee</prop>
 						<prop key="homepageUrl">http://www.nlib.ee</prop>
 						<prop key="schedule">0 0 0 2/16 * ?</prop>
+						<prop key="collectionType">PHOTOS</prop>
 					</props>
 				</entry>
 				<entry key="MKA">
@@ -57,6 +81,7 @@
 						<prop key="ignoreSet">rehemaja</prop>
 						<prop key="homepageUrl">http://register.muinas.ee</prop>
 						<prop key="schedule">0 0 0 3/17 * ?</prop>
+						<prop key="collectionType">PHOTOS</prop>
 					</props>
 				</entry>
 				 
@@ -69,6 +94,7 @@
 						<prop key="schedule">0 25 19 16 * ?</prop>
 						<prop key="disableSets">true</prop>
 						<prop key="setsToUse">none</prop>
+						<prop key="collectionType">PHOTOS</prop>
 					</props>
 				</entry>				
 
@@ -81,6 +107,7 @@
 						<prop key="schedule">0 30 21 25 * ?</prop>
 						<prop key="setsToUse">col_10062_34121,col_10062_223</prop>
 						<prop key="metadataPrefix">est_dc</prop>
+						<prop key="collectionType">PHOTOS</prop>
 					</props>
 				</entry>
 
@@ -92,6 +119,7 @@
 						<prop key="email">kivike@kirmus.ee</prop>
 						<prop key="homepageUrl">http://kivike.kirmus.ee/</prop>
 						<prop key="schedule">0 6 13 * * ?</prop>
+						<prop key="collectionType">PHOTOS</prop>
 					</props>
 				</entry>
 				-->

@@ -1,16 +1,15 @@
 package ee.ajapaik.harvester;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openarchives.oai._2.HeaderType;
-import org.openarchives.oai._2.MetadataType;
-import org.openarchives.oai._2.RecordType;
-
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
 import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.JaxbUtil;
+import org.openarchives.oai._2.HeaderType;
+import org.openarchives.oai._2.MetadataType;
+import org.openarchives.oai._2.RecordType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MKAHarvestTask extends HarvestTask {
 
@@ -61,6 +60,7 @@ public class MKAHarvestTask extends HarvestTask {
 			rec.setTypes(jaxbUtil.getValues(eseRec, "type"));
 			rec.setProviderHomepageUrl(infoSystem.getHomepageUrl());
 			rec.setProviderName(infoSystem.getName());
+			rec.setCollectionType(infoSystem.getCollectionType());
 
 			String imageUrl = jaxbUtil.getValue(eseRec, "object");
 			

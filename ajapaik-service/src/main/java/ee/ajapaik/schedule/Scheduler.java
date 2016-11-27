@@ -1,6 +1,7 @@
 package ee.ajapaik.schedule;
 
 import ee.ajapaik.model.InfoSystem;
+import ee.ajapaik.model.search.CollectionType;
 import ee.ajapaik.persist.SerializingPersister;
 import org.apache.log4j.Logger;
 import org.quartz.*;
@@ -97,6 +98,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 			is.setIgnoreSet(value.getProperty("ignoreSet"));
 			is.setDisableSets(Boolean.valueOf(value.getProperty("disableSets")));
 			is.setMetadataPrefix(String.valueOf(value.getProperty("metadataPrefix")));
+			is.setCollectionType(CollectionType.valueOf(value.getProperty("collectionType")));
 			
 			if(savedConf != null && savedConf.contains(is)) {
 				InfoSystem infoSystem = savedConf.get(savedConf.indexOf(is));
