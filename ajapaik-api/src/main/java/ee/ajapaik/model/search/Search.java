@@ -17,6 +17,7 @@ public class Search implements Serializable {
 	private SearchField from; // institution
 	private SearchField description; // description
 	private SearchField number; // identifying number
+	private SearchField collectionType;
 	private List<InstitutionType> institutionTypes;
 	private String luceneQuery;
 	private boolean digital; // urlToRecord peab olemas olema
@@ -31,6 +32,14 @@ public class Search implements Serializable {
 
 	public void setMaxResult(int maxResult) {
 		this.maxResult = maxResult;
+	}
+
+	public SearchField getCollectionType() {
+		return collectionType;
+	}
+
+	public void setCollectionType(SearchField collectionType) {
+		this.collectionType = collectionType;
 	}
 
 	public int getPageSize() {
@@ -151,6 +160,9 @@ public class Search implements Serializable {
 						+ getTerm(description) + ")";
 			if (number != null && number.getValue() != null && number.getValue().length() != 0)
 				phrase += " " + number.getAndOr() + "NUMBER:(" + getTerm(number) + ")";
+
+			if (collectionType != null && collectionType.getValue() != null && collectionType.getValue().length() != 0)
+				phrase += " " + collectionType.getAndOr() + "COLLECTION_TYPE:(" + getTerm(collectionType) + ")";
 			
 			if (id != null && id.getValue() != null && id.getValue().length() != 0)
 				phrase += " " + id.getAndOr() + "ID_NUMBER:(" + getTerm(id) + ")";

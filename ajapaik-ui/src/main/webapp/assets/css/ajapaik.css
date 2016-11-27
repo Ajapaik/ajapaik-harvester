@@ -30,8 +30,12 @@ body {
 	padding: 10px;
 }
 
-.w-13 {
-	width: 13%;
+.w-11 {
+	width: 11%;
+}
+
+.w-88 {
+    width: 88%
 }
 
 .input-group-addon {

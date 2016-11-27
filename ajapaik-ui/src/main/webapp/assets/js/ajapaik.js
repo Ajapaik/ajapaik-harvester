@@ -257,6 +257,9 @@ function search() {
 		"from" : {
 			"value" : $("#from").val(),
 		},
+		"collectionType" : {
+			"value" : $("#collectionType").val(),
+		},
 		"number" : {
 			"value" : $("#number").val(),
 		},
