@@ -257,14 +257,12 @@ function search() {
 		"from" : {
 			"value" : $("#from").val(),
 		},
-		"collectionType" : {
-			"value" : $("#collectionType").val(),
-		},
 		"number" : {
 			"value" : $("#number").val(),
 		},
 		
 		"luceneQuery" : $("#luceneQuery").val() == "" ? null : $("#luceneQuery").val(),
+		"collectionTypes" :  [getValue("PHOTOS"), getValue("PAINTINGS"), getValue("GRAPHIC_ART")],
 		"institutionTypes" : [getValue("MUSEUM"), getValue("LIBRARY"), getValue("ARCHIVE"), getValue("ETERA"), getValue("DSPACE")],
 		
 		"pageSize" : 200,

@@ -17,7 +17,7 @@ public class Search implements Serializable {
 	private SearchField from; // institution
 	private SearchField description; // description
 	private SearchField number; // identifying number
-	private SearchField collectionType;
+	private List<CollectionType> collectionTypes;
 	private List<InstitutionType> institutionTypes;
 	private String luceneQuery;
 	private boolean digital; // urlToRecord peab olemas olema
@@ -34,12 +34,12 @@ public class Search implements Serializable {
 		this.maxResult = maxResult;
 	}
 
-	public SearchField getCollectionType() {
-		return collectionType;
+	public List<CollectionType> getCollectionTypes() {
+		return collectionTypes;
 	}
 
-	public void setCollectionType(SearchField collectionType) {
-		this.collectionType = collectionType;
+	public void setCollectionTypes(List<CollectionType> collectionTypes) {
+		this.collectionTypes = collectionTypes;
 	}
 
 	public int getPageSize() {
@@ -136,7 +136,7 @@ public class Search implements Serializable {
 
 	public String getSearchPhrase() {
 		if(luceneQuery != null) {
-			return luceneQuery + getInstitutions();
+			return (luceneQuery + getInstitutions() + getCollectionTypesForQuery()).trim();
 		} else {
 			String phrase = "";
 			if (fullSearch != null && fullSearch.getValue() != null
@@ -161,33 +161,37 @@ public class Search implements Serializable {
 			if (number != null && number.getValue() != null && number.getValue().length() != 0)
 				phrase += " " + number.getAndOr() + "NUMBER:(" + getTerm(number) + ")";
 
-			if (collectionType != null && collectionType.getValue() != null && collectionType.getValue().length() != 0)
-				phrase += " " + collectionType.getAndOr() + "COLLECTION_TYPE:(" + getTerm(collectionType) + ")";
-			
 			if (id != null && id.getValue() != null && id.getValue().length() != 0)
 				phrase += " " + id.getAndOr() + "ID_NUMBER:(" + getTerm(id) + ")";
 	
 			if (phrase.startsWith(" "))
 				phrase = phrase.substring(1);
-			
-			return phrase + getInstitutions();
+
+			return (phrase + getInstitutions() + getCollectionTypesForQuery()).trim();
 		}
 	}
 
 	private String getInstitutions() {
+		return parseListForQuery(institutionTypes, "INSTITUTION_TYPE");
+	}
+
+	private String getCollectionTypesForQuery() {
+		return parseListForQuery(collectionTypes, "COLLECTION_TYPE");
+	}
+
+	private String parseListForQuery(List<?> values, String fieldName) {
 		StringBuilder builder = new StringBuilder();
-		
-		institutionTypes.removeAll(Collections.singleton(null));
-		
-		if(institutionTypes.size() > 0) {
-			builder.append(" +INSTITUTION_TYPE:(");
-			for (int i = 0; i < institutionTypes.size(); i++) {
-				InstitutionType institutionType = institutionTypes.get(i);
-				
-				builder.append(institutionType.toString());
-				
-				if(i < institutionTypes.size() - 1) {
-					builder.append(" OR ");	
+
+		values.removeAll(Collections.singleton(null));
+
+		if (values.size() > 0) {
+			builder.append(" +" + fieldName + ":(");
+			for (int i = 0; i < values.size(); i++) {
+
+				builder.append(values.get(i).toString());
+
+				if(i < values.size() - 1) {
+					builder.append(" OR ");
 				}
 			}
 			builder.append(") ");
