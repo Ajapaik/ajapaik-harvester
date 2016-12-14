@@ -6,7 +6,6 @@ import ee.ajapaik.model.search.Record;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.SortableField;
 import ee.ajapaik.util.Holder;
-import ee.ajapaik.util.Tracer;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -24,13 +23,17 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.InitializingBean;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ee.ajapaik.index.IndexedFields.*;
+import static org.apache.http.client.fluent.Request.Get;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=Indexer">Kaido Kalda</a>
@@ -297,84 +300,52 @@ public class Indexer implements InitializingBean {
 		logger.info("Initializing database indexing @ " + new Date());
 
 		final Holder<Integer> totalCount = new Holder<Integer>();
-		final Map<String, Integer> digitalCount = new HashMap<String, Integer>();
+		final Holder<Integer> alreadyDownloadedCount = new Holder<Integer>();
+		final Holder<Integer> missingMediaIDCount = new Holder<Integer>();
+		final Holder<Integer> exceptionCount = new Holder<Integer>();
 
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
 			
 			@Override
 			public void handleRecord(Record rec, String code) {
-				if(rec != null) {
+                if(rec != null) {
+                    //todo check code to download only from specified infosystems
+                    totalCount.setValue(totalCount.getValue() != null ? totalCount.getValue() + 1 : 1);
 
-					totalCount.setValue(totalCount.getValue() != null ? totalCount.getValue() + 1 : 1);
-					
-					if(totalCount.getValue() % 1000 == 0) {
-						logger.debug("Commiting index @ record: " + totalCount);
-						try {
-							writer.commit();
-						} catch (Exception e) {
-							logger.error("Commiting index failed", e);
-						}
-					}
-					
-					if(rec.getCachedThumbnailUrl() != null) {
-						Integer value = digitalCount.get(code);
-						
-						digitalCount.put(code, (value != null ? value + 1 : 0));
-						
-						if(rec.getCachedThumbnailUrl().equals("d41d8cd98f00b204e9800998ecf8427e")) {
-							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
-						}
-					}
-					
-					try {
-						writer.addDocument(getDocument(rec, code));
-					} catch (Exception e) {
-						logger.error("Add document failed", e);
-					} 
-				}
+                    if(totalCount.getValue() % 1000 == 0) {
+                        logger.debug("count: " + totalCount);
+                    }
+
+                    try {
+                        if(rec.getMediaId() == null) {
+                            logger.debug("Media ID missing: " + rec.getId());
+                            missingMediaIDCount.setValue(missingMediaIDCount.getValue() != null ? missingMediaIDCount.getValue() + 1 : 1);
+                            return;
+                        }
+                        String[] split = rec.getId().split(":");
+                        File file = new File("H:/images/" + rec.getSetSpec().get(0).replace(":", "_") + "/" + split[split.length - 1] + ".jpg");
+                        if(file.exists()) {
+                            alreadyDownloadedCount.setValue(alreadyDownloadedCount.getValue() != null ? alreadyDownloadedCount.getValue() + 1 : 1);
+                            return;
+                        }
+                        logger.debug("File = " + file);
+                        InputStream inputStream = Get(rec.getImageUrl()).execute().returnContent().asStream();
+                        BufferedImage image = ImageIO.read(inputStream);
+                        file.mkdirs();
+                        ImageIO.write(image, "jpg", file);
+                        logger.debug("File saved");
+
+                    } catch (Exception e) {
+                        exceptionCount.setValue(exceptionCount.getValue() != null ? exceptionCount.getValue() + 1 : 1);
+                        logger.debug(rec.getImageUrl() + " Exception message: " + e.getMessage());
+                    }
+                }
 			}
 		});
 
-		logger.debug("Indexing finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms. Metadata count: " + totalCount + ". Media count: " + digitalCount);
-		
-		start = System.currentTimeMillis();
-		
-		try {
-			writer.commit();
-			writer.forceMerge(1, true);
-		} catch (Exception e) {
-			logger.error("Index merging failed", e);
-		} finally {
-			try {
-				writer.close();
-			} catch (Exception e) {
-				logger.error("Error closing index writer", e);
-			}
-		}
-		
-		logger.debug("Index merging finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms");
-		
-		start = System.currentTimeMillis();
-		
-		try {
-			synchronized (searchers) {
-				logger.debug("Rotating index! Opened searchers: " + searchers.size());
-				
-				Tracer.trace();
-				
-				while(searchers.size() > 0) {
-					searchers.wait();
-				}
-				
-				rotateIndex();
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		this.updateTimestamp = System.currentTimeMillis();
-		
-		logger.debug("Index made available @ " + new Date() + ", took: " + (updateTimestamp - start) + " ms");
+		logger.debug("Media download finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms. Metadata count: " + totalCount +
+                ". Already downloaded count: " + alreadyDownloadedCount + ". Media ID missing count: " + missingMediaIDCount + ". Exception count: " + exceptionCount);
+
 	}
 
 	private void rotateIndex() throws CorruptIndexException, IOException {
