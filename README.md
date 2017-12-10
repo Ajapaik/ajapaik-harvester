@@ -1,6 +1,7 @@
 ##**Ajapaik.ee public API v1.0 specification**
 
-Endpoint: http://valimimoodul.ajapaik.ee/ajapaik-service/AjapaikService.json
+* Web interface: https://valimimoodul.ajapaik.ee/ajapaik-ui/
+* API endpoint: http://valimimoodul.ajapaik.ee/ajapaik-service/AjapaikService.json
 
 API content type is ```application/json```
 
