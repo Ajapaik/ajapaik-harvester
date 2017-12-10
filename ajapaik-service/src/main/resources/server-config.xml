@@ -31,7 +31,7 @@
 				<!-- -->
 				<entry key="MuIS">
 					<props>
-						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
+						<prop key="address">https://www.muis.ee/OAIService/OAIService</prop>
 						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
 						<prop key="email">muis@muis.ee</prop>
 						<prop key="homepageUrl">http://www.muis.ee</prop>
@@ -42,7 +42,7 @@
 				</entry>
 				<entry key="MuIS_paintings">
 					<props>
-						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
+						<prop key="address">https://www.muis.ee/OAIService/OAIService</prop>
 						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
 						<prop key="email">muis@muis.ee</prop>
 						<prop key="homepageUrl">http://www.muis.ee</prop>
@@ -53,7 +53,7 @@
 				</entry>
 				<entry key="MuIS_graphics">
 					<props>
-						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
+						<prop key="address">https://www.muis.ee/OAIService/OAIService</prop>
 						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
 						<prop key="email">muis@muis.ee</prop>
 						<prop key="homepageUrl">http://www.muis.ee</prop>
@@ -64,7 +64,7 @@
 				</entry>
 				<entry key="MuIS_persona">
 					<props>
-						<prop key="address">http://www.muis.ee/OAIService/OAIService</prop>
+						<prop key="address">https://www.muis.ee/OAIService/OAIService</prop>
 						<prop key="mapper">ee.ajapaik.harvester.MuisHarvestTask</prop>
 						<prop key="email">muis@muis.ee</prop>
 						<prop key="homepageUrl">http://www.muis.ee</prop>
