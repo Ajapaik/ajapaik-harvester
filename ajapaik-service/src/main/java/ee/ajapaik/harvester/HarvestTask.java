@@ -349,7 +349,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 
 	@SuppressWarnings("unchecked")
 	private JAXBElement<OAIPMHtype> getResponse(String operationUrl, Listener listener) throws ClientProtocolException, IOException, JAXBException {
-		InputStream is = Get(operationUrl).connectTimeout(5000).execute().returnContent().asStream();
+		InputStream is = Get(operationUrl).connectTimeout(15000).socketTimeout(15000).execute().returnContent().asStream();
 
 		if (is != null) {
 			MonitorableBufferedInputStream bis = null;
