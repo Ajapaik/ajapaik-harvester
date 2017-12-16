@@ -60,7 +60,7 @@ public class ETERAHarvestTask extends HarvestTask {
 					Map<String, String> headers = new HashMap<String, String>();
 					headers.put("Authorization", "Bearer vmt6o23sgq15mltlm462lhaoc1");
 					
-					List<Page> pages = MAPPER.readValue(IOHandler.openStream(url, null, headers), Pages.class).getPages();
+					List<Page> pages = MAPPER.readValue(IOHandler.openStream(url, headers), Pages.class).getPages();
 					
 					int mediaOrder = 0;
 					for (Page page : pages) {
@@ -68,7 +68,7 @@ public class ETERAHarvestTask extends HarvestTask {
 						Integer mediaId = page.getAttributes().getId();
 						
 						cloned.setId(rec.getId() + "_" + mediaId);
-						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail("http://www.etera.ee/api/page/" + mediaId + "/thumbnail", headers, repository, taskCode, null));
+						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail("http://www.etera.ee/api/page/" + mediaId + "/thumbnail", headers, repository, taskCode));
 						cloned.setImageUrl("http://www.etera.ee/api/page/" + mediaId + "/imageview?size=xxl");
 						
 						cloned.setMediaId(mediaId);

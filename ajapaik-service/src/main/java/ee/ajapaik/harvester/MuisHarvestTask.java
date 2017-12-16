@@ -116,13 +116,7 @@ public class MuisHarvestTask extends HarvestTask {
 						cloned.setMediaId(mediaId);
 						cloned.setMediaOrder(i);
 						cloned.setImageUrl(url);
-						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode, new DefaultRedirectStrategy() {
-							@Override
-							protected URI createLocationURI(String location) throws ProtocolException {
-								return super.createLocationURI(location.replace("thumb=false", "thumb=true"));
-
-							}
-						}));
+						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode));
 						save(cloned, header.getSetSpec());
 					}
 					return null;

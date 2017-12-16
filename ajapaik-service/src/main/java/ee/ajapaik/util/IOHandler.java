@@ -3,7 +3,6 @@ package ee.ajapaik.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,24 +10,14 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
 import ee.ajapaik.db.Repository;
-import ee.ajapaik.platform.BaseHttpClient;
-import ee.ajapaik.platform.HttpClientFactory;
 
 import static org.apache.http.client.fluent.Request.Get;
 
@@ -55,11 +44,11 @@ public class IOHandler {
 	}
 	
 
-	public static String saveThumbnail(String thumbnailUrl, Map<String, String> headers, Repository repository, String taskCode, RedirectStrategy strategy) {
+	public static String saveThumbnail(String thumbnailUrl, Map<String, String> headers, Repository repository, String taskCode) {
 		try {
 			URL url = new URL(thumbnailUrl);
 			
-			InputStream is = openStream(url, strategy, headers);
+			InputStream is = openStream(url, headers);
 			
 			if(is != null) {
 				byte[] data = IOUtils.toByteArray(is);
@@ -80,23 +69,15 @@ public class IOHandler {
 		return null;	
 	}
 	
-	public static String saveThumbnail(String thumbnailUrl, Repository repository, String taskCode, RedirectStrategy strategy) {
-		return saveThumbnail(thumbnailUrl, null, repository, taskCode, strategy);
-	}
-	
 	public static String saveThumbnail(String thumbnailUrl, Repository repository, String taskCode) {
-		return saveThumbnail(thumbnailUrl, repository, taskCode, null);
-	}
-	
-	public static InputStream openStream(URL url, RedirectStrategy strategy) {
-		return openStream(url, strategy, null);
+		return saveThumbnail(thumbnailUrl, null, repository, taskCode);
 	}
 	
 	public static InputStream openStream(URL url) {
-		return openStream(url, null, null);
+		return openStream(url, null);
 	}
 
-	public static InputStream openStream(URL url, RedirectStrategy strategy, Map<String, String> headers) {
+	public static InputStream openStream(URL url, Map<String, String> headers) {
 		try {
 			if(url != null) {
 				logger.debug("About to make query for url: " + url);
