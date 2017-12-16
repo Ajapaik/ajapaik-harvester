@@ -18,6 +18,15 @@
 			<param name="ConversionPattern" value="%d %p [%t] %l - %m%n" />
 		</layout>
 	</appender>
+
+	<appender name="failed-sets" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Threshold" value="debug" />
+		<param name="File" value="log/failed-sets.log" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+	</appender>
 	
 	<!-- 
 	<logger name="org.springframework.security">
@@ -40,6 +49,11 @@
 	<logger name="org.quartz">
 		<level value="DEBUG" />
 		<appender-ref ref="file" />
+	</logger>
+
+	<logger name="failed-sets">
+		<level value="INFO"/>
+		<appender-ref ref="failed-sets"/>
 	</logger>
 
 	<root>

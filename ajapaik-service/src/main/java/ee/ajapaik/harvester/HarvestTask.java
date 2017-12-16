@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,6 +31,7 @@ import java.util.Map.Entry;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.http.client.fluent.Request.Get;
 
 /**
@@ -38,7 +40,8 @@ import static org.apache.http.client.fluent.Request.Get;
 public abstract class HarvestTask extends QuartzJobBean implements ListRecordsType.Listener {
 
 	protected Logger logger = Logger.getLogger(HarvestTask.class);
-	
+	protected Logger failedSetsLogger = Logger.getLogger("failed-sets");
+
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	protected Repository repository;
@@ -282,22 +285,29 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 		};
 
 		while (true) {
-			ListRecordsType listRecords = executeOperation(ListRecordsType.class, params, listener);
-			if (listRecords != null) {
-				ResumptionTokenType rt = listRecords.getResumptionToken();
-				if (rt != null && rt.getValue() != null && !"".equals(rt.getValue())) {
-					logger.debug("Resuming records from token: " + rt.getValue());
+			try {
+				ListRecordsType listRecords = executeOperation(ListRecordsType.class, params, listener);
+				if (listRecords != null) {
+					ResumptionTokenType rt = listRecords.getResumptionToken();
+					if (rt != null && rt.getValue() != null && !"".equals(rt.getValue())) {
+						logger.debug("Resuming records from token: " + rt.getValue());
 
-					removeParameter(params, "metadataPrefix");
-					removeParameter(params, "set");
+						removeParameter(params, "metadataPrefix");
+						removeParameter(params, "set");
 
-					addParameter(params, "resumptionToken", rt.getValue());
+						addParameter(params, "resumptionToken", rt.getValue());
+					} else {
+						removeParameter(params, "resumptionToken");
+						break;
+					}
 				} else {
 					removeParameter(params, "resumptionToken");
 					break;
 				}
-			} else {
-				removeParameter(params, "resumptionToken");
+			} catch (Exception e) {
+				String set = params.get("set");
+				if (isNotBlank(set)) failedSetsLogger.error(set);
+				logger.error("Failed to iterate records, params=" + params, e);
 				break;
 			}
 		}
