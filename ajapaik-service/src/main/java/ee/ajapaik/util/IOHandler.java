@@ -3,6 +3,7 @@ package ee.ajapaik.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,6 +19,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.fluent.Request;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
@@ -27,6 +29,8 @@ import org.apache.log4j.Logger;
 import ee.ajapaik.db.Repository;
 import ee.ajapaik.platform.BaseHttpClient;
 import ee.ajapaik.platform.HttpClientFactory;
+
+import static org.apache.http.client.fluent.Request.Get;
 
 public class IOHandler {
 
@@ -96,37 +100,15 @@ public class IOHandler {
 		try {
 			if(url != null) {
 				logger.debug("About to make query for url: " + url);
-				
-				BaseHttpClient bc = HttpClientFactory.getInstance().getClient(url);
-				
-				HttpClient httpClient = bc.getHttpClient();
-				DefaultHttpClient defaultHttpClient = (DefaultHttpClient) httpClient;
-				if(strategy != null) {
-					defaultHttpClient.setRedirectStrategy(strategy);
-				}
+				Request request = Get(url.toURI()).socketTimeout(5000).connectTimeout(5000).addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
 
-				// Add host header check interceptor
-				defaultHttpClient.addRequestInterceptor(new HostReplacerInterceptor());
-				
-				HttpGet get = new HttpGet(url.getFile());
-				get.addHeader(new BasicHeader("Accept-Encoding", "gzip,deflate"));
-				
-				if(headers != null) {
-					for(Entry<String, String> entry : headers.entrySet()) {
-						get.addHeader(new BasicHeader(entry.getKey(), entry.getValue()));		
+				if (headers != null) {
+					for (Entry<String, String> entry : headers.entrySet()) {
+						request.addHeader(new BasicHeader(entry.getKey(), entry.getValue()));
 					}
 				}
-				
-				HttpResponse result = httpClient.execute(get);
-				
-				// Remove host header check interceptor
-				defaultHttpClient.removeRequestInterceptorByClass(HostReplacerInterceptor.class);
-				
-				HttpEntity entity = result.getEntity();
-				
-				if(entity != null) {
-					return getInputStream(result);
-				}
+
+				return request.execute().returnContent().asStream();
 			}
 		} catch (Exception e) {
 			logger.error("Error opening stream data", e);
