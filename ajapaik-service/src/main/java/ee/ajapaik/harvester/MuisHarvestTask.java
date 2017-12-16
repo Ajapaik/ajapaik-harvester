@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class MuisHarvestTask extends HarvestTask {
 
 	@Override
@@ -97,7 +99,7 @@ public class MuisHarvestTask extends HarvestTask {
 			rec.setCollectionType(infoSystem.getCollectionType());
 
 			String thumbnailUrl = jaxbUtil.getValue(eseRec, "object");
-			if(thumbnailUrl != null) {
+			if(isNotBlank(thumbnailUrl)) {
 				String[] split = rec.getId().split(":");
 				List<String> medias = null;
 				try {
