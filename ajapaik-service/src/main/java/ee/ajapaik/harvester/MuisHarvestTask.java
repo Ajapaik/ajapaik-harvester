@@ -111,7 +111,7 @@ public class MuisHarvestTask extends HarvestTask {
 				if (medias != null && medias.size() > 0) {
 					for (int i = 0; i < medias.size(); i++) {
 						String url = medias.get(i);
-						Integer mediaId = getMediaId(medias.get(i));
+						String mediaId = getMediaId(medias.get(i));
 
 						Record cloned = rec.clone();
 						cloned.setId(rec.getId() + "_" + mediaId);
@@ -134,18 +134,9 @@ public class MuisHarvestTask extends HarvestTask {
 		return rec;
 	}
 
-	private Integer getMediaId(String url) {
+	String getMediaId(String url) {
 		String[] urlSplit = url.split("\\/");
-		String mediaId = urlSplit[urlSplit.length - 1];
-		
-		if(mediaId != null) {
-			try {
-				return Integer.valueOf(mediaId);
-			} catch(NumberFormatException e) {
-				return null;
-			}
-		}
-		return null;
+		return urlSplit[urlSplit.length - 1];
 	}
 	
 	private List<String> parseMediaList(String about) throws Exception {

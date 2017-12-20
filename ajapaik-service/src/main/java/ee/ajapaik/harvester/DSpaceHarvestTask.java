@@ -59,7 +59,7 @@ public class DSpaceHarvestTask extends HarvestTask {
 				for (String image : images) {
 					if (!isThumbnail(image)) {
 						Record clone = rec.clone();
-						Integer mediaId = Integer.valueOf(image.split("/")[6]);
+						String mediaId = image.split("/")[6];
 						clone.setId(rec.getId() + "_" + mediaId);
 						clone.setImageUrl(image);
 						clone.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(images, image), repository, taskCode));

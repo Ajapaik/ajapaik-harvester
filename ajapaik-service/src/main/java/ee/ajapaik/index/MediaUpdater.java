@@ -27,14 +27,14 @@ public class MediaUpdater {
 				String[] idSplit = rec.getId().split("_");
 				String muisId = idSplit[0].split(":")[2];
 				
-				rec.setMediaId(Integer.valueOf(idSplit[1]));
+				rec.setMediaId(idSplit[1]);
 				
 				logger.debug("Update record: " + rec.getId() + ". mediaId: " + idSplit[1]);
 			
 				List<String> medias = getMedias(muisId);
 				for (int i = 0; i < medias.size(); i++) {
 					String url = medias.get(i);
-					Integer mediaId = getMediaId(url);
+					String mediaId = getMediaId(url);
 					
 					if(rec.getMediaId().equals(mediaId)) {
 						rec.setMediaOrder(i);
@@ -53,7 +53,7 @@ public class MediaUpdater {
 				
 				List<String> medias = getMedias(muisId);
 				if(medias != null && medias.size() > 0) {
-					Integer mediaId = getMediaId(medias.get(0));
+					String mediaId = getMediaId(medias.get(0));
 					
 					logger.debug("Update record: " + rec.getId());
 					
@@ -79,18 +79,9 @@ public class MediaUpdater {
 		return medias;
 	}
 
-	private static Integer getMediaId(String url) {
+	private static String getMediaId(String url) {
 		String[] urlSplit = url.split("\\/");
-		String mediaId = urlSplit[urlSplit.length - 1];
-
-		if (mediaId != null) {
-			try {
-				return Integer.valueOf(mediaId);
-			} catch (NumberFormatException e) {
-				return null;
-			}
-		}
-		return null;
+		return urlSplit[urlSplit.length - 1];
 	}
 
 	private static List<String> parseMediaList(String about) throws Exception {

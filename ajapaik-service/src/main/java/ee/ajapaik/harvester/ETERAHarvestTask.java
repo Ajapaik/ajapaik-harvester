@@ -65,7 +65,7 @@ public class ETERAHarvestTask extends HarvestTask {
 					int mediaOrder = 0;
 					for (Page page : pages) {
 						Record cloned = rec.clone();
-						Integer mediaId = page.getAttributes().getId();
+						String mediaId = String.valueOf(page.getAttributes().getId());
 						
 						cloned.setId(rec.getId() + "_" + mediaId);
 						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail("http://www.etera.ee/api/page/" + mediaId + "/thumbnail", headers, repository, taskCode));
