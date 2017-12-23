@@ -35,9 +35,9 @@ function loadInfosystems() {
 }
 
 function getSchedule() {
-    var dateTime = $('#schedule').val()
-    return '0 ' + dateTime.substr(14, 2) + ' ' + dateTime.substr(11, 2) + ' ' +
-        dateTime.substr(8, 2) + ' ' + dateTime.substr(5, 2) + ' ? ' + dateTime.substr(0, 4)
+    var dateTime = $('#schedule').datetimepicker('date')
+    return '0 ' + dateTime.get('minute') + ' ' + dateTime.get('hour') + ' ' +
+        dateTime.get('date') + ' ' + (dateTime.get('month') + 1) + ' ? ' + dateTime.get('year')
 }
 
 function createInfoSystem() {
