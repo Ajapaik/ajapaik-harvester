@@ -45,7 +45,7 @@ body {
 	cursor: pointer;
 }
 
-#result-view, #set-view, #task-view {
+#result-view, #set-view, #task-view, #harvester-view {
 	background: #F1F1F1;
 }
 
@@ -55,6 +55,9 @@ body {
 
 #set-view, #task-view {
 	padding: 150px 10px 10px;
+}
+#harvester-view {
+	padding: 70px 10px 10px;
 }
 
 #result-view:before, #result-view:after,#set-view:before, #set-view:after,#task-view:before, #task-view:after {

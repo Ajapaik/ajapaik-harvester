@@ -4,6 +4,7 @@ import ee.ajapaik.cache.CityCache;
 import ee.ajapaik.cache.SourceCache;
 import ee.ajapaik.dao.AjapaikDao;
 import ee.ajapaik.db.Repository;
+import ee.ajapaik.helper.DateTimeHelper;
 import ee.ajapaik.index.IndexedFields;
 import ee.ajapaik.index.Indexer;
 import ee.ajapaik.index.Result;
@@ -21,11 +22,12 @@ import org.apache.lucene.search.IndexSearcher;
 import org.quartz.SimpleTrigger;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.nio.file.Files;
+import java.util.*;
 
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=AjapaikServiceImpl">Kaido Kalda</a>
@@ -33,6 +35,9 @@ import java.util.List;
 public class AjapaikServiceImpl implements AjapaikService {
 	
 	private static final Logger logger = Logger.getLogger(AjapaikServiceImpl.class);
+	private final String FAILED_SETS_FILE_NAME = "failed-sets.log";
+
+	DateTimeHelper dateTimeHelper = new DateTimeHelper();
 	
 	interface DataCallback {
 		void notify(String name, byte[] data);
@@ -246,6 +251,30 @@ public class AjapaikServiceImpl implements AjapaikService {
 		trigger.setJobName(Scheduler.JOB_PROPOSAL_NAME);
 		
 		scheduler.scheduleProposal(trigger);
+	}
+
+	@Override
+	public Map<String, List<String>> getFailedSets() {
+		try {
+			Map<String, List<String>> result = new HashMap<>();
+			File logsDirectory = new File("../ajapaik-parent/log");
+
+			File [] files = logsDirectory.listFiles((dir, name) -> name.startsWith("failed-sets.log"));
+
+			for (File file : files) {
+                List<String> failedSets = Files.readAllLines(file.toPath());
+                if (!failedSets.isEmpty()) result.put(getDateFromFileName(file.getName()), failedSets);
+            }
+			return result;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new HashMap<>();
+		}
+	}
+
+	String getDateFromFileName(String fileName) {
+		if (fileName.equals(FAILED_SETS_FILE_NAME)) return dateTimeHelper.formatDate(dateTimeHelper.now());
+		return fileName.replace(FAILED_SETS_FILE_NAME + ".", "");
 	}
 
 	@Override

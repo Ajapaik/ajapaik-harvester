@@ -1,8 +1,5 @@
 package ee.ajapaik.service;
 
-import java.util.Collection;
-import java.util.List;
-
 import ee.ajapaik.model.City;
 import ee.ajapaik.model.InfoSystem;
 import ee.ajapaik.model.MediaView;
@@ -10,6 +7,10 @@ import ee.ajapaik.model.TaskView;
 import ee.ajapaik.model.search.RecordView;
 import ee.ajapaik.model.search.Search;
 import ee.ajapaik.model.search.SearchResults;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public interface AjapaikService {
 
@@ -46,4 +47,6 @@ public interface AjapaikService {
 	City createCity(City city) throws Exception;
 	
 	void scheduleProposal();
+
+	Map<String, List<String>> getFailedSets();
 }

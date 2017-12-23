@@ -41,22 +41,31 @@ $(document).ready(function() {
 
 		var target = $(e.currentTarget);
 		target.addClass("active");
-
-		if (target[0].id == "search") {
+		if (target[0].id === "search") {
 			$("#search-form").show();
 			$("#result-view").show();
 			
 			$("#set-form").hide();
 			$("#set-view").hide();
+            $("#harvester-view").hide();
 			
 			buildGrid($("#result-view"));
-		} else if(target[0].id == "set") {
+		} else if(target[0].id === "set") {
 			$("#search-form").hide();
 			$("#result-view").hide();
-			
+			$("#harvester-view").hide();
+
 			$("#set-form").show();
 
 			self.parseSelection();
+		} else if (target[0].id === "harvester") {
+            $("#search-form").hide();
+            $("#result-view").hide();
+            $("#set-form").hide();
+            $("#set-view").hide();
+
+            $("#harvester-view").show();
+            showFailedSets()
 		}
 	});
 
