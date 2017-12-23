@@ -80,7 +80,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 		for (InfoSystem is : getInfoSystems()) {
 			if(is.equals(infoSystem)) {
 				infoSystem.setName(is.getName() + "_custom");
-				if (infoSystem.getSetsToUse().isEmpty()) infoSystem.setSetsToUse(is.getSetsToUse());
+				if (infoSystem.getSetsToUse() == null || infoSystem.getSetsToUse().isEmpty()) infoSystem.setSetsToUse(is.getSetsToUse());
 				infoSystem.setIgnoreSet(is.getIgnoreSet());
 				infoSystem.setAddress(is.getAddress());
 				infoSystem.setCollectionType(is.getCollectionType());
