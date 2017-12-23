@@ -3,7 +3,7 @@ function showFailedSets() {
         console.log(response)
 
         Object.keys(response).forEach(function (date) {
-            $('#failed-sets').append('<h5>'+date+'</h5>').append('<ul></ul>')
+            $('#failed-sets').append('<h4>'+date+'</h4>').append('<ul></ul>')
             response[date].forEach(function (set) {
                 $('#failed-sets ul').append('<li>'+set+'</li>')
             })
