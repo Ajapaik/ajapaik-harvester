@@ -25,7 +25,6 @@ function createInfoSystem() {
     params['name'] = $('#harvesters').val()
     params['lastHarvestTime'] = $('#lastHarvestDate').val()
     params['schedule'] = getSchedule()
-    console.log(JSON.stringify(params))
     request('initCustomHarvester', [params], function () {
         $('#harvester-view alert').show()
     })
