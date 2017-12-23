@@ -85,6 +85,15 @@ public class AjapaikServiceImpl implements AjapaikService {
 		scheduler.updateInfoSystem(infoSystem);
 	}
 
+	@Override
+	public void initCustomHarvester(InfoSystem infoSystem) {
+		scheduler.initCustomHarvester(infoSystem);
+		logger.debug("Custom infosystem created! " +
+				"Name = " + infoSystem.getName() +
+				", schedule = " + infoSystem.getSchedule() +
+				", lastHarvestDate = " + infoSystem.getLastHarvestTime());
+	}
+
 	public void setAjapaikClient(AjapaikClient ajapaikClient) {
 		this.ajapaikClient = ajapaikClient;
 	}

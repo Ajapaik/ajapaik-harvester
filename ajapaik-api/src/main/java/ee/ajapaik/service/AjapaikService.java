@@ -49,4 +49,6 @@ public interface AjapaikService {
 	void scheduleProposal();
 
 	Map<String, List<String>> getFailedSets();
+
+	void initCustomHarvester(InfoSystem infoSystem);
 }

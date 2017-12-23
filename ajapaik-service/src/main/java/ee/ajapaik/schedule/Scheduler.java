@@ -76,6 +76,26 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 		updateConfiguration(infoSystem);
 	}
 
+	public void initCustomHarvester(InfoSystem infoSystem) {
+		for (InfoSystem is : getInfoSystems()) {
+			if(is.equals(infoSystem)) {
+				infoSystem.setName(is.getName() + "_custom");
+				if (infoSystem.getSetsToUse().isEmpty()) infoSystem.setSetsToUse(is.getSetsToUse());
+				infoSystem.setIgnoreSet(is.getIgnoreSet());
+				infoSystem.setAddress(is.getAddress());
+				infoSystem.setCollectionType(is.getCollectionType());
+				infoSystem.setDisableSets(is.isSetsDisabled());
+				infoSystem.setEmail(is.getEmail());
+				infoSystem.setHomepageUrl(is.getHomepageUrl());
+				infoSystem.setMetadataPrefix(is.getMetadataPrefix());
+				infoSystem.setMapper(is.getMapper());
+				persister.save(infoSystem);
+				break;
+			}
+		}
+		scheduleHarvest();
+	}
+
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		this.beanFactory = beanFactory;
@@ -241,7 +261,7 @@ public class Scheduler implements BeanFactoryAware, InitializingBean {
 		}
 		logger.debug("Finished scheduling indexing");
 	}
-	
+
 	public class HarvestJobListener implements JobListener {
 		private ThreadLocal<String> name = new ThreadLocal<String>();
 		
