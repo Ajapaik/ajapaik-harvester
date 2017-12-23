@@ -48,6 +48,6 @@ function createInfoSystem() {
     params['lastHarvestTime'] = $('#lastHarvestDate').val()
     params['schedule'] = getSchedule()
     request('initCustomHarvester', [params], function () {
-        $('#harvester-view alert').show()
+        $('#harvester-view .alert').slideDown()
     })
 }
