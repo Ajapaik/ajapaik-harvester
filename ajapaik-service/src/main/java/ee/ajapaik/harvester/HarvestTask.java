@@ -305,7 +305,7 @@ public abstract class HarvestTask extends QuartzJobBean implements ListRecordsTy
 				}
 			} catch (Exception e) {
 				String set = params.get("set");
-				if (isNotBlank(set)) failedSetsLogger.error(set);
+				if (isNotBlank(set)) failedSetsLogger.error(infoSystem.getName() + " - " +set);
 				logger.error("Failed to iterate records, params=" + params, e);
 				break;
 			}
