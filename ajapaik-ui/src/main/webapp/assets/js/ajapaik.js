@@ -66,6 +66,7 @@ $(document).ready(function() {
 
             $("#harvester-view").show();
             showFailedSets()
+            loadInfosystems()
 		}
 	});
 

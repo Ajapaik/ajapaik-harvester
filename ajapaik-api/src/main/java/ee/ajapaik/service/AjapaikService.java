@@ -16,6 +16,8 @@ public interface AjapaikService {
 
 	List<InfoSystem> getInfoSystems();
 
+	List<InfoSystem> getNotCustomInfoSystems();
+
 	void updateInfoSystem(InfoSystem infoSystem);
 
 	SearchResults search(Search search) throws Exception;

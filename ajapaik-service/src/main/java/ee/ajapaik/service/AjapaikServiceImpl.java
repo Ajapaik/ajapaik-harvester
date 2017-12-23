@@ -29,6 +29,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * @author <a href="mailto:kaido@quest.ee?subject=AjapaikServiceImpl">Kaido Kalda</a>
  */
@@ -78,6 +80,11 @@ public class AjapaikServiceImpl implements AjapaikService {
 	@Override
 	public List<InfoSystem> getInfoSystems() {
 		return scheduler.getInfoSystems();
+	}
+
+	@Override
+	public List<InfoSystem> getNotCustomInfoSystems() {
+		return getInfoSystems().stream().filter(is -> !is.getName().endsWith("_custom")).collect(toList());
 	}
 
 	@Override
