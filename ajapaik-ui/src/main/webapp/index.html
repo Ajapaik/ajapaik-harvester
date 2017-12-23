@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="assets/js/ajapaik.js"></script>
 	<script type="text/javascript" src="assets/js/failedSets.js"></script>
+	<script type="text/javascript" src="assets/js/harvester.js"></script>
 
 </head>
 <body>
@@ -253,6 +254,39 @@
 	<div id="set-view" style="display: none;"></div>
 
 	<div id="harvester-view" style="display: none;">
+		<div class="alert alert-success hidden">
+			Harvester created!
+		</div>
+		<h3>Create harvester</h3>
+		<form id="create-harvester">
+			<div class="row">
+				<div class="col-md-4">
+					<label>Infosystem</label>
+					<select id="harvesters" class="form-control">
+						<option value="MuIS">Muis</option>
+					</select>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label>Last harvest date</label>
+						<input id="lastHarvestDate" type="text" class="form-control">
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label>Start time</label>
+						<input id="schedule" type="text" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label>Sets to use</label>
+				<input id="setsToUse" type="text" class="form-control">
+			</div>
+
+			<button class="btn btn-primary">Create</button>
+		</form>
+
 		<h3>Failed sets</h3>
 		<div id="failed-sets"></div>
 	</div>
