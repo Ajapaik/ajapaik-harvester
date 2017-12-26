@@ -6,6 +6,7 @@ function showFailedSets() {
                 $list.append('<li>'+set+'</li>')
             })
         })
+        $('#sets-loader').hide()
     })
 }
 
