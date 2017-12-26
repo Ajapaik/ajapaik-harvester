@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.util.*;
 
+import static java.time.temporal.ChronoUnit.MONTHS;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -278,14 +280,23 @@ public class AjapaikServiceImpl implements AjapaikService {
 			File [] files = logsDirectory.listFiles((dir, name) -> name.startsWith("failed-sets.log"));
 
 			for (File file : files) {
-                List<String> failedSets = Files.readAllLines(file.toPath());
-                if (!failedSets.isEmpty()) result.put(getDateFromFileName(file.getName()), failedSets);
+				String date = getDateFromFileName(file.getName());
+				if (shouldNotShow(date)) continue;
+				List<String> failedSets = Files.readAllLines(file.toPath());
+                if (!failedSets.isEmpty()) {
+					result.put(date, failedSets);
+				}
             }
 			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return new HashMap<>();
 		}
+	}
+
+	boolean shouldNotShow(String dateString) {
+		LocalDate date = dateTimeHelper.parseDate(dateString);
+		return date.isBefore(dateTimeHelper.now().toLocalDate().minus(3, MONTHS));
 	}
 
 	String getDateFromFileName(String fileName) {
