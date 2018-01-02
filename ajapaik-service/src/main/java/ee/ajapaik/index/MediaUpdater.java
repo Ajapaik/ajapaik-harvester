@@ -1,21 +1,19 @@
 package ee.ajapaik.index;
 
+import ee.ajapaik.db.Repository;
+import ee.ajapaik.model.search.Record;
+import ee.ajapaik.util.IOHandler;
+import ee.ajapaik.xml.MediaHandler;
+import org.apache.log4j.Logger;
+import org.xml.sax.InputSource;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.List;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.log4j.Logger;
-import org.xml.sax.InputSource;
-
-import ee.ajapaik.db.Repository;
-import ee.ajapaik.model.search.Record;
-import ee.ajapaik.util.IOHandler;
-import ee.ajapaik.xml.MediaHandler;
 
 public class MediaUpdater {
 	
@@ -27,7 +25,7 @@ public class MediaUpdater {
 				String[] idSplit = rec.getId().split("_");
 				String muisId = idSplit[0].split(":")[2];
 				
-				rec.setMediaId(idSplit[1]);
+				rec.setMediaId(Integer.valueOf(idSplit[1]));
 				
 				logger.debug("Update record: " + rec.getId() + ". mediaId: " + idSplit[1]);
 			
@@ -58,7 +56,7 @@ public class MediaUpdater {
 					logger.debug("Update record: " + rec.getId());
 					
 					rec.setId(rec.getId() + "_" + mediaId);
-					rec.setMediaId(mediaId);
+					rec.setMediaId(Integer.valueOf(mediaId));
 					rec.setMediaOrder(0);
 					
 					logger.debug("Updated - id: " + rec.getId() + ", mediaId: " + mediaId + ", mediaOrder: " + 0);

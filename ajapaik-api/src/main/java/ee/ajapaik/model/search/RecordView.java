@@ -30,7 +30,7 @@ public class RecordView implements Serializable {
 	
 	private boolean inBasket;
 	private String cachedThumbnailUrl;
-	private String mediaId;
+	private Integer mediaId;
 	private Integer mediaOrder;
 
 	private String latitude;
@@ -41,7 +41,7 @@ public class RecordView implements Serializable {
 					  String collections, String institution, String urlToRecord,
 					  String providerHomepageUrl, String cachedThumbnailUrl,
 					  String imageUrl, InstitutionType institutionType, String id,
-					  String providerName, String mediaId, Integer mediaOrder, String latitude, String longitude) {
+					  String providerName, Integer mediaId, Integer mediaOrder, String latitude, String longitude) {
 		super();
 		this.creators = notNull(creators);
 		this.identifyingNumber = notNull(identifyingNumber);
@@ -198,7 +198,7 @@ public class RecordView implements Serializable {
 			this.date = fields[16];
 		
 		if(fields.length > 17 && fields[17] != null && !"null".equals(fields[17])) {
-			this.mediaId = fields[17];
+			this.mediaId = Integer.valueOf(fields[17]);
 		}
 		
 		if(fields.length > 18 && fields[18] != null && !"null".equals(fields[18])) {
@@ -281,11 +281,11 @@ public class RecordView implements Serializable {
 		this.date = date;
 	}
 
-	public String getMediaId() {
+	public Integer getMediaId() {
 		return mediaId;
 	}
 
-	public void setMediaId(String mediaId) {
+	public void setMediaId(Integer mediaId) {
 		this.mediaId = mediaId;
 	}
 

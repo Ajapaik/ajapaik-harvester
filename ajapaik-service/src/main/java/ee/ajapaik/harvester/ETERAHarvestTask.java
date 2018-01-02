@@ -71,7 +71,7 @@ public class ETERAHarvestTask extends HarvestTask {
 						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail("http://www.etera.ee/api/page/" + mediaId + "/thumbnail", headers, repository, taskCode));
 						cloned.setImageUrl("http://www.etera.ee/api/page/" + mediaId + "/imageview?size=xxl");
 						
-						cloned.setMediaId(mediaId);
+						cloned.setMediaId(Integer.valueOf(mediaId));
 						cloned.setMediaOrder(mediaOrder++);
 						
 						save(cloned, institutions);

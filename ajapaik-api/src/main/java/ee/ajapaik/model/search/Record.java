@@ -30,7 +30,7 @@ public class Record implements Serializable, Cloneable {
 	private boolean deleted;
 	private List<String> setSpec;
 	private Date dateCreated;
-	private String mediaId;
+	private Integer mediaId;
 	private Integer mediaOrder;
 	private String latitude;
 	private String longitude;
@@ -294,11 +294,11 @@ public class Record implements Serializable, Cloneable {
 		this.imageUrl = imageUrl;
 	}
 
-	public String getMediaId() {
+	public Integer getMediaId() {
 		return mediaId;
 	}
 
-	public void setMediaId(String mediaId) {
+	public void setMediaId(Integer mediaId) {
 		this.mediaId = mediaId;
 	}
 

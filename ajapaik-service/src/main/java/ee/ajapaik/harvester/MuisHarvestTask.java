@@ -5,8 +5,6 @@ import ee.ajapaik.model.search.Record;
 import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.JaxbUtil;
 import ee.ajapaik.xml.MediaHandler;
-import org.apache.http.ProtocolException;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.MetadataType;
 import org.openarchives.oai._2.RecordType;
@@ -17,7 +15,6 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,7 +108,7 @@ public class MuisHarvestTask extends HarvestTask {
 				if (medias != null && medias.size() > 0) {
 					for (int i = 0; i < medias.size(); i++) {
 						String url = medias.get(i);
-						String mediaId = getMediaId(medias.get(i));
+						Integer mediaId = getMediaId(medias.get(i));
 
 						Record cloned = rec.clone();
 						cloned.setId(rec.getId() + "_" + mediaId);
@@ -134,9 +131,9 @@ public class MuisHarvestTask extends HarvestTask {
 		return rec;
 	}
 
-	String getMediaId(String url) {
+	Integer getMediaId(String url) {
 		String[] urlSplit = url.split("\\/");
-		return urlSplit[urlSplit.length - 1];
+		return urlSplit[urlSplit.length - 1].hashCode();
 	}
 	
 	private List<String> parseMediaList(String about) throws Exception {

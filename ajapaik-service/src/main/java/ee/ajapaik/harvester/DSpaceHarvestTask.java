@@ -63,7 +63,7 @@ public class DSpaceHarvestTask extends HarvestTask {
 						clone.setId(rec.getId() + "_" + mediaId);
 						clone.setImageUrl(image);
 						clone.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(images, image), repository, taskCode));
-						clone.setMediaId(mediaId);
+						clone.setMediaId(Integer.valueOf(mediaId));
 						clone.setMediaOrder(mediaOrder++);
 						save(clone, recordType.getHeader().getSetSpec());
 					}
