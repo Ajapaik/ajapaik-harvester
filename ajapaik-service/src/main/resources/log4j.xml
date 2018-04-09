@@ -13,6 +13,7 @@
 	<appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="Threshold" value="debug" />
 		<param name="File" value="log/ajapaik.log" />
+		<param name="MaxBackupIndex" value="30" />
 		<param name="Append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %p [%t] %l - %m%n" />
@@ -22,6 +23,7 @@
 	<appender name="failed-sets" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="Threshold" value="debug" />
 		<param name="File" value="log/failed-sets.log" />
+		<param name="MaxBackupIndex" value="30" />
 		<param name="Append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%m%n" />
