@@ -1,15 +1,14 @@
 package ee.ajapaik.cache;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import ee.ajapaik.platform.AjapaikClient;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import ee.ajapaik.platform.AjapaikClient;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class Cache<T> implements InitializingBean, DisposableBean {
 	
@@ -45,7 +44,7 @@ public abstract class Cache<T> implements InitializingBean, DisposableBean {
 							listener.notify(data);
 						}
 					} catch (Exception e) {
-						logger.error("Error updating cache", e);
+						logger.error("Error updating cache: " + e.getCause().getMessage());
 					}			
 				}
 			}

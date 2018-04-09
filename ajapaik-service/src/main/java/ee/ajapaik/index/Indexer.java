@@ -308,7 +308,9 @@ public class Indexer implements InitializingBean {
 					totalCount.setValue(totalCount.getValue() != null ? totalCount.getValue() + 1 : 1);
 					
 					if(totalCount.getValue() % 1000 == 0) {
-						logger.debug("Commiting index @ record: " + totalCount);
+						if(totalCount.getValue() % 10000 == 0) {
+							logger.debug("Commiting index @ record: " + totalCount);
+						}
 						try {
 							writer.commit();
 						} catch (Exception e) {
