@@ -2,7 +2,6 @@ package ee.ajapaik.harvester;
 
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
-import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.JaxbUtil;
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.RecordType;
@@ -56,7 +55,6 @@ public class DigarHarvestTask extends HarvestTask {
 		String thumbnailUrl = jaxbUtil.getValue(eseRec, "object");
 		if(thumbnailUrl != null) {
 			rec.setImageUrl(thumbnailUrl);
-			rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
 		}
 		
 		rec.setInstitutionType(InstitutionType.LIBRARY);

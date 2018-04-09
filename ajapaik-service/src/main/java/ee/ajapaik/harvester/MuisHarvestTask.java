@@ -115,13 +115,11 @@ public class MuisHarvestTask extends HarvestTask {
 						cloned.setMediaId(mediaId);
 						cloned.setMediaOrder(i);
 						cloned.setImageUrl(url);
-						cloned.setCachedThumbnailUrl(IOHandler.saveThumbnail(url, repository, taskCode));
 						save(cloned, header.getSetSpec());
 					}
 					return null;
 				} else {
 					rec.setImageUrl(getImageUrl(thumbnailUrl));
-					rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
 				}
 			}
 		} else {

@@ -2,7 +2,6 @@ package ee.ajapaik.harvester;
 
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
-import ee.ajapaik.util.IOHandler;
 import ee.ajapaik.util.JaxbUtil;
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.MetadataType;
@@ -68,7 +67,6 @@ public class MKAHarvestTask extends HarvestTask {
 				rec.setImageUrl(imageUrl);
 
 				String thumbnailUrl = getThumbnailUrl(imageUrl);
-				rec.setCachedThumbnailUrl(IOHandler.saveThumbnail(thumbnailUrl, repository, taskCode));
 			}
 			
 			rec.setInstitutionType(InstitutionType.ARCHIVE);

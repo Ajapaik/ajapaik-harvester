@@ -2,7 +2,6 @@ package ee.ajapaik.harvester;
 
 import ee.ajapaik.model.search.InstitutionType;
 import ee.ajapaik.model.search.Record;
-import ee.ajapaik.util.IOHandler;
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.MetadataType;
 import org.openarchives.oai._2.RecordType;
@@ -62,7 +61,6 @@ public class DSpaceHarvestTask extends HarvestTask {
 						String mediaId = image.split("/")[6];
 						clone.setId(rec.getId() + "_" + mediaId);
 						clone.setImageUrl(image);
-						clone.setCachedThumbnailUrl(IOHandler.saveThumbnail(getThumbnailUrl(images, image), repository, taskCode));
 						clone.setMediaId(Integer.valueOf(mediaId));
 						clone.setMediaOrder(mediaOrder++);
 						save(clone, recordType.getHeader().getSetSpec());
