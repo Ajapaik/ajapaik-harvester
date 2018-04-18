@@ -165,9 +165,6 @@ public class AjapaikServiceImpl implements AjapaikService {
 		else
 			query = new StringBuilder(phrase);
 
-		if(search.isDigital())
-			query.append(" +DIGITAL:true");
-		
 		Result r = indexer.search(query.toString(), search.getSortBy(), search.getMaxResult());
 		
 		List<Document> documents = r.getResult();

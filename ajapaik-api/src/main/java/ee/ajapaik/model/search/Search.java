@@ -20,8 +20,7 @@ public class Search implements Serializable {
 	private List<CollectionType> collectionTypes;
 	private List<InstitutionType> institutionTypes;
 	private String luceneQuery;
-	private boolean digital; // urlToRecord peab olemas olema
-	private SortableField sortBy = SortableField.RELEVANCE; 
+	private SortableField sortBy = SortableField.RELEVANCE;
 	
 	private int maxResult = 10000; // Maximum total results
 	private int pageSize; // Initial result size
@@ -96,14 +95,6 @@ public class Search implements Serializable {
 
 	public void setNumber(SearchField number) {
 		this.number = number;
-	}
-
-	public void setDigital(boolean digital) {
-		this.digital = digital;
-	}
-
-	public boolean isDigital() {
-		return digital;
 	}
 
 	public SortableField getSortBy() {

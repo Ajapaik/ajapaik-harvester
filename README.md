@@ -38,8 +38,7 @@ API content type is ```application/json```
                 "MUSEUM",
                 "LIBRARY"
             ],
-            "pageSize": 200,
-            "digital": true
+            "pageSize": 200
         }
     ],
     "id": 0
@@ -59,7 +58,6 @@ API content type is ```application/json```
 - luceneQuery - ?
 - institutionTypes – Array. Possible values are: null, "MUSEUM", "LIBRARY", "DPSACE"
 - pageSize – limits number of record data. Record Ids list length is always up to 10 000 rows and cannot be limited. If not specified, no record views are returned
-- digital - ?
 
 **Response body:**
 ```

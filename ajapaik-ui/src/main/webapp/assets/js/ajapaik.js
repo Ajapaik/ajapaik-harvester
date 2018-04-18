@@ -275,8 +275,7 @@ function search() {
 		"collectionTypes" :  [getValue("PHOTOS"), getValue("PAINTINGS"), getValue("GRAPHIC_ART"), getValue("PERSONA")],
 		"institutionTypes" : [getValue("MUSEUM"), getValue("LIBRARY"), getValue("ARCHIVE"), getValue("ETERA"), getValue("DSPACE")],
 		
-		"pageSize" : 200,
-		"digital" : true
+		"pageSize" : 200
 	}
 
 	$("#result-view").fadeOut();

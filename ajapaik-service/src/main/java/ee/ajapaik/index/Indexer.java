@@ -155,11 +155,6 @@ public class Indexer implements InitializingBean {
 		addField(doc, SET_SPEC, rec.getSetSpec().get(0), Index.NOT_ANALYZED, Store.YES);
 		addField(doc, DATE_CREATED, DATE_CREATED_FORMAT.format(rec.getDateCreated()), Index.NOT_ANALYZED, Store.YES);
 		
-		if(rec.getCachedThumbnailUrl() == null)
-			addField(doc, DIGITAL, "false");
-		else
-			addField(doc, DIGITAL, "true");
-		
 		// fields for sorting
 		List<String> dates = rec.getDates();
 		if(dates != null && dates.size() > 0) {
@@ -256,14 +251,11 @@ public class Indexer implements InitializingBean {
 		}
 	}
 
-	public TopDocs search(IndexSearcher searcher, Date from, Date until, String set, String digital, String id) {
+	public TopDocs search(IndexSearcher searcher, Date from, Date until, String set, String id) {
 		BooleanQuery booleanQuery = new BooleanQuery();
 		if(id != null)
 			booleanQuery.add(new BooleanClause(new TermQuery(new Term("ID", id)), Occur.MUST));
-		
-		if(digital != null)
-			booleanQuery.add(new BooleanClause(new TermQuery(new Term("DIGITAL", digital)), Occur.MUST));
-		
+
 		if(set != null && set.length() > 0)
 			booleanQuery.add(new BooleanClause(new TermQuery(new Term("SET_SPEC", set)), Occur.MUST));
 		
@@ -297,7 +289,6 @@ public class Indexer implements InitializingBean {
 		logger.info("Initializing database indexing @ " + new Date());
 
 		final Holder<Integer> totalCount = new Holder<Integer>();
-		final Map<String, Integer> digitalCount = new HashMap<String, Integer>();
 
 		repository.iterateAllRecordsForIndexing(new RecordHandler() {
 			
@@ -318,16 +309,6 @@ public class Indexer implements InitializingBean {
 						}
 					}
 					
-					if(rec.getCachedThumbnailUrl() != null) {
-						Integer value = digitalCount.get(code);
-						
-						digitalCount.put(code, (value != null ? value + 1 : 0));
-						
-						if(rec.getCachedThumbnailUrl().equals("d41d8cd98f00b204e9800998ecf8427e")) {
-							logger.warn("Detected no thumbnail data for record: " + rec.getId() + ". Media url: " + rec.getImageUrl());
-						}
-					}
-					
 					try {
 						writer.addDocument(getDocument(rec, code));
 					} catch (Exception e) {
@@ -337,7 +318,7 @@ public class Indexer implements InitializingBean {
 			}
 		});
 
-		logger.debug("Indexing finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms. Metadata count: " + totalCount + ". Media count: " + digitalCount);
+		logger.debug("Indexing finished @ " + new Date() + ", took: " + (System.currentTimeMillis() - start) + " ms. Metadata count: " + totalCount);
 		
 		start = System.currentTimeMillis();
 		

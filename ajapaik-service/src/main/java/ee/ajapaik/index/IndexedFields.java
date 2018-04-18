@@ -11,7 +11,6 @@ public enum IndexedFields {
 	YEAR,
 	WHO,
 	FROM,
-	DIGITAL,
 	INSTITUTION_TYPE,
 	COLLECTION,
 	RECORD_VIEW,
