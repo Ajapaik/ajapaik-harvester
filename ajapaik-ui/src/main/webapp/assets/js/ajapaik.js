@@ -424,9 +424,9 @@ function parseResult(result, scroll) {
 		for (var i = 0; i < result.length; i++) {
 			var record = result[i];
 			
-			tooltipData[record.id] = {"img":(record.imageUrl != "null" ? record.imageUrl : (url + "../ajapaik-service/images/" + record.cachedThumbnailUrl)), "desc":record.description,"title":record.title, "number":record.identifyingNumber};
+			tooltipData[record.id] = {"img": record.imageUrl, "desc":record.description,"title":record.title, "number":record.identifyingNumber};
 			
-			var img = $("<img height='" + self.gridSize + "' src='" + url + "../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
+			var img = $("<img height='" + self.gridSize + "' src='" + record.imageUrl + "'>");
 			
 			img.load(function(e) {
 				loadedImages++;
@@ -583,8 +583,7 @@ function parseSelection() {
 					description.append("<p>" + record.description.replace("<", "").replace(">", "") + "</p>");
 					
 					// Image
-					//{"img":(record.imageUrl != "null" ? record.imageUrl : (url + "../ajapaik-service/images/" + record.cachedThumbnailUrl))
-					var img = $("<img src='" + (record.imageUrl != "null" ? record.imageUrl : (url + "../ajapaik-service/images/" + record.cachedThumbnailUrl)) + "'>");
+					var img = $("<img src='" + record.imageUrl + "'>");
 					
 					img.data(description);
 					
@@ -614,7 +613,7 @@ function parseSelection() {
 					recordContainer = $("<div class='item'></div>");
 					
 					// Image
-					var img = $("<img height='90' src='" + url + "../ajapaik-service/images/" + record.cachedThumbnailUrl + "'>");
+					var img = $("<img height='90' src='" + record.imageUrl + "'>");
 					
 					img.data(description);
 					
