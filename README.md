@@ -1,4 +1,7 @@
-##**Ajapaik.ee public API v1.0 specification**
+# The Ajapaik-harvester (valimimoodul) has been taken down (for now)
+___
+
+## **Ajapaik.ee public API v1.0 specification**
 
 * Web interface: https://valimimoodul.ajapaik.ee/ajapaik-ui/
 * API endpoint: http://valimimoodul.ajapaik.ee/ajapaik-service/AjapaikService.json
